@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    <nav>
+        <header>Dashboard</header>
+        <button onclick="showSection('home')">Trang chủ</button>
+        <button onclick="showSection('subjects')">Danh sách môn học</button>
+        <button onclick="showSection('syllabus')">Danh sách đề cương</button>
+    </nav>
+    <main>
+        <section id="home" class="active">
+            <h1>Trang chủ</h1>
+            <p>Chào mừng đến với trang chủ</p>
+        </section>
+        <section id="subjects">
+            <h1>Danh sách môn học</h1>
+            <div class="action-buttons">
+                <button onclick="showForm()">Thêm môn học</button>
+                <button>Xóa môn học</button>
+            </div>
+            <form id="subject-form" class="subject-form">
+                <label for="subject-name">Tên Môn Học:</label>
+                <input type="text" id="subject-name" name="subject-name" required>
+
+                <label for="subject-code">Mã Môn Học:</label>
+                <input type="text" id="subject-code" name="subject-code" required>
+
+                <label for="subject-description">Mô Tả:</label>
+                <textarea id="subject-description" name="subject-description" rows="4"></textarea>
+
+                <button type="submit">Lưu</button>
+                <button type="button" onclick="hideForm()">Hủy</button>
+            </form>
+        </section>
+        <section id="syllabus">
+            <h1>Danh sách đề cương</h1>
+            <p>danh sách đề cương sẽ ở đây</p>
+        </section>
+    </main>
+</body>
+</html>
