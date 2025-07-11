@@ -3,8 +3,7 @@ from typing import List, Optional
 from sqlalchemy import String, ForeignKey, Table, Column
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.testing.schema import mapped_column
-from manage_syllabus_app import db
-
+from manage_syllabus_app import db, app
 
 # quan hệ nhiều - nhiều giữa đề cương và học liệu
 Syllabus_LearningMaterial = Table("syllabus_learning_material",
@@ -26,6 +25,7 @@ class Syllabus(db.Model):
     __tablename__ = 'syllabus'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), unique=True)
+    main_parts : Mapped[List["MainPart"]] = relationship(back_populates="syllabus")
     # khóa ngoại tham chiếu môn học
     subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id'), nullable=False)
     subject: Mapped["Subject"] = relationship(back_populates="syllabuses")
@@ -40,6 +40,14 @@ class Syllabus(db.Model):
                                                                         back_populates="syllabuses")
 
 
+class MainPart(db.Model):
+    __tablename__ = 'main_part'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True)
+    syllabus_id: Mapped[int] = mapped_column(ForeignKey('syllabus.id'), nullable=False)
+    syllabus: Mapped["Syllabus"] = relationship(back_populates="main_parts")
+
+
 class Subject(db.Model):
     __tablename__ = 'subject'
     id: Mapped[str] = mapped_column(String(10), primary_key=True)
@@ -48,7 +56,7 @@ class Subject(db.Model):
     syllabuses: Mapped[List[Syllabus]] = relationship(back_populates='subject')
     # khóa ngoại tham chiếu tới tín chỉ
     credit_id: Mapped[int] = mapped_column(ForeignKey('credit.id'), nullable=False)
-    credit: Mapped[int] = mapped_column(ForeignKey('credit.id'), nullable=False)
+    credit: Mapped["Credit"] = relationship(back_populates="subjects")
     # quan hệ các môn là yêu cầu cho môn này
     required_by_relation: Mapped[List['RequirementSubject']] = relationship(
         foreign_keys=['RequirementSubject.subject_id'], back_populates="subject",
@@ -80,6 +88,7 @@ class Lecturer(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), unique=True)
     # 1 giảng viên thuộc 1 khoa
+    faculty_id: Mapped[int] = mapped_column(ForeignKey('faculty.id'), nullable=False)
     faculty: Mapped[Faculty] = relationship(back_populates="lecturers")
     # 1 giảng viên phụ trách nhiều đề cương
     syllabuses: Mapped[Optional[List[Syllabus]]] = relationship(back_populates='lecturer')
@@ -158,3 +167,8 @@ class TypeRequirement(db.Model):
 #     property_group = Mapped[PropertyGroup] = relationship(back_populates="property_values")
 #     subjects = Mapped[List["Subject"]] = relationship(secondary=Subject_PropertyValue,
 #                                                       back_populates="property_values")
+
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()

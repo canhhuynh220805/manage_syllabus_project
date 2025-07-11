@@ -21,11 +21,3 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-
-@app.cli.command("init-db")
-def init_db_command():
-    """Tạo các bảng trong database."""
-    with app.app_context():
-        from . import models
-        db.create_all()
-    click.echo("Đã khởi tạo database thành công.")
