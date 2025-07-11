@@ -28,17 +28,25 @@ class Syllabus(db.Model):
     main_parts : Mapped[List["MainPart"]] = relationship(back_populates="syllabus")
     # khóa ngoại tham chiếu môn học
     subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id'), nullable=False)
-    subject: Mapped["Subject"] = relationship(back_populates="syllabuses")
+    subject: Mapped["Subject"] = relationship(back_populates="syllabuses", lazy=False)
     # khóa ngoại tham chiếu khoa quản lí
     faculty_id: Mapped[int] = mapped_column(ForeignKey('faculty.id'), nullable=False)
-    faculty: Mapped["Faculty"] = relationship(back_populates="syllabuses")
+    faculty: Mapped["Faculty"] = relationship(back_populates="syllabuses", lazy=False)
     # khóa ngoai tham chiếu giảng viên phụ trách
     lecturer_id: Mapped[int] = mapped_column(ForeignKey('lecturer.id'), nullable=False)
-    lecturer: Mapped["Lecturer"] = relationship(back_populates="syllabuses")
+    lecturer: Mapped["Lecturer"] = relationship(back_populates="syllabuses",lazy=False)
     # 1 đề cương xây dựng bởi nhiều học liệu
     learning_materials: Mapped[List["LearningMaterial"]] = relationship(secondary=Syllabus_LearningMaterial,
                                                                         back_populates="syllabuses")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'subject': self.subject.to_dict(),  # <-- Gọi hàm to_dict() của subject
+            'lecturer': self.lecturer.to_dict(),
+
+        }
 
 class MainPart(db.Model):
     __tablename__ = 'main_part'
@@ -59,16 +67,22 @@ class Subject(db.Model):
     credit: Mapped["Credit"] = relationship(back_populates="subjects")
     # quan hệ các môn là yêu cầu cho môn này
     required_by_relation: Mapped[List['RequirementSubject']] = relationship(
-        foreign_keys=['RequirementSubject.subject_id'], back_populates="subject",
+        foreign_keys='RequirementSubject.subject_id', back_populates="subject",
         cascade="all, delete-orphan")
     # quan hệ các môn mà môn này là điều kiện cho
     required_relation: Mapped[List['RequirementSubject']] = relationship(
-        foreign_keys=['RequirementSubject.require_subject_id'], back_populates="require_subject",
-        cascade="all, delete-orphan")
+        foreign_keys='RequirementSubject.require_subject_id', cascade="all, delete-orphan",
+        back_populates="require_subject")
     # # 1 môn học có nhều thuộc tính
     # property_values = Mapped[List['PropertyValue']] = relationship(secondary=Subject_PropertyValue,
     #                                                                back_populates="subjects")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'credit': self.credit.to_dict()
+        }
 
 class Faculty(db.Model):
     __tablename__ = 'faculty'
@@ -78,6 +92,12 @@ class Faculty(db.Model):
     syllabuses: Mapped[List[Syllabus]] = relationship(back_populates='faculty')
     # 1 khoa có nhiều giảng viên
     lecturers: Mapped[List["Lecturer"]] = relationship(back_populates='faculty')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'faculty_name': self.name
+        }
 
 
 class Lecturer(db.Model):
@@ -92,6 +112,12 @@ class Lecturer(db.Model):
     faculty: Mapped[Faculty] = relationship(back_populates="lecturers")
     # 1 giảng viên phụ trách nhiều đề cương
     syllabuses: Mapped[Optional[List[Syllabus]]] = relationship(back_populates='lecturer')
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'faculty': self.faculty.to_dict()
+        }
 
 
 class LearningMaterial(db.Model):
@@ -125,6 +151,14 @@ class Credit(db.Model):
 
     def getTotalCredit(self):
         return self.numberTheory + self.numberPractice;
+
+    def to_dict(self):
+        return {
+            'totalCredit': self.getTotalCredit(),
+            'number theory': self.numberTheory,
+            'number practice': self.numberPractice,
+            'hour self study': self.hourSelfStudy
+        }
 
 
 class RequirementSubject(db.Model):
@@ -171,4 +205,5 @@ class TypeRequirement(db.Model):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+        dc = Syllabus.query.get(1)
+        print(dc.to_dict())
