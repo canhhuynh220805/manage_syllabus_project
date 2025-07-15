@@ -1,0 +1,56 @@
+{
+  "syllabuses": [
+    {
+      "id": 1,
+      "name": "Đề cương Lập trình hướng đối tượng - 2025",
+      "subject": {
+        "id": "IT001",
+        "name": "Lập trình hướng đối tượng",
+        "credit": {
+          "totalCredit": 4,
+          "number theory": 3,
+          "number practice": 1,
+          "hour self study": 60
+        }
+      },
+      "lecturer": {
+        "id": 101,
+        "name": "Nguyễn Văn A",
+        "faculty": {
+          "id": 1,
+          "faculty_name": "Khoa Công nghệ thông tin"
+        }
+      },
+      "faculty": {
+        "id": 1,
+        "faculty_name": "Khoa Công nghệ thông tin"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Đề cương Cấu trúc dữ liệu và giải thuật - 2025",
+      "subject": {
+        "id": "CS101",
+        "name": "Cấu trúc dữ liệu và giải thuật",
+        "credit": {
+          "totalCredit": 4,
+          "number theory": 2,
+          "number practice": 2,
+          "hour self study": 80
+        }
+      },
+      "lecturer": {
+        "id": 102,
+        "name": "Trần Thị B",
+        "faculty": {
+          "id": 1,
+          "faculty_name": "Khoa Công nghệ thông tin"
+        }
+      },
+      "faculty": {
+        "id": 1,
+        "faculty_name": "Khoa Công nghệ thông tin"
+      }
+    }
+  ]
+}

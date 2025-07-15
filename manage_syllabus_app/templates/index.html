@@ -1,48 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</head>
-<body>
-    <nav>
-        <header>Dashboard</header>
-        <button onclick="showSection('home')">Trang chủ</button>
-        <button onclick="showSection('subjects')">Danh sách môn học</button>
-        <button onclick="showSection('syllabus')">Danh sách đề cương</button>
-    </nav>
-    <main>
-        <section id="home" class="active">
-            <h1>Trang chủ</h1>
-            <p>Chào mừng đến với trang chủ</p>
-        </section>
-        <section id="subjects">
-            <h1>Danh sách môn học</h1>
-            <div class="action-buttons">
-                <button onclick="showForm()">Thêm môn học</button>
-                <button>Xóa môn học</button>
+{% extends 'base.html' %}
+
+{% block content%}
+<!-- tool bar -->
+<div class="custom-toolbar d-flex align-items-center justify-content-between px-4 py-3">
+    <div class="d-flex align-items-center flex-grow-1">
+        <div class="position-relative me-3" style="max-width: 400px; flex-grow: 1">
+            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+            <input type="text" id="searchInput" class="form-control ps-5" placeholder="Tìm kiếm đề cương...">
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-outline-custom dropdown-toggle" type="button"
+            data-bs-toggle="dropdown">
+                <i class="fas fa-filter me-2"></i>
+                Lọc theo Khoa
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="#">
+                        Công nghệ thông tin
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <a href="#" class="btn btn-custom-primary">
+        <i class="fas fa-plus me-2"></i>
+        Tạo Đề cương mới
+    </a>
+</div>
+
+<!-- table data -->
+<div class="container-fluid px-4 py-3">
+    <div class="card card-custom shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Tên Đề cương</th>
+                            <th>Người phụ trách</th>
+                            <th>Tên môn học</th>
+                            <th>Ngày cập nhật</th>
+                            <th class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for syllabus in syllabuses %}
+                            <tr>
+                                <td>{{ syllabus.name }}</td>
+                                <td>{{ syllabus.lecturer.name }}</td>
+                                <td>{{ syllabus.subject.name }}</td>
+                                <td>???????????</td>
+                                <td>???????????</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <form id="subject-form" class="subject-form">
-                <label for="subject-name">Tên Môn Học:</label>
-                <input type="text" id="subject-name" name="subject-name" required>
-
-                <label for="subject-code">Mã Môn Học:</label>
-                <input type="text" id="subject-code" name="subject-code" required>
-
-                <label for="subject-description">Mô Tả:</label>
-                <textarea id="subject-description" name="subject-description" rows="4"></textarea>
-
-                <button type="submit">Lưu</button>
-                <button type="button" onclick="hideForm()">Hủy</button>
-            </form>
-        </section>
-        <section id="syllabus">
-            <h1>Danh sách đề cương</h1>
-            <p>danh sách đề cương sẽ ở đây</p>
-        </section>
-    </main>
-</body>
-</html>
+        </div>
+    </div>
+</div>
+{% endblock%}
