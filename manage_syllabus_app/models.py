@@ -43,17 +43,24 @@ class Syllabus(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'subject': self.subject.to_dict(),  # <-- Gọi hàm to_dict() của subject
+            'subject': self.subject.to_dict(),
             'lecturer': self.lecturer.to_dict(),
-
+            'main parts': self.main_parts.to_dict(),
         }
 
 class MainPart(db.Model):
     __tablename__ = 'main_part'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True)
+    name: Mapped[str] = mapped_column(String(100))
     syllabus_id: Mapped[int] = mapped_column(ForeignKey('syllabus.id'), nullable=False)
     syllabus: Mapped["Syllabus"] = relationship(back_populates="main_parts")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'syllabus_id': self.syllabus.id
+        }
 
 
 class Subject(db.Model):
@@ -205,5 +212,5 @@ class TypeRequirement(db.Model):
 
 if __name__ == '__main__':
     with app.app_context():
-        dc = Syllabus.query.get(1)
-        print(dc.to_dict())
+        db.create_all()
+        print("tạo thành công")

@@ -2,55 +2,121 @@
   "syllabuses": [
     {
       "id": 1,
-      "name": "Đề cương Lập trình hướng đối tượng - 2025",
+      "name": "Đề cương chi tiết học phần CTDL & GT",
       "subject": {
-        "id": "IT001",
-        "name": "Lập trình hướng đối tượng",
+        "id": "CSE101",
+        "name": "Cấu trúc dữ liệu và giải thuật",
         "credit": {
-          "totalCredit": 4,
           "number theory": 3,
           "number practice": 1,
           "hour self study": 60
-        }
-      },
-      "lecturer": {
-        "id": 101,
-        "name": "Nguyễn Văn A",
-        "faculty": {
-          "id": 1,
-          "faculty_name": "Khoa Công nghệ thông tin"
-        }
+        },
+        "required_subjects": [
+          {
+            "require_subject_id": "PRG101",
+            "require_subject_name": "Nhập môn lập trình",
+            "type_requirement": "Tiên quyết"
+          }
+        ]
       },
       "faculty": {
         "id": 1,
-        "faculty_name": "Khoa Công nghệ thông tin"
-      }
-    },
-    {
-      "id": 2,
-      "name": "Đề cương Cấu trúc dữ liệu và giải thuật - 2025",
-      "subject": {
-        "id": "CS101",
-        "name": "Cấu trúc dữ liệu và giải thuật",
-        "credit": {
-          "totalCredit": 4,
-          "number theory": 2,
-          "number practice": 2,
-          "hour self study": 80
-        }
+        "name": "Khoa Công nghệ thông tin"
       },
       "lecturer": {
-        "id": 102,
+        "id": 201,
         "name": "Trần Thị B",
         "faculty": {
           "id": 1,
           "faculty_name": "Khoa Công nghệ thông tin"
         }
       },
+      "main_parts": [
+        {
+          "id": 1,
+          "name": "Thông tin tổng quát",
+          "syllabus_id": 1
+        },
+        {
+          "id": 2,
+          "name": "Thông tin môn học",
+          "syllabus_id": 1
+        }
+      ],
+      "learning_materials": [
+        {
+          "id": 10,
+          "name": "Cấu trúc Dữ liệu và Giải thuật - Robert Lafore",
+          "type_material": {
+            "id": 1,
+            "name": "Sách giáo trình"
+          }
+        },
+        {
+          "id": 11,
+          "name": "Introduction to Algorithms - CLRS",
+          "type_material": {
+            "id": 2,
+            "name": "Sách tham khảo"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Đề cương chi tiết học phần Cơ sở dữ liệu",
+      "subject": {
+        "id": "DBM201",
+        "name": "Cơ sở dữ liệu",
+        "credit": {
+          "number theory": 2,
+          "number practice": 1,
+          "hour self study": 40
+        },
+        "required_subjects": []
+      },
       "faculty": {
         "id": 1,
-        "faculty_name": "Khoa Công nghệ thông tin"
-      }
+        "name": "Khoa Công nghệ thông tin"
+      },
+      "lecturer": {
+        "id": 202,
+        "name": "Lê Văn C",
+        "faculty": {
+          "id": 1,
+          "faculty_name": "Khoa Công nghệ thông tin"
+        }
+      },
+      "main_parts": [
+        {
+          "id": 4,
+          "name": "Thông tin tổng quát",
+          "syllabus_id": 2
+        },
+        {
+          "id": 5,
+          "name": "Thông tin môn học",
+          "syllabus_id": 2
+        }
+      ],
+      "learning_materials": [
+        {
+          "id": 12,
+          "name": "Fundamentals of Database Systems - Elmasri, Navathe",
+          "type_material": {
+            "id": 1,
+            "name": "Sách giáo trình"
+          }
+        },
+        {
+          "id": 13,
+          "name": "Website W3Schools - SQL Tutorial",
+          "type_material": {
+            "id": 3,
+            "name": "Website"
+          }
+        }
+      ]
     }
   ]
 }

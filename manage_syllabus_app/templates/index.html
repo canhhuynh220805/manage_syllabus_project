@@ -15,15 +15,19 @@
                 Lọc theo Khoa
             </button>
             <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item" href="#">
-                        Công nghệ thông tin
-                    </a>
-                </li>
+                {% for fac in faculty %}
+                    {% if fac %}
+                    <li>
+                        <a class="dropdown-item" href="#">
+                            {{ fac.name }}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
             </ul>
         </div>
     </div>
-    <a href="#" class="btn btn-custom-primary">
+    <a href="{{ url_for('editor') }}" target="_blank" class="btn btn-custom-primary">
         <i class="fas fa-plus me-2"></i>
         Tạo Đề cương mới
     </a>
