@@ -10,66 +10,12 @@
         <h5 class="text-uppercase">Course Specification</h5>
     </div>
 
-    <h3 class="section-title text-uppercase mb-3">I. Thông tin tổng quát / General information</h3>
-    <table class="table table-bordered align-middle info-table">
-        <tbody>
-            <tr>
-                <th scope="row">1. Tên môn học tiếng Việt/Course title in Vietnamese</th>
-                <td>{{ syllabus.subject.name}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Mã môn học/Course code</th>
-                <td>{{ syllabus.subject_id }}</td>
-            </tr>
-            <tr>
-                <th scope="row">2. Tên môn học tiếng Anh</th>
-                <td>{{ syllabus.course_title_en }}</td>
-            </tr>
-            <tr>
-                <th scope="row">3. Phương thức giảng dạy</th>
-                <td>{{ syllabus.mode_of_delivery }}</td>
-            </tr>
-            <tr>
-                <th scope="row">4. Ngôn ngữ giảng dạy</th>
-                <td>{{ syllabus.language }}</td>
-            </tr>
-            <tr>
-                <th scope="row">5. Thuộc thành phần kiến thức/kỹ năng</th>
-                <td>{{ syllabus.knowledge_skills_type }}</td>
-            </tr>
-        </tbody>
-    </table>
+    {% for part in syllabus.main_sections %}
 
-    <h4 class="mt-4"><strong>6. Số tín chỉ / Credits</strong></h4>
-    <table class="table table-bordered credits-table mt-3">
-        <thead>
-            <tr>
-                <th scope="col">Tổng số/Total</th>
-                <th scope="col">Lý thuyết/Theory</th>
-                <th scope="col">Thực hành/Practice</th>
-                <th scope="col">Số giờ tự học/Self-study</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ syllabus.subject.credit.getTotalCredit() }}</td>
-                <td>{{ syllabus.subject.credit.numberTheory }}</td>
-                <td>{{ syllabus.subject.credit.numberPractice }}</td>
-                <td>{{ syllabus.subject.credit.hourSelfStudy }}</td>
-            </tr>
-        </tbody>
-    </table>
-    <h3 class="section-title text-uppercase mb-3">7. Phụ trách môn học / Administration of the course</h3>
-    <table class="table table-bordered align-middle info-table">
-        <tbody>
-            <tr>
-                <th scope="row">a. Khoa/Bộ môn/Faculty/Division</th>
-                <td>{{ syllabus.faculty.name }}</td>
-            </tr>
-            <tr>
-                <th scope="row">b. Giảng viên/Academics</th>
-                <td>{{ syllabus.lecturer.name }}</td>
-            </tr>
+        {# Include động file linh kiện dựa trên 'part.code' #}
+        {% include 'partials/_' + part.code + '.html' %}
+
+    {% endfor %}
     <!--        <tr>-->
     <!--            <th scope="row">c. Địa chỉ email liên hệ/Email</th>-->
     <!--            {# Giả sử bạn sẽ thêm trường 'email' vào model Lecturer #}-->
@@ -80,8 +26,6 @@
     <!--            {# Giả sử bạn sẽ thêm trường 'office_location' vào model Lecturer #}-->
     <!--            <td>{{ syllabus.lecturer.office_location }}</td>-->
     <!--        </tr>-->
-        </tbody>
-    </table>
     <h3 class="section-title text-uppercase mb-3">II. Thông tin về môn học / Course overview</h3>
 
     <h4 class="mb-2">1. Mô tả môn học / Course description</h4>
@@ -120,7 +64,36 @@
         {% endif %}
         </tbody>
     </table>
+    <h3 class="section-title text-uppercase mb-3">Tài liệu tham khảo / Learning Materials</h3>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th scope="col" style="width: 10%;">STT</th>
+                <th scope="col" style="width: 60%;">Tên tài liệu</th>
+                <th scope="col" style="width: 30%;">Loại tài liệu</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for material in syllabus.learning_materials %}
+            <tr>
+                <td class="text-center">{{ loop.index }}</td>
+                <td>{{ material.name }}</td>
+                <td>{{ material.type_material.name }}</td>
+            </tr>
+            {% endfor %}
+            {% if not syllabus.learning_materials %}
+            <tr>
+                <td colspan="3" class="text-center">Chưa có tài liệu tham khảo.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
 
+    <div class="text-center mt-5">
+        <a href="{{ url_for('index') }}" class="btn btn-custom px-4 py-2">&laquo; Quay lại danh sách</a>
+    </div>
+
+</div>
     <div class="text-center mt-5">
         <a href="{{ url_for('index') }}" class="btn btn-custom px-4 py-2">&laquo; Quay lại danh sách</a>
     </div>

@@ -6,7 +6,7 @@ from pathlib import Path
 from manage_syllabus_app import app, db
 from manage_syllabus_app.models import AttributeGroup, AttributeValue, Syllabus, Faculty, Lecturer, Subject, Credit, \
     TypeRequirement, RequirementSubject, TypeLearningMaterial, LearningMaterial, MainSection, SubSection, \
-    TextSubSection, SelectionSubSection
+    TextSubSection, SelectionSubSection, ReferenceSubSection
 
 
 def seed_data():
@@ -162,6 +162,12 @@ def seed_data_2():
                         attribute_group=attribute_group,
                         selected_values=selected_values
                     )
+                elif sub_section_data['type'] == 'reference':
+                    new_sub_section = ReferenceSubSection(
+                        name=sub_section_data['name'],
+                        position=sub_section_data['position'],
+                        reference_code=sub_section_data['reference_code']
+                    )
 
                 if new_sub_section:
                     # Gán SubSection vào MainSection cha
@@ -193,5 +199,5 @@ def seed_data_2():
         print(f"❌ Đã xảy ra lỗi khi commit: {e}")
 if __name__ == "__main__":
     with app.app_context():
-        # seed_data()
+         seed_data()
          seed_data_2()

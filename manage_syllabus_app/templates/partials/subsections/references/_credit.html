@@ -1,0 +1,16 @@
+<tr>
+    {# Sửa lại: Dùng 'item_index' thay vì 'loop.index' #}
+    <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
+    <td>
+        <table class="table table-bordered credits-table mb-0">
+            <tbody>
+                <tr>
+                    <td>Tổng tín chỉ: {{ syllabus.subject.credit.getTotalCredit() }}</td>
+                    <td>Số tín lý thuyết: {{ syllabus.subject.credit.numberTheory }}</td>
+                    <td>Số tín thực hành: {{ syllabus.subject.credit.numberPractice }}</td>
+                    <td>Thời gian tự học: {{ syllabus.subject.credit.hourSelfStudy }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </td>
+</tr>

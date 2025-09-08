@@ -118,6 +118,21 @@ class SelectionSubSection(SubSection):
     }
 
 
+# --- LỚP MỚI: TIỂU MỤC THAM CHIẾU ---
+class ReferenceSubSection(SubSection):
+    """
+    Tiểu mục này không chứa dữ liệu, chỉ chứa một mã để tham chiếu
+    tới một đối tượng dữ liệu phức tạp khác (ví dụ: Credit).
+    """
+    __tablename__ = 'reference_sub_section'
+    id: Mapped[int] = mapped_column(ForeignKey('sub_section.id'), primary_key=True, nullable=False)
+
+    reference_code: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'reference'
+    }
+
 #LỚP NHÓM THUỘC TÍNH
 class AttributeGroup(db.Model):
     __tablename__ = 'attribute_group'

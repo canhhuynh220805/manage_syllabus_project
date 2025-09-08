@@ -1,0 +1,17 @@
+<tr>
+    {# Sửa lại: Dùng 'item_index' thay vì 'loop.index' #}
+    <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
+    <td>
+        <div class="d-flex flex-wrap gap-4">
+            {% for option in sub_item.attribute_group.attribute_values %}
+                <div>
+                    {% if option in sub_item.selected_values %}
+                        <span>&#9745; {{ option.name_value }}</span>
+                    {% else %}
+                        <span>&#9744; {{ option.name_value }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </td>
+</tr>

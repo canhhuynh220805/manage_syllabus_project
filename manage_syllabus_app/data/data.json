@@ -45,6 +45,12 @@
               "type": "selection",
               "attribute_group_id": 1,
               "selected_value_ids": [101]
+            },
+            {
+              "position": 3,
+              "name": "Số tín chỉ / Credits",
+              "type": "reference",
+              "reference_code": "credit"
             }
           ]
         }
@@ -98,6 +104,12 @@
               "name": "Tên môn học tiếng Anh",
               "type": "text",
               "content": "Database Systems"
+            },
+            {
+              "position": 2,
+              "name": "Số tín chỉ / Credits",
+              "type": "reference",
+              "reference_code": "credit"
             }
           ]
         }
@@ -145,6 +157,12 @@
               "name": "Tên môn học tiếng Anh",
               "type": "text",
               "content": "Introduction to Programming"
+            },
+            {
+              "position": 2,
+              "name": "Số tín chỉ / Credits",
+              "type": "reference",
+              "reference_code": "credit"
             }
           ]
         }
