@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content%}
+<div class="container my-5 p-4 p-md-5 content-wrapper shadow-sm rounded">
+
+    <div class="text-center mb-5 syllabus-header">
+        <h6>BỘ GIÁO DỤC VÀ ĐÀO TẠO</h6>
+        <h6>TRƯỜNG ĐẠI HỌC MỞ THÀNH PHỐ HỒ CHÍ MINH</h6>
+        <h2 class="mt-4">ĐỀ CƯƠNG MÔN HỌC</h2>
+        <h5 class="text-uppercase">Course Specification</h5>
+    </div>
+
+    <h3 class="section-title text-uppercase mb-3">I. Thông tin tổng quát / General information</h3>
+    <table class="table table-bordered align-middle info-table">
+        <tbody>
+            <tr>
+                <th scope="row">1. Tên môn học tiếng Việt/Course title in Vietnamese</th>
+                <td>{{ syllabus.subject.name}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Mã môn học/Course code</th>
+                <td>{{ syllabus.subject_id }}</td>
+            </tr>
+            <tr>
+                <th scope="row">2. Tên môn học tiếng Anh</th>
+                <td>{{ syllabus.course_title_en }}</td>
+            </tr>
+            <tr>
+                <th scope="row">3. Phương thức giảng dạy</th>
+                <td>{{ syllabus.mode_of_delivery }}</td>
+            </tr>
+            <tr>
+                <th scope="row">4. Ngôn ngữ giảng dạy</th>
+                <td>{{ syllabus.language }}</td>
+            </tr>
+            <tr>
+                <th scope="row">5. Thuộc thành phần kiến thức/kỹ năng</th>
+                <td>{{ syllabus.knowledge_skills_type }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4 class="mt-4"><strong>6. Số tín chỉ / Credits</strong></h4>
+    <table class="table table-bordered credits-table mt-3">
+        <thead>
+            <tr>
+                <th scope="col">Tổng số/Total</th>
+                <th scope="col">Lý thuyết/Theory</th>
+                <th scope="col">Thực hành/Practice</th>
+                <th scope="col">Số giờ tự học/Self-study</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ syllabus.subject.credit.getTotalCredit() }}</td>
+                <td>{{ syllabus.subject.credit.numberTheory }}</td>
+                <td>{{ syllabus.subject.credit.numberPractice }}</td>
+                <td>{{ syllabus.subject.credit.hourSelfStudy }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3 class="section-title text-uppercase mb-3">7. Phụ trách môn học / Administration of the course</h3>
+    <table class="table table-bordered align-middle info-table">
+        <tbody>
+            <tr>
+                <th scope="row">a. Khoa/Bộ môn/Faculty/Division</th>
+                <td>{{ syllabus.faculty.name }}</td>
+            </tr>
+            <tr>
+                <th scope="row">b. Giảng viên/Academics</th>
+                <td>{{ syllabus.lecturer.name }}</td>
+            </tr>
+    <!--        <tr>-->
+    <!--            <th scope="row">c. Địa chỉ email liên hệ/Email</th>-->
+    <!--            {# Giả sử bạn sẽ thêm trường 'email' vào model Lecturer #}-->
+    <!--            <td>{{ syllabus.lecturer.email }}</td>-->
+    <!--        </tr>-->
+    <!--        <tr>-->
+    <!--            <th scope="row">d. Phòng làm việc/Room</th>-->
+    <!--            {# Giả sử bạn sẽ thêm trường 'office_location' vào model Lecturer #}-->
+    <!--            <td>{{ syllabus.lecturer.office_location }}</td>-->
+    <!--        </tr>-->
+        </tbody>
+    </table>
+    <h3 class="section-title text-uppercase mb-3">II. Thông tin về môn học / Course overview</h3>
+
+    <h4 class="mb-2">1. Mô tả môn học / Course description</h4>
+    {# Giả sử bạn sẽ thêm trường 'description' vào model Subject #}
+    <p style="text-align: justify;">
+        Cập nhật sau
+    </p>
+
+   <h4 class="mt-4 mb-2">2. Môn học điều kiện / Requirements</h4>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th scope="col" style="width: 10%;">STT/No.</th>
+                <th scope="col" style="width: 50%;">Môn học điều kiện/Requirements</th>
+                <th scope="col" style="width: 40%;">Mã môn học/Code</th>
+            </tr>
+        </thead>
+        <tbody>
+            {#
+          Lặp qua 'required_by_relation' để lấy danh sách các môn yêu cầu cho môn này.
+          Đây là danh sách các đối tượng RequirementSubject.
+        #}
+        {% for req_relation in syllabus.subject.required_by_relation %}
+        <tr>
+            <td class="text-center">{{ loop.index }}</td>
+            <td>{{ req_relation.require_subject.name }}/{{ req_relation.type_requirement.name }}</td>
+            <td>{{ req_relation.require_subject.id }}</td>
+        </tr>
+        {% endfor %}
+
+        {# Thêm một dòng thông báo nếu không có môn học điều kiện nào #}
+        {% if not syllabus.subject.required_by_relation %}
+            <tr>
+                <td colspan="4" class="text-center">Không có môn học điều kiện.</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+
+    <div class="text-center mt-5">
+        <a href="{{ url_for('index') }}" class="btn btn-custom px-4 py-2">&laquo; Quay lại danh sách</a>
+    </div>
+</div>
+{% endblock%}

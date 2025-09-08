@@ -6,25 +6,30 @@
     <!-- side bar -->
     <div class="custom-sidebar p-4" style="width: 25%;">
         <h2 class="h5 text-custom-headline mb-4">Cấu trúc đề cương</h2>
-        <div>
+        <div id="sectionsList">
 
         </div>
     </div>
 
     <!-- main editor -->
-    <div class="editor-content editor-content-with-footer flex-grow-1 p-4">
+    <form id="syllabusForm" class="editor-content editor-content-with-footer flex-grow-1 p-4">
         <div class="container-fluid">
             <div class="editor-main p-4">
-                <div>
+                <div id="editorContent">
 
                 </div>
-                <button class="btn btn-outline-custom w-100 py-3 mt-4" style="border-style: dashed;">
+                <button type="button" class="btn btn-outline-custom w-100 py-3 mt-4" style="border-style: dashed;" id="addPartBtn">
                     <i class="fas fa-plus me-2"></i>
                     Thêm phần
                 </button>
             </div>
         </div>
-    </div>
+        <div class="container-fluid d-flex justify-content-end align-items-center">
+            <button id="btnSubmit" type="submit" class="btn btn-custom-primary">
+                Lưu Đề Cương
+            </button>
+        </div>
+    </form>
 </div>
 
 

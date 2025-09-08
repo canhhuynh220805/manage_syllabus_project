@@ -7,9 +7,9 @@
         "id": "CSE101",
         "name": "Cấu trúc dữ liệu và giải thuật",
         "credit": {
-          "number theory": 3,
-          "number practice": 1,
-          "hour self study": 60
+          "number_theory": 3,
+          "number_practice": 1,
+          "hour_self_study": 90
         },
         "required_subjects": [
           {
@@ -25,22 +25,28 @@
       },
       "lecturer": {
         "id": 201,
-        "name": "Trần Thị B",
-        "faculty": {
-          "id": 1,
-          "faculty_name": "Khoa Công nghệ thông tin"
-        }
+        "name": "Trần Thị B"
       },
-      "main_parts": [
+      "main_sections": [
         {
-          "id": 1,
+          "position": 1,
           "name": "Thông tin tổng quát",
-          "syllabus_id": 1
-        },
-        {
-          "id": 2,
-          "name": "Thông tin môn học",
-          "syllabus_id": 1
+          "code": "general_info",
+          "sub_sections": [
+            {
+              "position": 1,
+              "name": "Tên môn học tiếng Anh",
+              "type": "text",
+              "content": "Data Structures and Algorithms"
+            },
+            {
+              "position": 2,
+              "name": "Phương thức giảng dạy",
+              "type": "selection",
+              "attribute_group_id": 1,
+              "selected_value_ids": [101]
+            }
+          ]
         }
       ],
       "learning_materials": [
@@ -50,14 +56,6 @@
           "type_material": {
             "id": 1,
             "name": "Sách giáo trình"
-          }
-        },
-        {
-          "id": 11,
-          "name": "Introduction to Algorithms - CLRS",
-          "type_material": {
-            "id": 2,
-            "name": "Sách tham khảo"
           }
         }
       ]
@@ -69,11 +67,17 @@
         "id": "DBM201",
         "name": "Cơ sở dữ liệu",
         "credit": {
-          "number theory": 2,
-          "number practice": 1,
-          "hour self study": 40
+          "number_theory": 2,
+          "number_practice": 1,
+          "hour_self_study": 60
         },
-        "required_subjects": []
+        "required_subjects": [
+          {
+            "require_subject_id": "PRG101",
+            "require_subject_name": "Nhập môn lập trình",
+            "type_requirement": "Tiên quyết"
+          }
+        ]
       },
       "faculty": {
         "id": 1,
@@ -81,22 +85,21 @@
       },
       "lecturer": {
         "id": 202,
-        "name": "Lê Văn C",
-        "faculty": {
-          "id": 1,
-          "faculty_name": "Khoa Công nghệ thông tin"
-        }
+        "name": "Lê Văn C"
       },
-      "main_parts": [
+      "main_sections": [
         {
-          "id": 4,
+          "position": 1,
           "name": "Thông tin tổng quát",
-          "syllabus_id": 2
-        },
-        {
-          "id": 5,
-          "name": "Thông tin môn học",
-          "syllabus_id": 2
+          "code": "general_info",
+          "sub_sections": [
+            {
+              "position": 1,
+              "name": "Tên môn học tiếng Anh",
+              "type": "text",
+              "content": "Database Systems"
+            }
+          ]
         }
       ],
       "learning_materials": [
@@ -107,13 +110,52 @@
             "id": 1,
             "name": "Sách giáo trình"
           }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Đề cương chi tiết học phần Nhập môn Lập trình",
+      "subject": {
+        "id": "PRG101",
+        "name": "Nhập môn Lập trình",
+        "credit": {
+          "number_theory": 2,
+          "number_practice": 2,
+          "hour_self_study": 90
         },
+        "required_subjects": []
+      },
+      "faculty": {
+        "id": 1,
+        "name": "Khoa Công nghệ thông tin"
+      },
+      "lecturer": {
+        "id": 203,
+        "name": "Nguyễn Văn An"
+      },
+      "main_sections": [
         {
-          "id": 13,
-          "name": "Website W3Schools - SQL Tutorial",
+          "position": 1,
+          "name": "Thông tin tổng quát",
+          "code": "general_info",
+          "sub_sections": [
+            {
+              "position": 1,
+              "name": "Tên môn học tiếng Anh",
+              "type": "text",
+              "content": "Introduction to Programming"
+            }
+          ]
+        }
+      ],
+      "learning_materials": [
+        {
+          "id": 14,
+          "name": "Python Crash Course - Eric Matthes",
           "type_material": {
-            "id": 3,
-            "name": "Website"
+            "id": 1,
+            "name": "Sách giáo trình"
           }
         }
       ]

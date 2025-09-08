@@ -45,7 +45,7 @@
                             <th>Người phụ trách</th>
                             <th>Tên môn học</th>
                             <th>Ngày cập nhật</th>
-                            <th class="text-center">Hành động</th>
+                            <th class="text-center">Chức năng</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -55,7 +55,11 @@
                                 <td>{{ syllabus.lecturer.name }}</td>
                                 <td>{{ syllabus.subject.name }}</td>
                                 <td>???????????</td>
-                                <td>???????????</td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('syllabus_detail', syllabus_id=syllabus.id) }}" class="btn btn-info btn-sm">
+                                        Xem chi tiết 🔎
+                                    </a>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>

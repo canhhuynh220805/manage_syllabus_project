@@ -5,7 +5,7 @@ from manage_syllabus_app import db
 import json, os
 
 from manage_syllabus_app.models import Faculty, Lecturer, Credit, Subject, Syllabus, RequirementSubject, \
-    TypeRequirement, MainPart, LearningMaterial, TypeLearningMaterial
+    TypeRequirement, MainSection, LearningMaterial, TypeLearningMaterial, AttributeGroup
 
 
 @app.route('/')
@@ -19,6 +19,13 @@ def index():
 @app.route('/editor')
 def editor():
     return render_template('editor.html')
+
+@app.route('/de-cuong/<int:syllabus_id>/')
+def syllabus_detail(syllabus_id):
+    syllabus = Syllabus.query.get_or_404(syllabus_id)
+    return render_template('syllabus_detail.html', syllabus=syllabus)
+
+
 @app.cli.command("db-seed")
 def db_seed():
     """Đọc file JSON và lưu dữ liệu vào database."""
@@ -122,7 +129,7 @@ def db_seed():
         # tạo phần đề cương
         main_parts = syllabus_data['main_parts']
         for temp in main_parts:
-            main_part = MainPart(name=temp['name'], syllabus=syllabus)
+            main_part = MainSection(name=temp['name'], syllabus=syllabus)
             db.session.add(main_part)
         learning_materials = syllabus_data['learning_materials']
         for temp in learning_materials:
@@ -149,6 +156,34 @@ def db_seed():
             # --- Liên kết học liệu với đề cương ---
             if lm_obj not in syllabus.learning_materials:
                 syllabus.learning_materials.append(lm_obj)
+
+    # 3. Commit tất cả thay đổi vào database
+    try:
+        db.session.commit()
+        print("✅ Gieo dữ liệu thành công!")
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Đã xảy ra lỗi: {e}")
+
+
+@app.cli.command("db-seed-2")
+def db_seed_2():
+    """Đọc file JSON và lưu dữ liệu vào database."""
+
+    # 1. Đọc file data.json
+    json_path = Path(__file__).parent / 'data' / 'attribute_groups.json'
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    for item in data['attribute_groups']:
+        name_group = item['name_group']
+        group_attribute = db.session.query(AttributeGroup).filter_by(name=name_group).first()
+        if not group_attribute:
+            attribute_values = item['attribute_values']
+
+            group_attribute = Faculty(name_group=name_group,attribute_values=attribute_values)
+            db.session.add(group_attribute)
+            print(f"Đã tạo nhóm thuộc tính: {name_group}")
 
     # 3. Commit tất cả thay đổi vào database
     try:

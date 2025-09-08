@@ -1,0 +1,22 @@
+{
+  "attribute_groups": [
+    {
+      "id": 1,
+      "name_group": "Phương thức giảng dạy",
+      "values": [
+        { "id": 101, "name_value": "Trực tiếp/FTF" },
+        { "id": 102, "name_value": "Trực tuyến/Online" },
+        { "id": 103, "name_value": "Kết hợp/Blended" }
+      ]
+    },
+    {
+      "id": 2,
+      "name_group": "Thành phần kiến thức",
+      "values": [
+        { "id": 201, "name_value": "Kiến thức cơ sở ngành" },
+        { "id": 202, "name_value": "Kiến thức chuyên ngành" },
+        { "id": 203, "name_value": "Kiến thức đại cương" }
+      ]
+    }
+  ]
+}

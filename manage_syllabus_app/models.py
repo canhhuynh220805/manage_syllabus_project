@@ -1,8 +1,8 @@
 from typing import List, Optional
 
-from sqlalchemy import String, ForeignKey, Table, Column
-from sqlalchemy.orm import Mapped, relationship
-from sqlalchemy.testing.schema import mapped_column
+from sqlalchemy import String, ForeignKey, Table, Column, Integer, UniqueConstraint, Text
+from sqlalchemy.orm import Mapped, relationship, mapped_column
+
 from manage_syllabus_app import db, app
 
 # quan hệ nhiều - nhiều giữa đề cương và học liệu
@@ -11,7 +11,11 @@ Syllabus_LearningMaterial = Table("syllabus_learning_material",
                                   Column("syllabus_id", ForeignKey("syllabus.id"), primary_key=True),
                                   Column("learning_material_id", ForeignKey("learning_material.id"), primary_key=True))
 
-
+# quan hệ nhiều - nhiều giữa tiểu mục lựa chọn và giá trị được chọn của đề cương
+SubSection_AttributeValue = Table("subsection_attribute_value",
+                                  db.metadata,
+                                  Column("subsection_id", ForeignKey("sub_section.id"), primary_key=True),
+                                  Column("attribute_value_id", ForeignKey("attribute_value.id"), primary_key=True))
 # quan hệ nhiều nhiều giữa môn học và các thuộc tính, vd 1 môn học có thuộc tính sau: ngôn ngữ giảng dạy là tiếng việt
 # hình thức dạy là onl , thuộc thành phần kiến thức nào, ngược lại ngôn ngữ giảng dạy tiếng việt có thể thuộc nhiều môn học
 
@@ -20,12 +24,16 @@ Syllabus_LearningMaterial = Table("syllabus_learning_material",
 #                               Column("subject_id", ForeignKey("subject.id"), primary_key=True),
 #                               Column("property_value_id", ForeignKey("property_value.id"), primary_key=True))
 
-
+#LỚP ĐỀ CƯƠNG
 class Syllabus(db.Model):
     __tablename__ = 'syllabus'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), unique=True)
-    main_parts : Mapped[List["MainPart"]] = relationship(back_populates="syllabus")
+    main_sections : Mapped[List["MainSection"]] = relationship(
+        back_populates="syllabus",
+        order_by="MainSection.position",
+        cascade="all, delete-orphan",
+    )
     # khóa ngoại tham chiếu môn học
     subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id'), nullable=False)
     subject: Mapped["Subject"] = relationship(back_populates="syllabuses", lazy=False)
@@ -45,24 +53,93 @@ class Syllabus(db.Model):
             'name': self.name,
             'subject': self.subject.to_dict(),
             'lecturer': self.lecturer.to_dict(),
-            'main parts': self.main_parts.to_dict(),
+            'main parts': self.main_sections.to_dict(),
         }
 
-class MainPart(db.Model):
-    __tablename__ = 'main_part'
+
+#LỚP PHẦN CỦA ĐỀ CƯƠNG
+class MainSection(db.Model):
+    __tablename__ = 'main_section'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100))
+    code: Mapped[str] = mapped_column(String(50), nullable=False)
+    position: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     syllabus_id: Mapped[int] = mapped_column(ForeignKey('syllabus.id'), nullable=False)
-    syllabus: Mapped["Syllabus"] = relationship(back_populates="main_parts")
-
+    syllabus: Mapped["Syllabus"] = relationship(back_populates="main_sections")
+    sub_sections: Mapped[List["SubSection"]] = relationship(
+        back_populates="main_section",
+        order_by="SubSection.position",
+        cascade="all, delete-orphan"
+    )
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'syllabus_id': self.syllabus.id
         }
+    __table_args__ = (UniqueConstraint('code', 'syllabus_id', name='uq_code_per_syllabus'), )
+
+#LỚP TIỂU MỤC CHA
+class SubSection(db.Model):
+    __tablename__ = 'sub_section'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    position: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    main_section_id: Mapped[int] = mapped_column(ForeignKey('main_section.id'), nullable=False)
+    main_section: Mapped["MainSection"] = relationship(back_populates="sub_sections")
+    type: Mapped[str] = mapped_column(String(50))
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'sub_section',
+        'polymorphic_on': type
+    }
+#LỚP TIỂU MỤC VĂN BẢN
+class TextSubSection(SubSection):
+    __tablename__ = 'text_sub_section'
+    id: Mapped[int] = mapped_column(ForeignKey('sub_section.id'), primary_key=True, nullable=False)
+    content: Mapped[Optional[str]] = mapped_column(Text)
+    __mapper_args__ = {
+        'polymorphic_identity': 'text'
+    }
+
+#LỚP TIỂU MỤC LỰA CHỌN
+class SelectionSubSection(SubSection):
+    __tablename__ = 'selection_sub_section'
+    id: Mapped[int] = mapped_column(ForeignKey('sub_section.id'), primary_key=True, nullable=False)
+
+    attribute_group_id: Mapped[int] = mapped_column(ForeignKey('attribute_group.id'), nullable=False)
+    attribute_group: Mapped["AttributeGroup"] = relationship(back_populates="selection_sub_sections")
+    selected_values: Mapped[List["AttributeValue"]] = relationship(
+        secondary=SubSection_AttributeValue,
+        back_populates="selection_sub_sections"
+    )
+    __mapper_args__ = {
+        'polymorphic_identity': 'selection'
+    }
 
 
+#LỚP NHÓM THUỘC TÍNH
+class AttributeGroup(db.Model):
+    __tablename__ = 'attribute_group'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name_group: Mapped[str] = mapped_column(String(100), nullable=False)
+    attribute_values: Mapped[List["AttributeValue"]] = relationship(back_populates="attribute_group")
+    selection_sub_sections: Mapped[List["SelectionSubSection"]] = relationship(back_populates="attribute_group")
+
+#LỚP GIÁ TRỊ CỦA NHÓM THUỘC TÍNH
+class AttributeValue(db.Model):
+    __tablename__ = 'attribute_value'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name_value: Mapped[str] = mapped_column(String(50), nullable=False)
+    attribute_group_id: Mapped[int] = mapped_column(ForeignKey('attribute_group.id'), nullable=False)
+    attribute_group: Mapped["AttributeGroup"] = relationship(back_populates="attribute_values")
+
+    selection_sub_sections: Mapped[List["SelectionSubSection"]] = relationship(
+        secondary=SubSection_AttributeValue,
+        back_populates="selected_values"
+    )
+
+#LỚP MÔN HỌC
 class Subject(db.Model):
     __tablename__ = 'subject'
     id: Mapped[str] = mapped_column(String(10), primary_key=True)
@@ -91,6 +168,7 @@ class Subject(db.Model):
             'credit': self.credit.to_dict()
         }
 
+#LỚP KHOA
 class Faculty(db.Model):
     __tablename__ = 'faculty'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -106,7 +184,7 @@ class Faculty(db.Model):
             'faculty_name': self.name
         }
 
-
+#LỚP GIẢNG VIÊN
 class Lecturer(db.Model):
     __tablename__ = 'lecturer'
     # tự cung cấp mã
@@ -126,7 +204,7 @@ class Lecturer(db.Model):
             'faculty': self.faculty.to_dict()
         }
 
-
+#LỚP TÀI LIỆU THAM KHẢO
 class LearningMaterial(db.Model):
     __tablename__ = 'learning_material'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -138,7 +216,7 @@ class LearningMaterial(db.Model):
     syllabuses: Mapped[List[Syllabus]] = relationship(secondary=Syllabus_LearningMaterial,
                                                       back_populates='learning_materials')
 
-
+#LỚP LOẠI TÀI LIỆU THAM KHẢO
 class TypeLearningMaterial(db.Model):
     __tablename__ = 'type_learning_material'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -146,13 +224,13 @@ class TypeLearningMaterial(db.Model):
     # 1 loại học liệu có nhiều học liệu
     learningMaterials: Mapped[Optional[List["LearningMaterial"]]] = relationship(back_populates="type_material")
 
-
+#LỚP TÍN CHỈ
 class Credit(db.Model):
     __tablename__ = 'credit'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    numberTheory: Mapped[int] = mapped_column(nullable=False)
-    numberPractice: Mapped[int] = mapped_column(nullable=False)
-    hourSelfStudy: Mapped[int] = mapped_column(nullable=False)
+    numberTheory: Mapped[int] = mapped_column(Integer, nullable=False)
+    numberPractice: Mapped[int] = mapped_column(Integer, nullable=False)
+    hourSelfStudy: Mapped[int] = mapped_column(Integer, nullable=False)
     # 1 tín chỉ thuộc nhiều môn học , có thể có hoặc ko
     subjects: Mapped[List["Subject"]] = relationship(back_populates="credit")
 
@@ -168,6 +246,7 @@ class Credit(db.Model):
         }
 
 
+#LỚP MÔN HỌC ĐIỀU KIỆN
 class RequirementSubject(db.Model):
     __tablename__ = 'requirement_subject'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -184,6 +263,7 @@ class RequirementSubject(db.Model):
                                                                back_populates="requirement_subjects")
 
 
+#LỚP LOẠI MÔN HỌC ĐIỀU KIỆN
 class TypeRequirement(db.Model):
     __tablename__ = 'requirement_type'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
