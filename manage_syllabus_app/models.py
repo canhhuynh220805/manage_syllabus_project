@@ -1,4 +1,5 @@
 from typing import List, Optional
+from xmlrpc.client import MAXINT
 
 from sqlalchemy import String, ForeignKey, Table, Column, Integer, UniqueConstraint, Text
 from sqlalchemy.orm import Mapped, relationship, mapped_column
@@ -16,14 +17,11 @@ SubSection_AttributeValue = Table("subsection_attribute_value",
                                   db.metadata,
                                   Column("subsection_id", ForeignKey("sub_section.id"), primary_key=True),
                                   Column("attribute_value_id", ForeignKey("attribute_value.id"), primary_key=True))
-# quan hệ nhiều nhiều giữa môn học và các thuộc tính, vd 1 môn học có thuộc tính sau: ngôn ngữ giảng dạy là tiếng việt
-# hình thức dạy là onl , thuộc thành phần kiến thức nào, ngược lại ngôn ngữ giảng dạy tiếng việt có thể thuộc nhiều môn học
 
-# Subject_PropertyValue = Table("subject_property_value",
-#                               db.metadata,
-#                               Column("subject_id", ForeignKey("subject.id"), primary_key=True),
-#                               Column("property_value_id", ForeignKey("property_value.id"), primary_key=True))
-
+CourseObjective_ProgrammeLearningOutcome = Table("course_objective_programme_learning_outcome",
+                                                 db.metadata,
+                                                 Column("course_objective_id", ForeignKey("course_objective.id"), primary_key=True),
+                                                 Column("programme_learning_outcome_id", ForeignKey("programme_learning_outcome.id"), primary_key=True))
 #LỚP ĐỀ CƯƠNG
 class Syllabus(db.Model):
     __tablename__ = 'syllabus'
@@ -269,7 +267,29 @@ class TypeRequirement(db.Model):
     name: Mapped[str] = mapped_column(String(30), unique=True)
     # 1 loại môn học điều kiện có nhiều môn học điều kiện
     requirement_subjects: Mapped[List[RequirementSubject]] = relationship(back_populates="type_requirement")
-
+#LỚP MỤC TIÊU MÔN HỌC
+class CourseObjective(db.Model):
+    __tablename__ = 'course_objective'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    course_learning_outcomes: Mapped[List["CourseLearningOutcome"]] = relationship(back_populates="course_objective")
+    programme_learning_outcomes: Mapped[List["ProgrammeLearningOutcome"]] = relationship(secondary=CourseObjective_ProgrammeLearningOutcome
+                                                                                         ,back_populates="course_objectives")
+#LỚP CHUẨN ĐẦU RA MÔN HỌC
+class CourseLearningOutcome(db.Model):
+    __tablename__ = 'course_learning_outcome'
+    id: Mapped[str] = mapped_column(String(10),primary_key=True)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    course_objective: Mapped[CourseObjective] = relationship(back_populates="course_learning_outcomes")
+    course_objective_id: Mapped[int] = mapped_column(ForeignKey('course_objective.id'))
+#LỚP PLO
+class ProgrammeLearningOutcome(db.Model):
+    __tablename__ = 'programme_learning_outcome'
+    id: Mapped[str] = mapped_column(String(10),primary_key=True)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    course_objectives: Mapped[List[CourseObjective]] = relationship(secondary=CourseObjective_ProgrammeLearningOutcome
+                                                                    ,back_populates="programme_learning_outcomes")
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
