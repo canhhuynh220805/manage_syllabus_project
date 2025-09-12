@@ -1,0 +1,12 @@
+<div class="mb-5">
+    <h3 class="section-title text-uppercase mb-3">{{ part.position }}. {{ part.name }}</h3>
+    <table class="table table-bordered align-middle info-table">
+        <tbody>
+             {% for sub_item in part.sub_sections %}
+                {% with item_index = loop.index %}
+                    {% include 'partials/subsections/_' + sub_item.type + '.html' %}
+                {% endwith %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

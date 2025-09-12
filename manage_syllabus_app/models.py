@@ -78,7 +78,6 @@ class MainSection(db.Model):
             'syllabus_id': self.syllabus.id
         }
     __table_args__ = (UniqueConstraint('code', 'syllabus_id', name='uq_code_per_syllabus'), )
-
 #LỚP TIỂU MỤC CHA
 class SubSection(db.Model):
     __tablename__ = 'sub_section'
@@ -101,7 +100,6 @@ class TextSubSection(SubSection):
     __mapper_args__ = {
         'polymorphic_identity': 'text'
     }
-
 #LỚP TIỂU MỤC LỰA CHỌN
 class SelectionSubSection(SubSection):
     __tablename__ = 'selection_sub_section'
@@ -116,8 +114,6 @@ class SelectionSubSection(SubSection):
     __mapper_args__ = {
         'polymorphic_identity': 'selection'
     }
-
-
 # --- LỚP MỚI: TIỂU MỤC THAM CHIẾU ---
 class ReferenceSubSection(SubSection):
     """
@@ -132,7 +128,6 @@ class ReferenceSubSection(SubSection):
     __mapper_args__ = {
         'polymorphic_identity': 'reference'
     }
-
 #LỚP NHÓM THUỘC TÍNH
 class AttributeGroup(db.Model):
     __tablename__ = 'attribute_group'
@@ -140,7 +135,6 @@ class AttributeGroup(db.Model):
     name_group: Mapped[str] = mapped_column(String(100), nullable=False)
     attribute_values: Mapped[List["AttributeValue"]] = relationship(back_populates="attribute_group")
     selection_sub_sections: Mapped[List["SelectionSubSection"]] = relationship(back_populates="attribute_group")
-
 #LỚP GIÁ TRỊ CỦA NHÓM THUỘC TÍNH
 class AttributeValue(db.Model):
     __tablename__ = 'attribute_value'
@@ -153,7 +147,6 @@ class AttributeValue(db.Model):
         secondary=SubSection_AttributeValue,
         back_populates="selected_values"
     )
-
 #LỚP MÔN HỌC
 class Subject(db.Model):
     __tablename__ = 'subject'
@@ -182,7 +175,6 @@ class Subject(db.Model):
             'name': self.name,
             'credit': self.credit.to_dict()
         }
-
 #LỚP KHOA
 class Faculty(db.Model):
     __tablename__ = 'faculty'
@@ -198,7 +190,6 @@ class Faculty(db.Model):
             'id': self.id,
             'faculty_name': self.name
         }
-
 #LỚP GIẢNG VIÊN
 class Lecturer(db.Model):
     __tablename__ = 'lecturer'
@@ -218,7 +209,6 @@ class Lecturer(db.Model):
             'name': self.name,
             'faculty': self.faculty.to_dict()
         }
-
 #LỚP TÀI LIỆU THAM KHẢO
 class LearningMaterial(db.Model):
     __tablename__ = 'learning_material'
@@ -230,7 +220,6 @@ class LearningMaterial(db.Model):
     # 1 học liệu có thể thuộc nnhiều đề cương
     syllabuses: Mapped[List[Syllabus]] = relationship(secondary=Syllabus_LearningMaterial,
                                                       back_populates='learning_materials')
-
 #LỚP LOẠI TÀI LIỆU THAM KHẢO
 class TypeLearningMaterial(db.Model):
     __tablename__ = 'type_learning_material'
@@ -238,7 +227,6 @@ class TypeLearningMaterial(db.Model):
     name: Mapped[str] = mapped_column(String(100), unique=True)
     # 1 loại học liệu có nhiều học liệu
     learningMaterials: Mapped[Optional[List["LearningMaterial"]]] = relationship(back_populates="type_material")
-
 #LỚP TÍN CHỈ
 class Credit(db.Model):
     __tablename__ = 'credit'
@@ -259,8 +247,6 @@ class Credit(db.Model):
             'number practice': self.numberPractice,
             'hour self study': self.hourSelfStudy
         }
-
-
 #LỚP MÔN HỌC ĐIỀU KIỆN
 class RequirementSubject(db.Model):
     __tablename__ = 'requirement_subject'
@@ -276,8 +262,6 @@ class RequirementSubject(db.Model):
     type_requirement_id: Mapped[int] = mapped_column(ForeignKey("requirement_type.id"), nullable=False)
     type_requirement: Mapped["TypeRequirement"] = relationship(foreign_keys=[type_requirement_id],
                                                                back_populates="requirement_subjects")
-
-
 #LỚP LOẠI MÔN HỌC ĐIỀU KIỆN
 class TypeRequirement(db.Model):
     __tablename__ = 'requirement_type'
@@ -285,25 +269,6 @@ class TypeRequirement(db.Model):
     name: Mapped[str] = mapped_column(String(30), unique=True)
     # 1 loại môn học điều kiện có nhiều môn học điều kiện
     requirement_subjects: Mapped[List[RequirementSubject]] = relationship(back_populates="type_requirement")
-
-# class PropertyGroup(db.Model):
-#     __tablename__ = 'property_group'
-#     id = Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-#     name = Mapped[str] = mapped_column(String(20), nullable=False)
-#     # 1 nhóm thuộc tính có nhiều giá trị thuộc tính cùng loại với nhóm
-#     property_values = Mapped[List["PropertyValue"]] = relationship(back_populates="property_group")
-#
-#
-# class PropertyValue(db.Model):
-#     __tablename__ = 'property_value'
-#     id = Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-#     value = Mapped[str] = mapped_column(String(20), nullable=False)
-#     # 1 giá trị thuộc tính thuộc 1 nhóm thuộc tính
-#     property_group_id = Mapped[int] = mapped_column(ForeignKey("property_group.id"), primary_key=True)
-#     property_group = Mapped[PropertyGroup] = relationship(back_populates="property_values")
-#     subjects = Mapped[List["Subject"]] = relationship(secondary=Subject_PropertyValue,
-#                                                       back_populates="property_values")
-
 
 if __name__ == '__main__':
     with app.app_context():

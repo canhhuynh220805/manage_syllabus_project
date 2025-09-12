@@ -30,12 +30,12 @@
       "main_sections": [
         {
           "position": 1,
-          "name": "Thông tin tổng quát",
+          "name": "Thông tin tổng quát - General Information",
           "code": "general_info",
           "sub_sections": [
             {
               "position": 1,
-              "name": "Tên môn học tiếng Anh",
+              "name": "Tên môn học tiếng Anh/Course title in English",
               "type": "text",
               "content": "Data Structures and Algorithms"
             },
@@ -48,9 +48,54 @@
             },
             {
               "position": 3,
+              "name": "Ngôn ngữ giảng dạy",
+              "type": "selection",
+              "attribute_group_id": 3,
+              "selected_value_ids": [301]
+            },
+            {
+              "position": 4,
+              "name": "Thành phần kiến thức",
+              "type": "selection",
+              "attribute_group_id": 2,
+              "selected_value_ids": [205, 206]
+            },
+            {
+              "position": 5,
               "name": "Số tín chỉ / Credits",
               "type": "reference",
               "reference_code": "credit"
+            },
+            {
+              "position": 6,
+              "name": "Phụ trách môn học/ Administration of the course",
+              "type": "reference",
+              "reference_code": "director"
+            }
+          ]
+        },
+        {
+          "position": 2,
+          "name": "Mô tả môn học",
+          "code": "course_overview",
+          "sub_sections": [
+            {
+              "position": 1,
+              "name": "Mô tả chi tiết",
+              "type": "text",
+              "content": "Môn học trang bị cho sinh viên các kiến thức về cấu trúc dữ liệu cơ bản và các giải thuật phổ biến, làm nền tảng cho các môn học chuyên ngành."
+            },
+            {
+              "position": 2,
+              "name": "Môn học điều kiện/Requirements",
+              "type": "reference",
+              "reference_code": "requirement_subject"
+            },
+            {
+              "position": 3,
+              "name": "Học liệu - Textbook and materials",
+              "type": "reference",
+              "reference_code": "learning_material"
             }
           ]
         }
@@ -62,6 +107,14 @@
           "type_material": {
             "id": 1,
             "name": "Sách giáo trình"
+          }
+        },
+        {
+          "id": 11,
+          "name": "Introduction to Algorithms - CLRS",
+          "type_material": {
+            "id": 2,
+            "name": "Sách tham khảo"
           }
         }
       ]
@@ -96,20 +149,72 @@
       "main_sections": [
         {
           "position": 1,
-          "name": "Thông tin tổng quát",
+          "name": "Thông tin tổng quát - General Information",
           "code": "general_info",
           "sub_sections": [
             {
               "position": 1,
-              "name": "Tên môn học tiếng Anh",
+              "name": "Tên môn học tiếng Anh/Course title in English",
               "type": "text",
               "content": "Database Systems"
             },
             {
               "position": 2,
+              "name": "Phương thức giảng dạy",
+              "type": "selection",
+              "attribute_group_id": 1,
+              "selected_value_ids": [102]
+            },
+            {
+              "position": 3,
+              "name": "Ngôn ngữ giảng dạy",
+              "type": "selection",
+              "attribute_group_id": 3,
+              "selected_value_ids": [301]
+            },
+            {
+              "position": 4,
+              "name": "Thành phần kiến thức",
+              "type": "selection",
+              "attribute_group_id": 2,
+              "selected_value_ids": [201]
+            },
+            {
+              "position": 5,
               "name": "Số tín chỉ / Credits",
               "type": "reference",
               "reference_code": "credit"
+            },
+            {
+              "position": 6,
+              "name": "Phụ trách môn học/ Administration of the course",
+              "type": "reference",
+              "reference_code": "director"
+            }
+          ]
+        },
+        {
+          "position": 2,
+          "name": "Mô tả môn học",
+          "code": "course_overview",
+          "sub_sections": [
+            {
+              "position": 1,
+              "name": "Mô tả chi tiết",
+              "type": "text",
+              "content": "Cung cấp kiến thức nền tảng về hệ cơ sở dữ liệu, mô hình quan hệ, ngôn ngữ truy vấn SQL và các nguyên tắc thiết kế cơ sở dữ liệu."
+            },
+            {
+              "position": 2,
+              "name": "Môn học điều kiện/Requirements",
+              "type": "reference",
+              "reference_code": "requirement_subject"
+            },
+            {
+              "position": 3,
+              "name": "Học liệu - Textbook and materials",
+              "type": "reference",
+              "reference_code": "learning_material"
             }
           ]
         }
@@ -149,20 +254,72 @@
       "main_sections": [
         {
           "position": 1,
-          "name": "Thông tin tổng quát",
+          "name": "Thông tin tổng quát - General Information",
           "code": "general_info",
           "sub_sections": [
             {
               "position": 1,
-              "name": "Tên môn học tiếng Anh",
+              "name": "Tên môn học tiếng Anh/Course title in English",
               "type": "text",
               "content": "Introduction to Programming"
             },
             {
               "position": 2,
+              "name": "Phương thức giảng dạy",
+              "type": "selection",
+              "attribute_group_id": 1,
+              "selected_value_ids": [103]
+            },
+            {
+              "position": 3,
+              "name": "Ngôn ngữ giảng dạy",
+              "type": "selection",
+              "attribute_group_id": 3,
+              "selected_value_ids": [302]
+            },
+            {
+              "position": 4,
+              "name": "Thành phần kiến thức",
+              "type": "selection",
+              "attribute_group_id": 2,
+              "selected_value_ids": [203]
+            },
+            {
+              "position": 5,
               "name": "Số tín chỉ / Credits",
               "type": "reference",
               "reference_code": "credit"
+            },
+            {
+              "position": 6,
+              "name": "Phụ trách môn học/ Administration of the course",
+              "type": "reference",
+              "reference_code": "director"
+            }
+          ]
+        },
+        {
+          "position": 2,
+          "name": "Mô tả môn học",
+          "code": "course_overview",
+          "sub_sections": [
+            {
+              "position": 1,
+              "name": "Mô tả chi tiết",
+              "type": "text",
+              "content": "Môn học cung cấp các khái niệm cơ bản về lập trình, tư duy giải quyết vấn đề và ngôn ngữ lập trình Python."
+            },
+            {
+              "position": 2,
+              "name": "Môn học điều kiện/Requirements",
+              "type": "reference",
+              "reference_code": "requirement_subject"
+            },
+            {
+              "position": 3,
+              "name": "Học liệu - Textbook and materials",
+              "type": "reference",
+              "reference_code": "learning_material"
             }
           ]
         }

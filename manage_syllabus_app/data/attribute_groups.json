@@ -13,9 +13,21 @@
       "id": 2,
       "name_group": "Thành phần kiến thức",
       "values": [
-        { "id": 201, "name_value": "Kiến thức cơ sở ngành" },
-        { "id": 202, "name_value": "Kiến thức chuyên ngành" },
-        { "id": 203, "name_value": "Kiến thức đại cương" }
+        { "id": 201, "name_value": "Giáo dục đại cương/General" },
+        { "id": 202, "name_value": "Kiến thức cơ sở/Foundation" },
+        { "id": 203, "name_value": "Kiến thức ngành/Discipline" },
+        { "id": 204, "name_value": "Kiến thức chuyên ngành/Major"},
+        { "id": 205, "name_value": "Kiến thức bổ trợ/Additional" },
+        { "id": 206, "name_value": "Đồ án /Khóa luận tốt nghiệp/Graduation thesis" }
+      ]
+    },
+    {
+      "id": 3,
+      "name_group": "Ngôn ngữ giảng dạy",
+      "values": [
+        { "id": 301, "name_value": "Tiếng Việt/Vietnamese" },
+        { "id": 302, "name_value": "Tiếng Anh/English" },
+        { "id": 303, "name_value": "Cả hai/Both" }
       ]
     }
   ]

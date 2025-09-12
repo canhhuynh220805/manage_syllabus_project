@@ -1,0 +1,28 @@
+<tr>
+    <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
+    <td>
+        <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th scope="col" style="width: 10%;">STT</th>
+                <th scope="col" style="width: 60%;">Tên tài liệu</th>
+                <th scope="col" style="width: 30%;">Loại tài liệu</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for material in syllabus.learning_materials %}
+            <tr>
+                <td class="text-center">{{ loop.index }}</td>
+                <td>{{ material.name }}</td>
+                <td>{{ material.type_material.name }}</td>
+            </tr>
+            {% endfor %}
+            {% if not syllabus.learning_materials %}
+            <tr>
+                <td colspan="3" class="text-center">Chưa có tài liệu tham khảo.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    </td>
+</tr>

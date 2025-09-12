@@ -1,0 +1,34 @@
+<tr>
+    <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
+    <td>
+        <table class="table table-bordered">
+          <thead class="table-light">
+              <tr>
+                  <th scope="col" style="width: 10%;">STT/No.</th>
+                  <th scope="col" style="width: 50%;">Môn học điều kiện/Requirements</th>
+                  <th scope="col" style="width: 40%;">Mã môn học/Code</th>
+              </tr>
+          </thead>
+          <tbody>
+              {#
+            Lặp qua 'required_by_relation' để lấy danh sách các môn yêu cầu cho môn này.
+            Đây là danh sách các đối tượng RequirementSubject.
+          #}
+          {% for req_relation in syllabus.subject.required_by_relation %}
+          <tr>
+              <td class="text-center">{{ loop.index }}</td>
+              <td>{{ req_relation.require_subject.name }}/{{ req_relation.type_requirement.name }}</td>
+              <td>{{ req_relation.require_subject.id }}</td>
+          </tr>
+          {% endfor %}
+
+          {# Thêm một dòng thông báo nếu không có môn học điều kiện nào #}
+          {% if not syllabus.subject.required_by_relation %}
+              <tr>
+                  <td colspan="4" class="text-center">Không có môn học điều kiện.</td>
+              </tr>
+          {% endif %}
+          </tbody>
+      </table>
+    </td>
+</tr>
