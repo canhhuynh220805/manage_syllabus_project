@@ -1,0 +1,79 @@
+<tr>
+    <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
+    <td>
+        <table class="table table-bordered">
+          <thead class="table-light">
+              <tr>
+                  <th scope="col" style="width: 20%;" class="text-center align-middle">Mục tiêu môn học/Course Objectives</th>
+                  <th scope="col" style="width: 20%;" class="text-center align-middle">CĐR môn học - CLO</th>
+                  <th scope="col" style="width: 60%;" class="text-center align-middle">Mô tả CĐR - description</th>
+              </tr>
+                {% set ns = namespace(cnt=1) %}
+                {% for co in syllabus.subject.course_objectives %}
+                <tr>
+                    {% set clo_count = co.course_learning_outcomes|length %}
+                    <td class="text-center align-middle" rowspan="{{ clo_count }}">
+                        {{ co.name }}
+                    </td>
+                    {% for clo in co.course_learning_outcomes %}
+                        <td class="text-center align-middle">
+                            {{ ns.cnt }}
+                        </td>
+                        {% set ns.cnt = ns.cnt + 1 %}
+                        <td class="text-center align-middle">
+                            {{clo.content}}
+                        </td>
+                    </tr>
+                    <tr>
+                    {% endfor %}
+                    {% endfor %}
+          </thead>
+      </table>
+        <h6 class="mt-4 text-center">Ma trận tích hợp giữa chuẩn đầu ra của môn học và chuẩn đầu ra của chương trình đào tạo</h6>
+        {% set unique_plos = [] %}
+        {% for co in syllabus.subject.course_objectives %}
+            {% for plo in co.programme_learning_outcomes %}
+                {% if plo not in unique_plos %}
+                    {% do unique_plos.append(plo) %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        <table border="1" class="table table-bordered text-center align-middle">
+            <thead>
+                <tr>
+                    <td>CLOs</td>
+                    {% for plo in unique_plos %}
+                        <td>{{plo.id}}</td>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% set ns = namespace(cnt=1) %}
+                {% for co in syllabus.subject.course_objectives %}
+                    {% for clo in co.course_learning_outcomes %}
+                        <tr>
+                            <td>{{ ns.cnt }}</td>
+                            {% set ns.cnt = ns.cnt + 1 %}
+                            {% for plo in unique_plos %}
+                                <td>
+                                    {% set found_rating = none %}
+                                    {% for assoc in clo.plo_associations %}
+                                        {% if assoc.plo is defined and assoc.plo.id == plo.id %}
+                                            {% set found_rating = assoc.rating %}
+                                            {% break %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if found_rating is not none %}
+                                        {{ found_rating }}
+                                    {% else %}
+                                        &nbsp;
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </td>
+</tr>

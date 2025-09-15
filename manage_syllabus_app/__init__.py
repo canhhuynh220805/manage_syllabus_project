@@ -18,7 +18,7 @@ db_uri = f"mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}?charset=utf8m
 
 app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+app.jinja_env.add_extension('jinja2.ext.do')
 db = SQLAlchemy(app)
 
 

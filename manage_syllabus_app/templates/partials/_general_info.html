@@ -14,11 +14,6 @@
             </tr>
 
             {% for sub_item in part.sub_sections %}
-                {#
-                  SỬA LẠI THEO CÁCH NÀY:
-                  1. Dùng {% with %} để tạo biến tạm 'item_index'.
-                  2. Bên trong khối này, gọi {% include %} như bình thường.
-                #}
                 {% with item_index = loop.index + 1 %}
                     {% include 'partials/subsections/_' + sub_item.type + '.html' %}
                 {% endwith %}

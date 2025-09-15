@@ -6,7 +6,8 @@ from pathlib import Path
 from manage_syllabus_app import app, db
 from manage_syllabus_app.models import AttributeGroup, AttributeValue, Syllabus, Faculty, Lecturer, Subject, Credit, \
     TypeRequirement, RequirementSubject, TypeLearningMaterial, LearningMaterial, MainSection, SubSection, \
-    TextSubSection, SelectionSubSection, ReferenceSubSection
+    TextSubSection, SelectionSubSection, ReferenceSubSection, ProgrammeLearningOutcome, CourseLearningOutcome, \
+    CourseObjective, CloPloAssociation
 
 
 def seed_data():
@@ -44,9 +45,30 @@ def seed_data():
         db.session.rollback()
         print(f"❌ Đã xảy ra lỗi: {e}")
 
-
-
 def seed_data_2():
+    """Hàm chứa logic đọc file JSON và lưu vào database."""
+    json_path = Path(__file__).parent / 'data' / 'plo.json'
+
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    cnt = 0;
+    print("Bắt đầu gieo dữ liệu...")
+    for item in data['programme_learning_outcomes']:
+        id_plo = item['id']
+        description = item['description']
+
+        plo = ProgrammeLearningOutcome(id=id_plo, description=description)
+        db.session.add(plo)
+        cnt += 1
+    try:
+        db.session.commit()
+        print(f"✅ Gieo dữ liệu thành công!  {cnt}")
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Đã xảy ra lỗi: {e}")
+
+
+def seed_data_3():
     json_path = Path(__file__).parent / 'data' / 'data.json'
     with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -173,6 +195,36 @@ def seed_data_2():
                     # Gán SubSection vào MainSection cha
                     new_section.sub_sections.append(new_sub_section)
                     db.session.add(new_sub_section)
+        # --- Course Objective
+        for co in item.get('course_objectives', []):
+            name_co = co['name']
+            description_co = co['description']
+            new_co = CourseObjective(name=name_co, content=description_co, subject=subject)
+
+            for plo_id in co["plos"]:
+                plo = db.session.query(ProgrammeLearningOutcome).filter_by(id=plo_id).first()
+                new_co.programme_learning_outcomes.append(plo)
+
+            for clo_data in co["clos"]:
+                new_clo = CourseLearningOutcome(content=clo_data['description'], course_objective=new_co)
+                new_co.course_learning_outcomes.append(new_clo)
+                db.session.add(new_clo)
+
+                for rating in clo_data.get('ratings', []):
+                    plo_id = rating['plo_id']
+                    level = rating['level']
+
+                    plo_obj = db.session.query(ProgrammeLearningOutcome).filter_by(id=plo_id).first()
+                    if plo_obj:
+                        association = CloPloAssociation(
+                            clo=new_clo,
+                            plo=plo_obj,
+                            rating=level
+                        )
+                        db.session.add(association)
+
+            db.session.add(new_co)
+
 
         # --- Learning Materials ---
         for lm_data in item.get('learning_materials', []):
@@ -199,5 +251,6 @@ def seed_data_2():
         print(f"❌ Đã xảy ra lỗi khi commit: {e}")
 if __name__ == "__main__":
     with app.app_context():
-         seed_data()
-         seed_data_2()
+         # seed_data()
+         # seed_data_2()
+         seed_data_3()

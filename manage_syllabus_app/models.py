@@ -163,9 +163,7 @@ class Subject(db.Model):
     required_relation: Mapped[List['RequirementSubject']] = relationship(
         foreign_keys='RequirementSubject.require_subject_id', cascade="all, delete-orphan",
         back_populates="require_subject")
-    # # 1 môn học có nhều thuộc tính
-    # property_values = Mapped[List['PropertyValue']] = relationship(secondary=Subject_PropertyValue,
-    #                                                                back_populates="subjects")
+    course_objectives: Mapped[List["CourseObjective"]] = relationship(back_populates="subject")
 
     def to_dict(self):
         return {
@@ -267,22 +265,27 @@ class TypeRequirement(db.Model):
     name: Mapped[str] = mapped_column(String(30), unique=True)
     # 1 loại môn học điều kiện có nhiều môn học điều kiện
     requirement_subjects: Mapped[List[RequirementSubject]] = relationship(back_populates="type_requirement")
+
 #LỚP MỤC TIÊU MÔN HỌC
 class CourseObjective(db.Model):
     __tablename__ = 'course_objective'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True)
+    name: Mapped[str] = mapped_column(String(100))
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id'), primary_key=True)
+    subject: Mapped[Subject] = relationship(back_populates="course_objectives")
     course_learning_outcomes: Mapped[List["CourseLearningOutcome"]] = relationship(back_populates="course_objective")
     programme_learning_outcomes: Mapped[List["ProgrammeLearningOutcome"]] = relationship(secondary=CourseObjective_ProgrammeLearningOutcome
                                                                                          ,back_populates="course_objectives")
 #LỚP CHUẨN ĐẦU RA MÔN HỌC
 class CourseLearningOutcome(db.Model):
     __tablename__ = 'course_learning_outcome'
-    id: Mapped[str] = mapped_column(String(10),primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     course_objective: Mapped[CourseObjective] = relationship(back_populates="course_learning_outcomes")
     course_objective_id: Mapped[int] = mapped_column(ForeignKey('course_objective.id'))
+
+    plo_associations : Mapped[List["CloPloAssociation"]] = relationship(back_populates="clo")
 #LỚP PLO
 class ProgrammeLearningOutcome(db.Model):
     __tablename__ = 'programme_learning_outcome'
@@ -290,6 +293,19 @@ class ProgrammeLearningOutcome(db.Model):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     course_objectives: Mapped[List[CourseObjective]] = relationship(secondary=CourseObjective_ProgrammeLearningOutcome
                                                                     ,back_populates="programme_learning_outcomes")
+
+    clo_associations: Mapped[List["CloPloAssociation"]] = relationship(back_populates="plo")
+
+#LỚP QUAN HỆ NHIỀU NHIỀU GIỮA CLO VÀ PLO (CÓ ĐIỂM RATING)
+class CloPloAssociation(db.Model):
+    __tablename__ = 'clo_plo_association'
+    clo_id: Mapped[int] = mapped_column(ForeignKey('course_learning_outcome.id'), primary_key=True)
+    plo_id: Mapped[str] = mapped_column(ForeignKey('programme_learning_outcome.id'), primary_key=True)
+    rating: Mapped[int] = mapped_column(nullable=False)
+
+    clo: Mapped[List[CourseLearningOutcome]] = relationship(back_populates="plo_associations")
+    plo: Mapped[List[ProgrammeLearningOutcome]] = relationship(back_populates="clo_associations")
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

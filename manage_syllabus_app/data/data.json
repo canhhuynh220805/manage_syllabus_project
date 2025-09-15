@@ -99,6 +99,12 @@
             },
             {
               "position": 4,
+              "name": "Chuẩn đầu ra môn học - Course Learning Outcomes",
+              "type": "reference",
+              "reference_code": "course_learning_outcomes"
+            }
+            ,{
+              "position": 5,
               "name": "Học liệu - Textbook and materials",
               "type": "reference",
               "reference_code": "learning_material"
@@ -108,28 +114,48 @@
       ],
       "course_objectives": [
         {
-          "id": "CO1",
+          "name": "CO1",
           "description": "Hiểu và trình bày được các cấu trúc dữ liệu cơ bản như danh sách liên kết, ngăn xếp, hàng đợi, cây và đồ thị.",
           "plos": ["PLO.2", "PLO.3"],
           "clos": [
-            { "id": "1", "description": "Trình bày được khái niệm và cách hoạt động của các cấu trúc dữ liệu tuyến tính." },
-            { "id": "2", "description": "Trình bày được khái niệm và cách hoạt động của các cấu trúc dữ liệu phi tuyến." }
+            {
+              "description": "Trình bày được khái niệm và cách hoạt động của các cấu trúc dữ liệu tuyến tính.",
+              "ratings": [
+                { "plo_id": "PLO.2", "level": 4 }
+              ]
+            },
+            {
+              "description": "Trình bày được khái niệm và cách hoạt động của các cấu trúc dữ liệu phi tuyến.",
+              "ratings": [
+                { "plo_id": "PLO.3", "level": 4 }
+              ]
+            }
           ]
         },
         {
-          "id": "CO2",
+          "name": "CO2",
           "description": "Phân tích và đánh giá được độ phức tạp của các giải thuật sắp xếp, tìm kiếm và duyệt đồ thị.",
           "plos": ["PLO.9"],
           "clos": [
-            { "id": "3", "description": "Vận dụng được các giải thuật sắp xếp và tìm kiếm trên các cấu trúc dữ liệu khác nhau." }
+            {
+              "description": "Vận dụng được các giải thuật sắp xếp và tìm kiếm trên các cấu trúc dữ liệu khác nhau.",
+              "ratings": [
+                { "plo_id": "PLO.9", "level": 4 }
+              ]
+            }
           ]
         },
         {
-          "id": "CO3",
+          "name": "CO3",
           "description": "Vận dụng kiến thức đã học để giải quyết các bài toán thực tế bằng cách lựa chọn cấu trúc dữ liệu và giải thuật phù hợp.",
           "plos": ["PLO.10"],
           "clos": [
-            { "id": "4", "description": "Có khả năng hiện thực các cấu trúc dữ liệu và giải thuật bằng một ngôn ngữ lập trình cụ thể." }
+            {
+              "description": "Có khả năng hiện thực các cấu trúc dữ liệu và giải thuật bằng một ngôn ngữ lập trình cụ thể.",
+              "ratings": [
+                { "plo_id": "PLO.10", "level": 5 }
+              ]
+            }
           ]
         }
       ],
@@ -251,6 +277,12 @@
             },
             {
               "position": 4,
+              "name": "Chuẩn đầu ra môn học - Course Learning Outcomes",
+              "type": "reference",
+              "reference_code": "course_learning_outcomes"
+            }
+            ,{
+              "position": 5,
               "name": "Học liệu - Textbook and materials",
               "type": "reference",
               "reference_code": "learning_material"
@@ -258,30 +290,50 @@
           ]
         }
       ],
-      "course_objectives": [
+     "course_objectives": [
         {
-          "id": "CO1",
+          "name": "CO1",
           "description": "Hiểu rõ các khái niệm về cơ sở dữ liệu quan hệ và mô hình thực thể kết hợp (ERD).",
           "plos": ["PLO.2"],
           "clos": [
-            { "id": "1", "description": "Thiết kế được mô hình ERD cho một bài toán quản lý thực tế." }
+            {
+              "description": "Thiết kế được mô hình ERD cho một bài toán quản lý thực tế.",
+              "ratings": [
+                { "plo_id": "PLO.2", "level": 4 }
+              ]
+            }
           ]
         },
         {
-          "id": "CO2",
+          "name": "CO2",
           "description": "Sử dụng thành thạo ngôn ngữ truy vấn có cấu trúc (SQL) để truy vấn và thao tác dữ liệu.",
           "plos": ["PLO.9"],
           "clos": [
-            { "id": "2", "description": "Viết được các câu lệnh SQL phức tạp bao gồm JOIN, subquery và các hàm tổng hợp." },
-            { "id": "3", "description": "Thực hiện được các thao tác thêm, xóa, sửa dữ liệu." }
+            {
+              "description": "Viết được các câu lệnh SQL phức tạp bao gồm JOIN, subquery và các hàm tổng hợp.",
+              "ratings": [
+                { "plo_id": "PLO.9", "level": 5 }
+              ]
+            },
+            {
+              "description": "Thực hiện được các thao tác thêm, xóa, sửa dữ liệu.",
+              "ratings": [
+                { "plo_id": "PLO.9", "level": 4 }
+              ]
+            }
           ]
         },
         {
-          "id": "CO3",
+          "name": "CO3",
           "description": "Nắm vững các nguyên tắc về chuẩn hóa cơ sở dữ liệu và quản lý giao dịch.",
           "plos": ["PLO.3"],
           "clos": [
-            { "id": "4", "description": "Áp dụng được các dạng chuẩn (1NF, 2NF, 3NF) để tối ưu hóa thiết kế CSDL." }
+            {
+              "description": "Áp dụng được các dạng chuẩn (1NF, 2NF, 3NF) để tối ưu hóa thiết kế CSDL.",
+              "ratings": [
+                { "plo_id": "PLO.3", "level": 4 }
+              ]
+            }
           ]
         }
       ]
@@ -389,6 +441,12 @@
             },
             {
               "position": 4,
+              "name": "Chuẩn đầu ra môn học - Course Learning Outcomes",
+              "type": "reference",
+              "reference_code": "course_learning_outcomes"
+            }
+            ,{
+              "position": 5,
               "name": "Học liệu - Textbook and materials",
               "type": "reference",
               "reference_code": "learning_material"
@@ -398,28 +456,49 @@
       ],
       "course_objectives": [
         {
-          "id": "CO1",
+          "name": "CO1",
           "description": "Hiểu và sử dụng được các cấu trúc lập trình cơ bản: biến, kiểu dữ liệu, toán tử, cấu trúc điều kiện và vòng lặp.",
           "plos": ["PLO.1", "PLO.2"],
           "clos": [
-            { "id": "1", "description": "Viết được các chương trình đơn giản sử dụng các cấu trúc điều khiển." }
+            {
+              "description": "Viết được các chương trình đơn giản sử dụng các cấu trúc điều khiển.",
+              "ratings": [
+                { "plo_id": "PLO.1", "level": 4 },
+                { "plo_id": "PLO.2", "level": 4 }
+              ]
+            }
           ]
         },
         {
-          "id": "CO2",
+          "name": "CO2",
           "description": "Làm việc được với các cấu trúc dữ liệu cơ bản như danh sách, chuỗi và sử dụng hàm để cấu trúc hóa chương trình.",
           "plos": ["PLO.9"],
           "clos": [
-            { "id": "2", "description": "Xây dựng và sử dụng được các hàm tự định nghĩa để giải quyết các bài toán nhỏ." },
-            { "id": "3", "description": "Thao tác được trên các kiểu dữ liệu có cấu trúc như list, tuple, dictionary." }
+            {
+              "description": "Xây dựng và sử dụng được các hàm tự định nghĩa để giải quyết các bài toán nhỏ.",
+              "ratings": [
+                { "plo_id": "PLO.9", "level": 4 }
+              ]
+            },
+            {
+              "description": "Thao tác được trên các kiểu dữ liệu có cấu trúc như list, tuple, dictionary.",
+              "ratings": [
+                { "plo_id": "PLO.9", "level": 5 }
+              ]
+            }
           ]
         },
         {
-          "id": "CO3",
+          "name": "CO3",
           "description": "Phát triển tư duy logic và kỹ năng giải quyết vấn đề thông qua việc phân tích và hiện thực các thuật toán đơn giản.",
           "plos": ["PLO.8"],
           "clos": [
-            { "id": "4", "description": "Áp dụng được phương pháp đệ quy để giải quyết các bài toán phù hợp." }
+            {
+              "description": "Áp dụng được phương pháp đệ quy để giải quyết các bài toán phù hợp.",
+              "ratings": [
+                { "plo_id": "PLO.8", "level": 4 }
+              ]
+            }
           ]
         }
       ]
