@@ -285,7 +285,7 @@ class CourseLearningOutcome(db.Model):
     course_objective: Mapped[CourseObjective] = relationship(back_populates="course_learning_outcomes")
     course_objective_id: Mapped[int] = mapped_column(ForeignKey('course_objective.id'))
 
-    plo_associations : Mapped[List["CloPloAssociation"]] = relationship(back_populates="clo")
+    plo_association : Mapped[List["CloPloAssociation"]] = relationship(back_populates="clo")
 #LỚP PLO
 class ProgrammeLearningOutcome(db.Model):
     __tablename__ = 'programme_learning_outcome'
@@ -294,7 +294,7 @@ class ProgrammeLearningOutcome(db.Model):
     course_objectives: Mapped[List[CourseObjective]] = relationship(secondary=CourseObjective_ProgrammeLearningOutcome
                                                                     ,back_populates="programme_learning_outcomes")
 
-    clo_associations: Mapped[List["CloPloAssociation"]] = relationship(back_populates="plo")
+    clo_association: Mapped[List["CloPloAssociation"]] = relationship(back_populates="plo")
 
 #LỚP QUAN HỆ NHIỀU NHIỀU GIỮA CLO VÀ PLO (CÓ ĐIỂM RATING)
 class CloPloAssociation(db.Model):
@@ -303,8 +303,8 @@ class CloPloAssociation(db.Model):
     plo_id: Mapped[str] = mapped_column(ForeignKey('programme_learning_outcome.id'), primary_key=True)
     rating: Mapped[int] = mapped_column(nullable=False)
 
-    clo: Mapped[List[CourseLearningOutcome]] = relationship(back_populates="plo_associations")
-    plo: Mapped[List[ProgrammeLearningOutcome]] = relationship(back_populates="clo_associations")
+    clo: Mapped[CourseLearningOutcome] = relationship(back_populates="plo_association")
+    plo: Mapped[ProgrammeLearningOutcome] = relationship(back_populates="clo_association")
 
 if __name__ == '__main__':
     with app.app_context():

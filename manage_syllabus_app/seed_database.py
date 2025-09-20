@@ -251,6 +251,6 @@ def seed_data_3():
         print(f"❌ Đã xảy ra lỗi khi commit: {e}")
 if __name__ == "__main__":
     with app.app_context():
-         # seed_data()
-         # seed_data_2()
+         seed_data()
+         seed_data_2()
          seed_data_3()

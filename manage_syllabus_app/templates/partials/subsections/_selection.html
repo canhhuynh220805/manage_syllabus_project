@@ -2,15 +2,32 @@
     {# Sửa lại: Dùng 'item_index' thay vì 'loop.index' #}
     <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
+        <div class="dropdown">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                Chọn
+            </button>
+            <ul class="dropdown-menu">
+                {% for option in sub_item.attribute_group.attribute_values %}
+            <div>
+                {% if option in sub_item.selected_values %}
+                <li><a class="dropdown-item" href="#">{{ option.name_value }}</a></li>
+                {% else %}
+               <li><a class="dropdown-item" href="#">{{ option.name_value }}</a></li>
+                {% endif %}
+            </div>
+            {% endfor %}
+                <li><a class="dropdown-item" href="#">Link 1</a></li>
+            </ul>
+        </div>
         <div class="d-flex flex-wrap gap-4">
             {% for option in sub_item.attribute_group.attribute_values %}
-                <div>
-                    {% if option in sub_item.selected_values %}
-                        <span>&#9745; {{ option.name_value }}</span>
-                    {% else %}
-                        <span>&#9744; {{ option.name_value }}</span>
-                    {% endif %}
-                </div>
+            <div>
+                {% if option in sub_item.selected_values %}
+                <span>&#9745; {{ option.name_value }}</span>
+                {% else %}
+                <span>&#9744; {{ option.name_value }}</span>
+                {% endif %}
+            </div>
             {% endfor %}
         </div>
     </td>
