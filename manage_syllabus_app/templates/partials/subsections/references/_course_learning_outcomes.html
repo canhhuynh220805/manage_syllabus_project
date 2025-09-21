@@ -1,3 +1,4 @@
+{% from 'partials/_macros.html' import editable_field %}
 <tr>
     <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
@@ -9,26 +10,6 @@
                   <th scope="col" style="width: 60%;" class="text-center align-middle">Mô tả CĐR - description</th>
               </tr>
           </thead>
-<!--            <tbody>-->
-<!--                {% set ns = namespace(cnt=1) %}-->
-<!--                    {% for co in syllabus.subject.course_objectives %}-->
-<!--                    <tr>-->
-<!--                    {% set clo_count = co.course_learning_outcomes|length %}-->
-<!--                        <td class="text-center align-middle" rowspan="{{ clo_count }}">-->
-<!--                            {{ co.name }}-->
-<!--                        </td>-->
-<!--                        {% for clo in co.course_learning_outcomes %}-->
-<!--                        <td class="text-center align-middle">-->
-<!--                            {{ ns.cnt }}-->
-<!--                        </td>-->
-<!--                        {% set ns.cnt = ns.cnt + 1 %}-->
-<!--                        <td class="text-center align-middle">-->
-<!--                            {{clo.content}}-->
-<!--                        </td>-->
-<!--                    <tr>-->
-<!--                        {% endfor %}-->
-<!--                    {% endfor %}-->
-<!--            </tbody>-->
                     <tbody>
                         {% set ns = namespace(cnt=1) %}
                         {% for co in syllabus.subject.course_objectives %}
@@ -39,7 +20,9 @@
                                         <td class="text-center align-middle" rowspan="{{ clo_count }}">{{ co.name }}</td>
                                     {% endif %}
                                     <td class="text-center align-middle">{{ ns.cnt }}</td>
-                                    <td class="align-middle">{{ clo.content }}</td>
+                                    <td class="align-middle editable-cell" onclick="activateEditMode(this)">
+                                        {{editable_field(clo, 'content','CourseLearningOutcome', syllabus, input_type='textarea')}}
+                                    </td>
                                 </tr>
                                 {% set ns.cnt = ns.cnt + 1 %}
                             {% endfor %}

@@ -20,27 +20,31 @@ SubSection_AttributeValue = Table("subsection_attribute_value",
 
 CourseObjective_ProgrammeLearningOutcome = Table("course_objective_programme_learning_outcome",
                                                  db.metadata,
-                                                 Column("course_objective_id", ForeignKey("course_objective.id"), primary_key=True),
-                                                 Column("programme_learning_outcome_id", ForeignKey("programme_learning_outcome.id"), primary_key=True))
-#LỚP ĐỀ CƯƠNG
+                                                 Column("course_objective_id", ForeignKey("course_objective.id"),
+                                                        primary_key=True),
+                                                 Column("programme_learning_outcome_id",
+                                                        ForeignKey("programme_learning_outcome.id"), primary_key=True))
+
+
+# LỚP ĐỀ CƯƠNG
 class Syllabus(db.Model):
     __tablename__ = 'syllabus'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), unique=True)
-    main_sections : Mapped[List["MainSection"]] = relationship(
+    main_sections: Mapped[List["MainSection"]] = relationship(
         back_populates="syllabus",
         order_by="MainSection.position",
         cascade="all, delete-orphan",
     )
     # khóa ngoại tham chiếu môn học
-    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id'), nullable=False)
+    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'), nullable=False)
     subject: Mapped["Subject"] = relationship(back_populates="syllabuses", lazy=False)
     # khóa ngoại tham chiếu khoa quản lí
     faculty_id: Mapped[int] = mapped_column(ForeignKey('faculty.id'), nullable=False)
     faculty: Mapped["Faculty"] = relationship(back_populates="syllabuses", lazy=False)
     # khóa ngoai tham chiếu giảng viên phụ trách
     lecturer_id: Mapped[int] = mapped_column(ForeignKey('lecturer.id'), nullable=False)
-    lecturer: Mapped["Lecturer"] = relationship(back_populates="syllabuses",lazy=False)
+    lecturer: Mapped["Lecturer"] = relationship(back_populates="syllabuses", lazy=False)
     # 1 đề cương xây dựng bởi nhiều học liệu
     learning_materials: Mapped[List["LearningMaterial"]] = relationship(secondary=Syllabus_LearningMaterial,
                                                                         back_populates="syllabuses")
@@ -55,7 +59,7 @@ class Syllabus(db.Model):
         }
 
 
-#LỚP PHẦN CỦA ĐỀ CƯƠNG
+# LỚP PHẦN CỦA ĐỀ CƯƠNG
 class MainSection(db.Model):
     __tablename__ = 'main_section'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -69,14 +73,18 @@ class MainSection(db.Model):
         order_by="SubSection.position",
         cascade="all, delete-orphan"
     )
+
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'syllabus_id': self.syllabus.id
         }
-    __table_args__ = (UniqueConstraint('code', 'syllabus_id', name='uq_code_per_syllabus'), )
-#LỚP TIỂU MỤC CHA
+
+    __table_args__ = (UniqueConstraint('code', 'syllabus_id', name='uq_code_per_syllabus'),)
+
+
+# LỚP TIỂU MỤC CHA
 class SubSection(db.Model):
     __tablename__ = 'sub_section'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -90,7 +98,9 @@ class SubSection(db.Model):
         'polymorphic_identity': 'sub_section',
         'polymorphic_on': type
     }
-#LỚP TIỂU MỤC VĂN BẢN
+
+
+# LỚP TIỂU MỤC VĂN BẢN
 class TextSubSection(SubSection):
     __tablename__ = 'text_sub_section'
     id: Mapped[int] = mapped_column(ForeignKey('sub_section.id'), primary_key=True, nullable=False)
@@ -98,7 +108,9 @@ class TextSubSection(SubSection):
     __mapper_args__ = {
         'polymorphic_identity': 'text'
     }
-#LỚP TIỂU MỤC LỰA CHỌN
+
+
+# LỚP TIỂU MỤC LỰA CHỌN
 class SelectionSubSection(SubSection):
     __tablename__ = 'selection_sub_section'
     id: Mapped[int] = mapped_column(ForeignKey('sub_section.id'), primary_key=True, nullable=False)
@@ -112,6 +124,8 @@ class SelectionSubSection(SubSection):
     __mapper_args__ = {
         'polymorphic_identity': 'selection'
     }
+
+
 # --- LỚP MỚI: TIỂU MỤC THAM CHIẾU ---
 class ReferenceSubSection(SubSection):
     """
@@ -126,14 +140,18 @@ class ReferenceSubSection(SubSection):
     __mapper_args__ = {
         'polymorphic_identity': 'reference'
     }
-#LỚP NHÓM THUỘC TÍNH
+
+
+# LỚP NHÓM THUỘC TÍNH
 class AttributeGroup(db.Model):
     __tablename__ = 'attribute_group'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name_group: Mapped[str] = mapped_column(String(100), nullable=False)
     attribute_values: Mapped[List["AttributeValue"]] = relationship(back_populates="attribute_group")
     selection_sub_sections: Mapped[List["SelectionSubSection"]] = relationship(back_populates="attribute_group")
-#LỚP GIÁ TRỊ CỦA NHÓM THUỘC TÍNH
+
+
+# LỚP GIÁ TRỊ CỦA NHÓM THUỘC TÍNH
 class AttributeValue(db.Model):
     __tablename__ = 'attribute_value'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -145,7 +163,9 @@ class AttributeValue(db.Model):
         secondary=SubSection_AttributeValue,
         back_populates="selected_values"
     )
-#LỚP MÔN HỌC
+
+
+# LỚP MÔN HỌC
 class Subject(db.Model):
     __tablename__ = 'subject'
     id: Mapped[str] = mapped_column(String(10), primary_key=True)
@@ -171,7 +191,9 @@ class Subject(db.Model):
             'name': self.name,
             'credit': self.credit.to_dict()
         }
-#LỚP KHOA
+
+
+# LỚP KHOA
 class Faculty(db.Model):
     __tablename__ = 'faculty'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -186,7 +208,9 @@ class Faculty(db.Model):
             'id': self.id,
             'faculty_name': self.name
         }
-#LỚP GIẢNG VIÊN
+
+
+# LỚP GIẢNG VIÊN
 class Lecturer(db.Model):
     __tablename__ = 'lecturer'
     # tự cung cấp mã
@@ -199,13 +223,16 @@ class Lecturer(db.Model):
     faculty: Mapped[Faculty] = relationship(back_populates="lecturers")
     # 1 giảng viên phụ trách nhiều đề cương
     syllabuses: Mapped[Optional[List[Syllabus]]] = relationship(back_populates='lecturer')
+
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'faculty': self.faculty.to_dict()
         }
-#LỚP TÀI LIỆU THAM KHẢO
+
+
+# LỚP TÀI LIỆU THAM KHẢO
 class LearningMaterial(db.Model):
     __tablename__ = 'learning_material'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -216,14 +243,18 @@ class LearningMaterial(db.Model):
     # 1 học liệu có thể thuộc nnhiều đề cương
     syllabuses: Mapped[List[Syllabus]] = relationship(secondary=Syllabus_LearningMaterial,
                                                       back_populates='learning_materials')
-#LỚP LOẠI TÀI LIỆU THAM KHẢO
+
+
+# LỚP LOẠI TÀI LIỆU THAM KHẢO
 class TypeLearningMaterial(db.Model):
     __tablename__ = 'type_learning_material'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), unique=True)
     # 1 loại học liệu có nhiều học liệu
     learningMaterials: Mapped[Optional[List["LearningMaterial"]]] = relationship(back_populates="type_material")
-#LỚP TÍN CHỈ
+
+
+# LỚP TÍN CHỈ
 class Credit(db.Model):
     __tablename__ = 'credit'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -243,22 +274,26 @@ class Credit(db.Model):
             'number practice': self.numberPractice,
             'hour self study': self.hourSelfStudy
         }
-#LỚP MÔN HỌC ĐIỀU KIỆN
+
+
+# LỚP MÔN HỌC ĐIỀU KIỆN
 class RequirementSubject(db.Model):
     __tablename__ = 'requirement_subject'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     # môn học bị yêu cầu ( có yêu cầu )
-    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id'), primary_key=True)
+    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'), primary_key=True)
     subject: Mapped[Subject] = relationship(foreign_keys=[subject_id], back_populates="required_by_relation")
     # môn học điều kiện
-    require_subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id'), primary_key=True)
+    require_subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'), primary_key=True)
     require_subject: Mapped[Subject] = relationship(foreign_keys=[require_subject_id],
                                                     back_populates="required_relation")
     # loại điều kiện
     type_requirement_id: Mapped[int] = mapped_column(ForeignKey("requirement_type.id"), nullable=False)
     type_requirement: Mapped["TypeRequirement"] = relationship(foreign_keys=[type_requirement_id],
                                                                back_populates="requirement_subjects")
-#LỚP LOẠI MÔN HỌC ĐIỀU KIỆN
+
+
+# LỚP LOẠI MÔN HỌC ĐIỀU KIỆN
 class TypeRequirement(db.Model):
     __tablename__ = 'requirement_type'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -266,18 +301,22 @@ class TypeRequirement(db.Model):
     # 1 loại môn học điều kiện có nhiều môn học điều kiện
     requirement_subjects: Mapped[List[RequirementSubject]] = relationship(back_populates="type_requirement")
 
-#LỚP MỤC TIÊU MÔN HỌC
+
+# LỚP MỤC TIÊU MÔN HỌC
 class CourseObjective(db.Model):
     __tablename__ = 'course_objective'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100))
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id'), primary_key=True)
+    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate="CASCADE"))
     subject: Mapped[Subject] = relationship(back_populates="course_objectives")
     course_learning_outcomes: Mapped[List["CourseLearningOutcome"]] = relationship(back_populates="course_objective")
-    programme_learning_outcomes: Mapped[List["ProgrammeLearningOutcome"]] = relationship(secondary=CourseObjective_ProgrammeLearningOutcome
-                                                                                         ,back_populates="course_objectives")
-#LỚP CHUẨN ĐẦU RA MÔN HỌC
+    programme_learning_outcomes: Mapped[List["ProgrammeLearningOutcome"]] = relationship(
+        secondary=CourseObjective_ProgrammeLearningOutcome
+        , back_populates="course_objectives")
+
+
+# LỚP CHUẨN ĐẦU RA MÔN HỌC
 class CourseLearningOutcome(db.Model):
     __tablename__ = 'course_learning_outcome'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -285,18 +324,21 @@ class CourseLearningOutcome(db.Model):
     course_objective: Mapped[CourseObjective] = relationship(back_populates="course_learning_outcomes")
     course_objective_id: Mapped[int] = mapped_column(ForeignKey('course_objective.id'))
 
-    plo_association : Mapped[List["CloPloAssociation"]] = relationship(back_populates="clo")
-#LỚP PLO
+    plo_association: Mapped[List["CloPloAssociation"]] = relationship(back_populates="clo")
+
+
+# LỚP PLO
 class ProgrammeLearningOutcome(db.Model):
     __tablename__ = 'programme_learning_outcome'
-    id: Mapped[str] = mapped_column(String(10),primary_key=True)
+    id: Mapped[str] = mapped_column(String(10), primary_key=True)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     course_objectives: Mapped[List[CourseObjective]] = relationship(secondary=CourseObjective_ProgrammeLearningOutcome
-                                                                    ,back_populates="programme_learning_outcomes")
+                                                                    , back_populates="programme_learning_outcomes")
 
     clo_association: Mapped[List["CloPloAssociation"]] = relationship(back_populates="plo")
 
-#LỚP QUAN HỆ NHIỀU NHIỀU GIỮA CLO VÀ PLO (CÓ ĐIỂM RATING)
+
+# LỚP QUAN HỆ NHIỀU NHIỀU GIỮA CLO VÀ PLO (CÓ ĐIỂM RATING)
 class CloPloAssociation(db.Model):
     __tablename__ = 'clo_plo_association'
     clo_id: Mapped[int] = mapped_column(ForeignKey('course_learning_outcome.id'), primary_key=True)
@@ -305,6 +347,7 @@ class CloPloAssociation(db.Model):
 
     clo: Mapped[CourseLearningOutcome] = relationship(back_populates="plo_association")
     plo: Mapped[ProgrammeLearningOutcome] = relationship(back_populates="clo_association")
+
 
 if __name__ == '__main__':
     with app.app_context():

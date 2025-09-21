@@ -56,7 +56,7 @@
 }
 
 body{
-    background-color: var(--background);
+    background-color: var(--secondary);
     color: var(--paragraph);
     font-family: Arial;
 }
@@ -176,4 +176,183 @@ body{
 .dropdown-item:hover{
     background-color: var(--secondary);
     color: var(--headline);
+}
+
+/* === FRESH GREEN THEME FOR GENERAL INFO === */
+
+/* Bảng màu xanh tươi */
+:root {
+  --fresh-green-dark: #1E6043;   /* Xanh lá đậm cho chữ và viền */
+  --fresh-green-light: #F0FAF6;  /* Xanh lá rất nhạt cho nền */
+  --fresh-green-accent: #28a745; /* Xanh lá tươi làm điểm nhấn */
+}
+
+/* Tùy chỉnh cho tiêu đề phần (h3) */
+.section-title-fresh {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--fresh-green-dark); /* Màu chữ xanh lá đậm */
+    padding: 0.75rem 1.25rem;
+    background-color: var(--fresh-green-light); /* Nền xanh lá rất nhạt */
+    border-left: 5px solid var(--fresh-green-accent); /* Viền nhấn màu xanh tươi */
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+/* Màu của icon trong tiêu đề */
+.section-title-fresh .fas {
+    color: var(--fresh-green-accent); /* Icon có màu xanh tươi */
+}
+
+/* Tùy chỉnh cho bảng thông tin */
+.info-table-fresh {
+    border: 1px solid #d4edda; /* Viền bảng màu xanh lá nhạt */
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Thêm bóng mờ nhẹ nhàng */
+}
+
+/* Tùy chỉnh cho các ô tiêu đề của hàng (th) */
+.info-table-fresh th {
+    color: var(--fresh-green-dark);
+    font-weight: 600;
+    width: 40%;
+}
+
+/* Tùy chỉnh màu cho hàng được tô màu của table-striped */
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-accent-bg: var(--fresh-green-light); /* Nền xen kẽ màu xanh lá nhạt */
+  color: var(--fresh-green-dark);
+}
+
+/* === NAVBAR TỪ GIAO DIỆN AGENCY === */
+
+#mainNav {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background-color: #212529;
+  transition: padding-top 0.3s ease-in-out, padding-bottom 0.3s ease-in-out;
+}
+#mainNav .navbar-toggler {
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  text-transform: uppercase;
+  font-weight: 700;
+}
+#mainNav .navbar-brand {
+  color: var(--highlight); /* Dùng lại màu vàng của bạn */
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-weight: 700;
+  letter-spacing: 0.0625em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
+#mainNav .navbar-nav .nav-item .nav-link {
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 0.95rem;
+  color: #fff;
+  letter-spacing: 0.0625em;
+}
+#mainNav .navbar-nav .nav-item .nav-link.active, #mainNav .navbar-nav .nav-item .nav-link:hover {
+  color: var(--highlight); /* Dùng lại màu vàng của bạn */
+}
+
+/* Thêm lại logo OU vào navbar brand */
+#mainNav .navbar-brand .custom-logo {
+    width: 28px;
+    height: 28px;
+    background-color: var(--button);
+    color: var(--button-text);
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hiệu ứng khi cuộn chuột */
+@media (min-width: 992px) {
+  #mainNav {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    border: none;
+  }
+  #mainNav .navbar-brand {
+    font-size: 1.5em;
+    transition: font-size 0.3s ease-in-out;
+  }
+  #mainNav.navbar-shrink {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    background-color: #212529;
+  }
+  #mainNav.navbar-shrink .navbar-brand {
+    font-size: 1.25em;
+  }
+  #mainNav .navbar-nav .nav-item {
+    margin-right: 1rem;
+  }
+  #mainNav .navbar-nav .nav-item:last-child {
+    margin-right: 0;
+  }
+}
+
+/* Chỉnh lại khoảng cách cho nội dung chính để không bị navbar che mất */
+main {
+    padding-top: 100px;
+}
+
+/* CSS cho tính năng "Click to Edit" */
+.editable-cell {
+    cursor: pointer;
+}
+
+/* Mặc định, ẩn form sửa và hiện nội dung tĩnh */
+.editable-cell .edit-view { display: none; }
+.editable-cell .display-view { display: block; }
+
+/* Khi ô được JS thêm class 'is-editing' */
+.editable-cell.is-editing { cursor: default; }
+.editable-cell.is-editing .display-view { display: none; }
+.editable-cell.is-editing .edit-view { display: block; }
+
+/* --- CSS cho thanh tín chỉ hàng ngang --- */
+.credit-horizontal-bar {
+    display: flex;
+    justify-content: space-around; /* Căn đều các mục */
+    align-items: center;
+    background-color: var(--fresh-green-light); /* Dùng lại nền xanh nhạt */
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #d4edda;
+}
+
+.credit-item {
+    text-align: center;
+}
+
+.credit-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--paragraph);
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.credit-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--fresh-green-dark); /* Dùng lại màu chữ xanh đậm */
+}
+
+/* Làm nổi bật phần "Tổng tín chỉ" */
+.credit-value.total {
+    color: var(--fresh-green-accent); /* Dùng màu xanh nhấn */
+    font-size: 1.8rem; /* Cho to hơn một chút */
 }

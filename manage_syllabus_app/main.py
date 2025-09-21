@@ -1,12 +1,43 @@
-from flask import render_template
+from flask import render_template, request, url_for, flash
+from werkzeug.utils import redirect
+
 from manage_syllabus_app import app
 from pathlib import Path
 from manage_syllabus_app import db
 import json, os
 
-from manage_syllabus_app.models import Faculty, Lecturer, Credit, Subject, Syllabus, RequirementSubject, \
-    TypeRequirement, MainSection, LearningMaterial, TypeLearningMaterial, AttributeGroup
 
+from manage_syllabus_app.models import Faculty, Lecturer, Credit, Subject, Syllabus, RequirementSubject, \
+    TypeRequirement, MainSection, LearningMaterial, TypeLearningMaterial, AttributeGroup, SubSection, TextSubSection, \
+    CourseLearningOutcome, CourseObjective
+
+
+def to_roman(n):
+    """Chuyển một số nguyên sang số La Mã."""
+    if not isinstance(n, int) or not 1 <= n < 4000:
+        return n  # Trả về giá trị gốc nếu không phải là số hợp lệ
+    val = [
+        1000, 900, 500, 400,
+        100, 90, 50, 40,
+        10, 9, 5, 4,
+        1
+    ]
+    syb = [
+        "M", "CM", "D", "CD",
+        "C", "XC", "L", "XL",
+        "X", "IX", "V", "IV",
+        "I"
+    ]
+    roman_num = ''
+    i = 0
+    while n > 0:
+        for _ in range(n // val[i]):
+            roman_num += syb[i]
+            n -= val[i]
+        i += 1
+    return roman_num
+
+app.jinja_env.filters['roman'] = to_roman
 
 @app.route('/')
 def index():
@@ -20,12 +51,50 @@ def index():
 def editor():
     return render_template('editor.html')
 
-@app.route('/de-cuong/<int:syllabus_id>/')
+@app.route('/syllabus/<int:syllabus_id>/')
 def syllabus_detail(syllabus_id):
     syllabus = Syllabus.query.get_or_404(syllabus_id)
     return render_template('syllabus_detail.html', syllabus=syllabus)
 
+MODEL_MAP = {
+    'Subject': Subject,
+    'TextSubSection': TextSubSection,
+    'Credit': Credit,
+    'Lecturer': Lecturer,
+    'MainSection': MainSection,
+    'CourseLearningOutcome': CourseLearningOutcome,
+    'CourseObjective': CourseObjective,
+}
 
+@app.route('/update_generic_field', methods=['POST'])
+def update_generic_field():
+    form_data = request.form
+
+    model_name = form_data.get('model_name')
+    object_id = form_data.get('object_id')
+    syllabus_id = form_data.get('syllabus_id')
+    ModelClass = MODEL_MAP.get(model_name)
+    if not ModelClass or not object_id:
+        flash('Yêu cầu không hợp lệ!', 'danger')
+        return redirect(url_for('index'))
+
+
+    obj_to_update = db.session.get(ModelClass, object_id)
+    if not obj_to_update:
+        flash('Không tìm thấy đối tượng', 'danger')
+        return redirect(url_for('index'))
+    try:
+        for field, new_value in form_data.items():
+            if hasattr(obj_to_update, field):
+                setattr(obj_to_update, field, new_value)
+
+        db.session.commit()
+        flash("Cập nhật thành công", 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Cập nhật thất bại! Lỗi: {str(e)}', 'danger')
+
+    return redirect(url_for('syllabus_detail', syllabus_id=syllabus_id))
 @app.cli.command("db-seed")
 def db_seed():
     """Đọc file JSON và lưu dữ liệu vào database."""

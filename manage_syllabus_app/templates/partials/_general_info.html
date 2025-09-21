@@ -1,23 +1,33 @@
 <div class="mb-5">
-    <h3 class="section-title text-uppercase mb-3 text-info">{{ part.position }}. {{ part.name }}</h3>
-    <table class="table table-bordered align-middle info-table">
-        <tbody>
-            {# 1. Tên môn học tiếng Việt (cố định, lấy từ syllabus.subject) #}
-            <tr>
-                <th scope="row">1. Tên môn học tiếng Việt/Course title in Vietnamese</th>
-                <td>{{ syllabus.subject.name }}</td>
-            </tr>
-            {# Mã môn học đi kèm, không đánh số #}
-            <tr>
-                <th scope="row">Mã môn học/Course code</th>
-                <td>{{ syllabus.subject.id }}</td>
-            </tr>
+    {% from 'partials/_macros.html' import editable_section_header %}
+    {% from 'partials/_macros.html' import editable_field %}
+    {{ editable_section_header(part, syllabus) }}
 
-            {% for sub_item in part.sub_sections %}
-                {% with item_index = loop.index + 1 %}
-                    {% include 'partials/subsections/_' + sub_item.type + '.html' %}
-                {% endwith %}
-            {% endfor %}
+    <table class="table table-striped align-middle info-table-fresh">
+        <tbody>
+        {# 1. Tên môn học tiếng Việt #}
+        <tr>
+            <th scope="row">1. Tên môn học tiếng Việt/Course title in Vietnamese</th>
+            <td class="editable-cell" onclick="activateEditMode(this)">
+                {{editable_field(syllabus.subject, 'name','Subject', syllabus, input_type='input')}}
+            </td>
+        </tr>
+
+        {# Mã môn học #}
+        <tr>
+            <th scope="row">Mã môn học/Course code</th>
+            <td class="editable-cell" onclick="activateEditMode(this)">
+                {{editable_field(syllabus.subject, 'id','Subject', syllabus, input_type='input')}}
+            </td>
+        </tr>
+
+        {# Các tiểu mục còn lại #}
+        {% for sub_item in part.sub_sections %}
+        {# Sửa lại công thức tính index để số thứ tự được đúng (bắt đầu từ 3) #}
+        {% with item_index = loop.index + 1 %}
+        {% include 'partials/subsections/_' + sub_item.type + '.html' %}
+        {% endwith %}
+        {% endfor %}
         </tbody>
     </table>
 </div>

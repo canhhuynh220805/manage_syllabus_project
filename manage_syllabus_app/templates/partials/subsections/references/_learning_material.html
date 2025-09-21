@@ -1,3 +1,4 @@
+{% from 'partials/_macros.html' import editable_field %}
 <tr>
     <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
@@ -13,7 +14,9 @@
             {% for material in syllabus.learning_materials %}
             <tr>
                 <td class="text-center">{{ loop.index }}</td>
-                <td>{{ material.name }}</td>
+                <td class="editable-cell" onclick="activateEditMode(this)">
+                    {{editable_field(material, 'name', 'LearningMaterial', syllabus, input_type='input')}}
+                </td>
                 <td>{{ material.type_material.name }}</td>
             </tr>
             {% endfor %}

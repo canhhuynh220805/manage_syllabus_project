@@ -175,7 +175,7 @@ def seed_data_3():
                     group_id = sub_section_data['attribute_group_id']
                     selected_ids = sub_section_data['selected_value_ids']
                     print(selected_ids)
-                    attribute_group = AttributeGroup.query.get(group_id)
+                    attribute_group = db.session.get(AttributeGroup, group_id)
                     selected_values = AttributeValue.query.filter(AttributeValue.id.in_(selected_ids)).all()
                     print(selected_values)
                     new_sub_section = SelectionSubSection(
@@ -200,7 +200,7 @@ def seed_data_3():
             name_co = co['name']
             description_co = co['description']
             new_co = CourseObjective(name=name_co, content=description_co, subject=subject)
-
+            db.session.add(new_co)
             for plo_id in co["plos"]:
                 plo = db.session.query(ProgrammeLearningOutcome).filter_by(id=plo_id).first()
                 new_co.programme_learning_outcomes.append(plo)
@@ -208,7 +208,7 @@ def seed_data_3():
             for clo_data in co["clos"]:
                 new_clo = CourseLearningOutcome(content=clo_data['description'], course_objective=new_co)
                 new_co.course_learning_outcomes.append(new_clo)
-                db.session.add(new_clo)
+                # db.session.add(new_clo)
 
                 for rating in clo_data.get('ratings', []):
                     plo_id = rating['plo_id']
@@ -223,7 +223,7 @@ def seed_data_3():
                         )
                         db.session.add(association)
 
-            db.session.add(new_co)
+            # db.session.add(new_co)
 
 
         # --- Learning Materials ---

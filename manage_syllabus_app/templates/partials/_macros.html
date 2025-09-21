@@ -1,0 +1,57 @@
+{# Nhận vào 2 biến: `part_object` và `syllabus_object` #}
+{% macro editable_section_header(part_object, syllabus_object) %}
+<div class="editable-cell" onclick="activateEditMode(this)">
+
+    <div class="display-view">
+        <h1 class="section-title-fresh mb-3">
+            <i class="fas fa-info-circle me-2"></i> {{ part_object.position | roman }}. {{ part_object.name }}
+        </h1>
+    </div>
+
+    <div class="edit-view">
+        <form method="post" action="{{ url_for('update_generic_field') }}">
+            <input type="hidden" name="model_name" value="MainSection">
+            <input type="hidden" name="object_id" value="{{ part_object.id }}">
+            <input type="hidden" name="syllabus_id" value="{{ syllabus_object.id }}">
+
+            <div class="input-group">
+                <input type="text" name="name" class="form-control form-control-lg" style="width: 900px;"
+                       value="{{ part_object.name }}">
+
+                <div class="text-end mt-2">
+                    <button type="submit" class="btn btn-success btn-sm">Lưu</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEditMode(this, event)">Hủy
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro editable_field(object, field_name, model_name, syllabus_object, input_type='input') %}
+
+<div class="display-view">
+    <p class="mb-0" style="white-space: pre-wrap;">{{ object[field_name] }}</p>
+</div>
+
+<div class="edit-view">
+    <form method="post" action="{{ url_for('update_generic_field') }}">
+        <input type="hidden" name="model_name" value="{{ model_name }}">
+        <input type="hidden" name="object_id" value="{{ object.id }}">
+        <input type="hidden" name="syllabus_id" value="{{ syllabus_object.id }}">
+
+        {% if input_type == 'textarea' %}
+        <textarea class="form-control" name="{{ field_name }}" rows="3">{{ object[field_name] }}</textarea>
+        {% else %}
+        <input type="text" class="form-control" name="{{ field_name }}" value="{{ object[field_name] }}">
+        {% endif %}
+
+        <div class="text-end mt-2">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEditMode(this, event)">Hủy</button>
+
+            <button type="submit" class="btn btn-success btn-sm">Lưu</button>
+        </div>
+    </form>
+</div>
+{% endmacro %}

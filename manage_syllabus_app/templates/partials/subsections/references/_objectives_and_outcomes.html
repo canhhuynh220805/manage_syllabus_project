@@ -1,32 +1,39 @@
+{% from 'partials/_macros.html' import editable_field %}
+
 <tr>
     <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
         <table class="table table-bordered">
-          <thead class="table-light">
-              <tr>
-                  <th scope="col" style="width: 30%;" class="text-center align-middle">Mục tiêu môn học/Course Objectives</th>
-                  <th scope="col" style="width: 50%;" class="text-center align-middle">Mô tả - Description</th>
-                  <th scope="col" style="width: 20%;" class="text-center align-middle">CĐR CTĐT phân bổ cho môn học - PLOs</th>
-              </tr>
-              {% for co in syllabus.subject.course_objectives %}
-                <tr>
-                    <td class="text-center align-middle">
-                        {{co.name}}
-                    </td>
-                    <td class="align-middle">
-                        {{co.content}}
-                    </td>
-                    <td class="text-center align-middle">
-                        {% for plo in co.programme_learning_outcomes %}
-                            {{plo.id}}<br>
-                        {% endfor %}
-                    </td>
-                </tr>
-              {% endfor %}
-          </thead>
-          <tbody>
+            <thead class="table-light">
+            <tr>
+                <th scope="col" style="width: 30%;" class="text-center align-middle">Mục tiêu môn học/Course
+                    Objectives
+                </th>
+                <th scope="col" style="width: 50%;" class="text-center align-middle">Mô tả - Description</th>
+                <th scope="col" style="width: 20%;" class="text-center align-middle">CĐR CTĐT phân bổ cho môn học -
+                    PLOs
+                </th>
+            </tr>
+            {% for co in syllabus.subject.course_objectives %}
+            <tr>
+                <td class="text-center align-middle editable-cell" onclick="activateEditMode(this)">
+                    {{editable_field(co, 'name', 'CourseObjective', syllabus, input_type='input')}}
+                </td>
 
-          </tbody>
-      </table>
+                <td class="editable-cell align-middle" onclick="activateEditMode(this)">
+                    {{editable_field(co, 'content', 'CourseObjective', syllabus, input_type='textarea')}}
+                </td>
+                <td class="text-center align-middle">
+                    {% for plo in co.programme_learning_outcomes %}
+                    {{plo.id}}<br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
     </td>
 </tr>
