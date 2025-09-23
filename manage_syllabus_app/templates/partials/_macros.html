@@ -1,26 +1,29 @@
 {# Nhận vào 2 biến: `part_object` và `syllabus_object` #}
 {% macro editable_section_header(part_object, syllabus_object) %}
-<div class="editable-cell" onclick="activateEditMode(this)">
+<div id="editable-container-MainSection-{{ part_object.id }}-name" class="editable-container">
 
     <div class="display-view">
-        <h1 class="section-title-fresh mb-3">
+        <h3 class="section-title-fresh mb-3">
             <i class="fas fa-info-circle me-2"></i> {{ part_object.position | roman }}. {{ part_object.name }}
-        </h1>
+        </h3>
+        <button type="button" class="btn btn-outline-primary btn-sm edit-trigger-button"
+                onclick="toggleFieldEdit('MainSection-{{ part_object.id }}-name', true)">
+            <i class="fas fa-pencil-alt"></i> Chỉnh sửa
+        </button>
     </div>
 
-    <div class="edit-view">
+    <div class="edit-view" style="display: none;">
         <form method="post" action="{{ url_for('update_generic_field') }}">
             <input type="hidden" name="model_name" value="MainSection">
             <input type="hidden" name="object_id" value="{{ part_object.id }}">
             <input type="hidden" name="syllabus_id" value="{{ syllabus_object.id }}">
 
             <div class="input-group">
-                <input type="text" name="name" class="form-control form-control-lg" style="width: 900px;"
-                       value="{{ part_object.name }}">
-
-                <div class="text-end mt-2">
-                    <button type="submit" class="btn btn-success btn-sm">Lưu</button>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEditMode(this, event)">Hủy
+                <input type="text" name="name" class="form-control form-control-lg" value="{{ part_object.name }}">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button type="button" class="btn btn-secondary"
+                            onclick="toggleFieldEdit('MainSection-{{ part_object.id }}-name', false)">Hủy
                     </button>
                 </div>
             </div>
@@ -32,14 +35,12 @@
 {% macro editable_field(object, field_name, model_name, syllabus_object, input_type='input') %}
 <div id="editable-container-{{ model_name }}-{{ object.id }}-{{ field_name }}" class="editable-container">
 
-    <div class="display-view">
-        <div>
-            <p class="mb-0" style="white-space: pre-wrap;">{{ object[field_name] or "Chưa có nội dung" }}</p>
-            <button type="button" class="btn btn-outline-primary btn-sm ms-3 flex-shrink-0 edit-trigger-button"
-                    onclick="toggleFieldEdit('{{ model_name }}-{{ object.id }}-{{ field_name }}', true)">
-                <i class="fas fa-pencil-alt"></i> Chỉnh sửa
-            </button>
-        </div>
+    <div class="display-view d-flex justify-content-between align-items-center">
+        <p class="mb-0" style="white-space: pre-wrap;">{{ object[field_name] or "Chưa có nội dung" }}</p>
+        <button type="button" class="btn btn-outline-primary btn-sm ms-3 flex-shrink-0 edit-trigger-button"
+                onclick="toggleFieldEdit('{{ model_name }}-{{ object.id }}-{{ field_name }}', true)">
+            <i class="fas fa-pencil-alt"></i> Chỉnh sửa
+        </button>
     </div>
 
     <div class="edit-view" style="display: none;">

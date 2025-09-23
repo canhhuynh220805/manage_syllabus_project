@@ -8,7 +8,7 @@
         {# 1. Tên môn học tiếng Việt #}
         <tr>
             <th scope="row">1. Tên môn học tiếng Việt/Course title in Vietnamese</th>
-            <td class="editable-cell" onclick="activateEditMode(this)">
+            <td>
                 {{editable_field(syllabus.subject, 'name','Subject', syllabus, input_type='input')}}
             </td>
         </tr>
@@ -16,7 +16,7 @@
         {# Mã môn học #}
         <tr>
             <th scope="row">Mã môn học/Course code</th>
-            <td class="editable-cell" onclick="activateEditMode(this)">
+            <td>
                 {{editable_field(syllabus.subject, 'id','Subject', syllabus, input_type='input')}}
             </td>
         </tr>

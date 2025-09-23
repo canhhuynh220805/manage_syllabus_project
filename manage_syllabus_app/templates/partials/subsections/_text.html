@@ -2,7 +2,7 @@
 <tr>
     {# Sửa lại: Dùng 'item_index' thay vì 'loop.index' #}
     <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
-    <td class="align-middle">
+    <td>
         {{ editable_field(sub_item, 'content', 'TextSubSection', syllabus, input_type='textarea') }}
     </td>
 </tr>
