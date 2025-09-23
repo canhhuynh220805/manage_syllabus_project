@@ -1,4 +1,4 @@
-from flask import render_template, request, url_for, flash
+from flask import render_template, request, url_for, flash, jsonify
 from werkzeug.utils import redirect
 
 from manage_syllabus_app import app
@@ -9,7 +9,7 @@ import json, os
 
 from manage_syllabus_app.models import Faculty, Lecturer, Credit, Subject, Syllabus, RequirementSubject, \
     TypeRequirement, MainSection, LearningMaterial, TypeLearningMaterial, AttributeGroup, SubSection, TextSubSection, \
-    CourseLearningOutcome, CourseObjective
+    CourseLearningOutcome, CourseObjective, SelectionSubSection, AttributeValue, ProgrammeLearningOutcome
 
 
 def to_roman(n):
@@ -41,10 +41,10 @@ app.jinja_env.filters['roman'] = to_roman
 
 @app.route('/')
 def index():
-    faculty = Faculty.query.all()
+    all_faculties = Faculty.query.all()
     syllabuses = Syllabus.query.all()
-
-    return render_template('index.html', syllabuses=syllabuses, faculty=faculty)
+    all_lecturers = Lecturer.query.all()
+    return render_template('index.html', syllabuses=syllabuses, faculty=all_faculties, lecturer=all_lecturers)
 
 
 @app.route('/editor')
@@ -53,9 +53,53 @@ def editor():
 
 @app.route('/syllabus/<int:syllabus_id>/')
 def syllabus_detail(syllabus_id):
+    all_faculties = Faculty.query.all()
+    all_lecturers = Lecturer.query.all()
+    plos = ProgrammeLearningOutcome.query.all()
     syllabus = Syllabus.query.get_or_404(syllabus_id)
-    return render_template('syllabus_detail.html', syllabus=syllabus)
+    return render_template('syllabus_detail.html', syllabus=syllabus,
+                           all_faculties=all_faculties, all_lecturers=all_lecturers,
+                           plos = plos)
 
+@app.route('/get_lecturer_detail/<int:lecturer_id>/')
+def get_lecturer_detail(lecturer_id):
+    lecturer = db.session.get(Lecturer, lecturer_id)
+    if lecturer:
+        return jsonify({
+            'email': lecturer.email or '',  # Trả về chuỗi rỗng nếu là None
+            'room': lecturer.room or ''
+        })
+    return jsonify({'error': 'Lecturer not found'}), 404
+
+@app.route('/update_director/<int:syllabus_id>/', methods=['POST'])
+def update_director(syllabus_id):
+    syllabus = db.session.get(Syllabus, syllabus_id)
+    if not syllabus:
+        flash('Không tìm thấy đề cương', 'danger')
+        return redirect(url_for('index'))
+
+    try:
+        new_faculty_id = request.form.get('faculty_id')
+        new_lecturer_id = request.form.get('lecturer_id')
+        if new_faculty_id:
+            syllabus.faculty_id = int(new_faculty_id)
+        if new_lecturer_id:
+            syllabus.lecturer_id = int(new_lecturer_id)
+
+        lecturer_to_update = db.session.get(Lecturer, syllabus.lecturer_id)
+        if lecturer_to_update:
+            new_email = request.form.get('lecturer_email')
+            new_room = request.form.get('lecturer_room')
+            lecturer_to_update.email = new_email
+            lecturer_to_update.room = new_room
+
+        db.session.commit()
+    except Exception as e:
+        # Nếu có lỗi xảy ra, hoàn tác lại để đảm bảo an toàn.
+        db.session.rollback()
+        flash(f'Cập nhật thất bại! Lỗi: {str(e)}', 'danger')
+
+    return redirect(url_for('syllabus_detail', syllabus_id=syllabus_id))
 MODEL_MAP = {
     'Subject': Subject,
     'TextSubSection': TextSubSection,
@@ -95,6 +139,55 @@ def update_generic_field():
         flash(f'Cập nhật thất bại! Lỗi: {str(e)}', 'danger')
 
     return redirect(url_for('syllabus_detail', syllabus_id=syllabus_id))
+
+@app.route('/update_selection/<int:subsection_id>', methods=['POST'])
+def update_selection(subsection_id):
+    subsection = db.session.get(SelectionSubSection, subsection_id)
+    syllabus_id = subsection.main_section.syllabus_id
+
+    if not subsection:
+        flash('Không tìm thấy tiểu mục!', 'danger')
+        return redirect(url_for('index'))
+
+    try:
+        selected_ids = request.form.getlist('selected_ids')
+        subsection.selected_values.clear()
+
+        if selected_ids:
+            int_ids = [int(id_str) for id_str in selected_ids]
+            new_selection = AttributeValue.query.filter(AttributeValue.id.in_(int_ids)).all()
+            subsection.selected_values.extend(new_selection)
+
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Cập nhật thất bại! Lỗi: {str(e)}', 'danger')
+
+    return redirect(url_for('syllabus_detail', syllabus_id=syllabus_id))
+
+@app.route('/update_co_plos/<int:co_id>', methods=['POST'])
+def update_co_plos(co_id):
+    co = db.session.get(CourseObjective, co_id)
+    if not co:
+        flash('Không tìm thấy mục tiêu môn học!', 'danger')
+        return redirect(url_for('index'))
+    syllabus_id = request.form.get('syllabus_id')
+    try:
+        selected_plos = request.form.getlist('plo_ids')
+        co.programme_learning_outcomes.clear()
+        if selected_plos:
+            new_plos = ProgrammeLearningOutcome.query.filter(ProgrammeLearningOutcome.id.in_(selected_plos)).all()
+            co.programme_learning_outcomes.extend(new_plos)
+
+        db.session.commit();
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Cập nhật thất bại! Lỗi: {str(e)}', 'danger')
+
+    return redirect(url_for('syllabus_detail', syllabus_id=syllabus_id))
+
 @app.cli.command("db-seed")
 def db_seed():
     """Đọc file JSON và lưu dữ liệu vào database."""

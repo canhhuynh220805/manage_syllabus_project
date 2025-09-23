@@ -146,6 +146,15 @@ body{
     color: var(--headline);
 }
 
+.syllabus-detail-card {
+    /* Nền trắng với độ trong mờ là 85% */
+    background-color: rgba(255, 255, 255, 0.85);
+
+    /* (Tùy chọn) Thêm hiệu ứng làm mờ nền phía sau, rất đẹp mắt */
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
 /* sidebar custom*/
 
 .custom-sidebar{
@@ -217,14 +226,47 @@ body{
 .info-table-fresh th {
     color: var(--fresh-green-dark);
     font-weight: 600;
-    width: 40%;
+    width: 30%;
 }
 
-/* Tùy chỉnh màu cho hàng được tô màu của table-striped */
-.table-striped > tbody > tr:nth-of-type(odd) > * {
-  --bs-table-accent-bg: var(--fresh-green-light); /* Nền xen kẽ màu xanh lá nhạt */
-  color: var(--fresh-green-dark);
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Đảm bảo body luôn cao ít nhất bằng chiều cao màn hình */
 }
+
+main {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  background: lightblue;
+  position: relative;
+  overflow: hidden;
+}
+
+main::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, #3498db 10%, transparent 20%),
+    radial-gradient(circle, transparent 10%, #3498db 20%);
+  background-size: 30px 30px; /* Adjust the size of the pattern */
+  animation: moveBackground 8s linear infinite; /* Adjust the animation duration and timing function */
+}
+
+@keyframes moveBackground {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(20%, 20%);
+  }
+}
+
+
 
 /* === NAVBAR TỪ GIAO DIỆN AGENCY === */
 
@@ -355,4 +397,24 @@ main {
 .credit-value.total {
     color: var(--fresh-green-accent); /* Dùng màu xanh nhấn */
     font-size: 1.8rem; /* Cho to hơn một chút */
+}
+
+/* 1. Tạo một container có thể định vị được */
+.editable-container {
+    position: relative;
+    padding-bottom: 40px; /* Thêm khoảng đệm ở dưới để nút không che mất nội dung */
+}
+
+/* 2. Định vị nút "Chỉnh sửa" ở góc dưới bên phải */
+.edit-trigger-button {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    opacity: 0; /* Mặc định ẩn nút đi */
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* 3. Khi di chuột vào container, nút "Chỉnh sửa" sẽ hiện ra */
+.editable-container:hover .edit-trigger-button {
+    opacity: 1;
 }

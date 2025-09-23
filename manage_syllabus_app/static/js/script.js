@@ -35,18 +35,109 @@ window.addEventListener('DOMContentLoaded', event => {
 });
 
 
-function activateEditMode(cell){
-    if(!cell.classList.contains('is-editing')){
-        cell.classList.add('is-editing');
-        const input = cell.querySelector('input[type="text"], input[type="number"], textarea');
-        if(input)
-            input.focus();
+function toggleFieldEdit(uniqueId, isEditing) {
+    const container = document.getElementById('editable-container-' + uniqueId);
+    if (!container) return;
+
+    const displayView = container.querySelector('.display-view');
+    const editView = container.querySelector('.edit-view');
+
+    if (isEditing) {
+        displayView.style.display = 'none';
+        editView.style.display = 'block';
+        // Tự động focus vào ô nhập liệu
+        const input = editView.querySelector('input, textarea');
+        if (input) input.focus();
+    } else {
+        displayView.style.display = 'block';
+        editView.style.display = 'none';
     }
 }
 
-function cancelEditMode(cancelButton, event){
-    const cell = cancelButton.closest('.editable-cell');
-    cell.classList.remove('is-editing');
-    // Ngăn sự kiện click bị lan ra ngoài và kích hoạt lại chế độ sửa
-    event.stopPropagation();
+function updateLecturerInfo(selectElement) {
+    // Lấy ID của giảng viên vừa được chọn
+    const lecturerId = selectElement.value;
+
+    // Tìm form cha để có thể tìm các ô input khác
+    const form = selectElement.closest('form');
+    const emailInput = form.querySelector('input[name="lecturer_email"]');
+    const roomInput = form.querySelector('input[name="lecturer_room"]');
+
+    // Gọi đến API endpoint mới mà chúng ta đã tạo ở backend
+    fetch('/get_lecturer_detail/' + lecturerId)
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                // Cập nhật giá trị của các ô input với thông tin mới
+                emailInput.value = data.email;
+                roomInput.value = data.room;
+            }
+        })
+        .catch(error => console.error('Error fetching lecturer details:', error));
+}
+
+function removePill(button){
+    const badge = button.closest('.selection-pill');
+    if(badge)
+        badge.remove();
+}
+
+function addSelection(subItemId, optionId, optionName, event) {
+    event.preventDefault();
+    const container = document.getElementById('edit-selected-values-' + subItemId);
+    const form = document.getElementById('form-' + subItemId);
+
+    if (form.querySelector(`input[name="selected_ids"][value="${optionId}"]`)) {
+        alert("Lựa chọn này đã có");
+        return;
+    }
+
+    const pill = document.createElement('div');
+    pill.className = 'selection-pill';
+
+    pill.innerHTML = `
+        <span class="badge bg-success d-flex align-items-center">${optionName}</span>
+        <button type="button" class="btn btn-danger btn-sm ms-2"
+                onclick="removeSelection(this)">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+        <input type="hidden" name="selected_ids" value="${optionId}">
+    `;
+
+    container.appendChild(pill);
+}
+
+function toggleSelectionEdit(subsectionId,isEditing){
+    const container = document.getElementById('selection-container-' + subsectionId);
+    const displayView = container.querySelector('.display-view');
+    const editView = container.querySelector('.edit-view');
+
+    if (isEditing) {
+        displayView.style.display = 'none';
+        editView.style.display = 'block';
+    } else {
+        displayView.style.display = 'block';
+        editView.style.display = 'none';
+    }
+}
+
+function addPillForCO(coId, ploId, event){
+    event.preventDefault();
+    container = document.getElementById('edit-selected-values-co-' + coId);
+
+    if(container.querySelector(`input[name="plo_ids"][value="${ploId}"]`)){
+        alert("Lựa chọn này đã có")
+        return;
+    }
+
+    const pill = document.createElement('div');
+    pill.className = "selection-pill";
+    pill.innerHTML = `
+        <span class="badge bg-success">${ploId}</span>
+        <button type="button" onclick="removeSelection(this)"><i
+                class="fa-solid fa-trash"></i>
+        </button>
+        <input type="hidden" name="plo_ids" value="${ploId}">
+    `;
+    container.appendChild(pill);
 }

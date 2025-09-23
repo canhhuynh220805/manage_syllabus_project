@@ -30,28 +30,37 @@
 {% endmacro %}
 
 {% macro editable_field(object, field_name, model_name, syllabus_object, input_type='input') %}
+<div id="editable-container-{{ model_name }}-{{ object.id }}-{{ field_name }}" class="editable-container">
 
-<div class="display-view">
-    <p class="mb-0" style="white-space: pre-wrap;">{{ object[field_name] }}</p>
-</div>
-
-<div class="edit-view">
-    <form method="post" action="{{ url_for('update_generic_field') }}">
-        <input type="hidden" name="model_name" value="{{ model_name }}">
-        <input type="hidden" name="object_id" value="{{ object.id }}">
-        <input type="hidden" name="syllabus_id" value="{{ syllabus_object.id }}">
-
-        {% if input_type == 'textarea' %}
-        <textarea class="form-control" name="{{ field_name }}" rows="3">{{ object[field_name] }}</textarea>
-        {% else %}
-        <input type="text" class="form-control" name="{{ field_name }}" value="{{ object[field_name] }}">
-        {% endif %}
-
-        <div class="text-end mt-2">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEditMode(this, event)">Hủy</button>
-
-            <button type="submit" class="btn btn-success btn-sm">Lưu</button>
+    <div class="display-view">
+        <div>
+            <p class="mb-0" style="white-space: pre-wrap;">{{ object[field_name] or "Chưa có nội dung" }}</p>
+            <button type="button" class="btn btn-outline-primary btn-sm ms-3 flex-shrink-0 edit-trigger-button"
+                    onclick="toggleFieldEdit('{{ model_name }}-{{ object.id }}-{{ field_name }}', true)">
+                <i class="fas fa-pencil-alt"></i> Chỉnh sửa
+            </button>
         </div>
-    </form>
+    </div>
+
+    <div class="edit-view" style="display: none;">
+        <form method="post" action="{{ url_for('update_generic_field') }}">
+            <input type="hidden" name="model_name" value="{{ model_name }}">
+            <input type="hidden" name="object_id" value="{{ object.id }}">
+            <input type="hidden" name="syllabus_id" value="{{ syllabus_object.id }}">
+
+            {% if input_type == 'textarea' %}
+            <textarea class="form-control" name="{{ field_name }}" rows="3">{{ object[field_name] }}</textarea>
+            {% else %}
+            <input type="text" class="form-control" name="{{ field_name }}" value="{{ object[field_name] }}">
+            {% endif %}
+
+            <div class="text-end mt-2">
+                <button type="button" class="btn btn-secondary btn-sm"
+                        onclick="toggleFieldEdit('{{ model_name }}-{{ object.id }}-{{ field_name }}', false)">Hủy
+                </button>
+                <button type="submit" class="btn btn-success btn-sm">Lưu</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endmacro %}

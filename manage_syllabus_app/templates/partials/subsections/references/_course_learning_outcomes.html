@@ -1,6 +1,6 @@
 {% from 'partials/_macros.html' import editable_field %}
 <tr>
-    <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
+    <th scope="row" style="width: 300px;">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
         <table class="table table-bordered">
           <thead class="table-light">
@@ -20,7 +20,7 @@
                                         <td class="text-center align-middle" rowspan="{{ clo_count }}">{{ co.name }}</td>
                                     {% endif %}
                                     <td class="text-center align-middle">{{ ns.cnt }}</td>
-                                    <td class="align-middle editable-cell" onclick="activateEditMode(this)">
+                                    <td class="align-middle">
                                         {{editable_field(clo, 'content','CourseLearningOutcome', syllabus, input_type='textarea')}}
                                     </td>
                                 </tr>

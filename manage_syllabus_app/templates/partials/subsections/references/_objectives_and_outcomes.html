@@ -1,7 +1,7 @@
 {% from 'partials/_macros.html' import editable_field %}
 
 <tr>
-    <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
+    <th scope="row" style="width: 300px;">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
         <table class="table table-bordered">
             <thead class="table-light">
@@ -14,25 +14,79 @@
                     PLOs
                 </th>
             </tr>
+            </thead>
+            <tbody>
             {% for co in syllabus.subject.course_objectives %}
             <tr>
-                <td class="text-center align-middle editable-cell" onclick="activateEditMode(this)">
+                <td class="text-center align-middle editable-cell">
                     {{editable_field(co, 'name', 'CourseObjective', syllabus, input_type='input')}}
                 </td>
 
-                <td class="editable-cell align-middle" onclick="activateEditMode(this)">
+                <td class="editable-cell align-middle">
                     {{editable_field(co, 'content', 'CourseObjective', syllabus, input_type='textarea')}}
                 </td>
                 <td class="text-center align-middle">
-                    {% for plo in co.programme_learning_outcomes %}
-                    {{plo.id}}<br>
-                    {% endfor %}
+                    <div id="selection-container-co-{{ co.id }}">
+                        <div class="display-view editable-container">
+                            <div class="d-flex flex-column align-items-center gap-1">
+                                {% for plo in co.programme_learning_outcomes %}
+                                <span class="badge bg-success">{{ plo.id }}</span>
+                                {% else %}
+                                <span class="text-muted">Chưa có</span>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm  ms-3 flex-shrink-0  edit-trigger-button"
+                                    onclick="toggleSelectionEdit('co-{{ co.id }}',true)">
+                                <i class="fas fa-pencil-alt"></i> Chỉnh sửa
+                            </button>
+                        </div>
+                        <div class="edit-view" style="display: none">
+                            <form action="{{ url_for('update_co_plos', co_id = co.id)}}" method="POST">
+                                <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
+                                <div id="edit-selected-values-co-{{ co.id }}" class="d-flex flex-wrap gap-2 mb-2">
+                                    {% for plo in co.programme_learning_outcomes %}
+                                    <div class="selection-pill">
+                                        <span class="badge bg-success">{{ plo.id }}</span>
+                                        <button type="button" onclick="removeSelection(this)"><i
+                                                class="fa-solid fa-trash"></i>
+                                        </button>
+                                        <input type="hidden" name="plo_ids" value="{{ plo.id }}">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="dropdown">-->
+                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle"
+                                                data-bs-toggle="dropdown">
+                                            Thêm PLO
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            {% for option_plo in plos %}
+                                            <li>
+                                                <a class="dropdown-item" href="#"
+                                                   onclick="addPillForCO('{{ co.id }}', '{{ option_plo.id }}', event)">
+                                                    {{ option_plo.id }}: {{ option_plo.description[:30] }}...
+                                                </a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    <div class="ms-auto">
+                                        <button type="button" class="btn btn-secondary btn-sm"
+                                                onclick="toggleSelectionEdit('co-{{co.id}}',false)">
+                                            Hủy
+                                        </button>
+                                        <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-save"></i>
+                                            Lưu
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </td>
             </tr>
             {% endfor %}
-            </thead>
-            <tbody>
-
             </tbody>
         </table>
     </td>

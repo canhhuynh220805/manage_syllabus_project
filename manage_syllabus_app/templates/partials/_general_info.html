@@ -3,7 +3,7 @@
     {% from 'partials/_macros.html' import editable_field %}
     {{ editable_section_header(part, syllabus) }}
 
-    <table class="table table-striped align-middle info-table-fresh">
+    <table class="table align-middle info-table-fresh">
         <tbody>
         {# 1. Tên môn học tiếng Việt #}
         <tr>
@@ -23,7 +23,6 @@
 
         {# Các tiểu mục còn lại #}
         {% for sub_item in part.sub_sections %}
-        {# Sửa lại công thức tính index để số thứ tự được đúng (bắt đầu từ 3) #}
         {% with item_index = loop.index + 1 %}
         {% include 'partials/subsections/_' + sub_item.type + '.html' %}
         {% endwith %}

@@ -1,9 +1,64 @@
 <tr>
-    <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
-    <td>
-      <div style="white-space: pre-line;">
-      a.Khoa/Bộ môn/Faculty/Division: {{syllabus.faculty.name}}
-      b.Giảng viên/Academics: {{syllabus.lecturer.name}}
-      </div>
+    <th scope="row" style="width: 300px;">{{ item_index }}. {{ sub_item.name }}</th>
+    <td >
+        <div id="editable-container-director-{{ sub_item.id }}" class="editable-container ">
+
+            <div class="display-view">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="mb-0 d-flex flex-column" style="white-space: pre-line;">
+                        <span>a. Khoa/Bộ môn: <strong>{{ syllabus.faculty.name }}</strong></span>
+                        <span>b. Giảng viên: <strong>{{ syllabus.lecturer.name }}</strong></span>
+                        <span>c. Email liên hệ: <strong>{{ syllabus.lecturer.email or 'Chưa có' }}</strong></span>
+                        <span>d. Phòng làm việc: <strong>{{ syllabus.lecturer.room or 'Chưa có' }}</strong></span>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm ms-3 flex-shrink-0  edit-trigger-button"
+                            onclick="toggleFieldEdit('director-{{ sub_item.id }}', true)">
+                        <i class="fas fa-pencil-alt"></i> Chỉnh sửa
+                    </button>
+                </div>
+            </div>
+
+            <div class="edit-view" style="display: none;">
+                <form action="{{ url_for('update_director', syllabus_id=syllabus.id) }}" method="POST">
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">a. Khoa/Bộ môn:</label>
+                        <select class="form-select form-select-sm" name="faculty_id">
+                            {% for faculty in all_faculties %}
+                            <option value="{{ faculty.id }}" {% if faculty.id== syllabus.faculty_id %}selected{% endif
+                                    %}>{{ faculty.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">b. Giảng viên:</label>
+                        <select class="form-select form-select-sm" name="lecturer_id"
+                                onchange="updateLecturerInfo(this)">
+                            {% for lecturer in all_lecturers %}
+                            <option value="{{ lecturer.id }}" {% if lecturer.id== syllabus.lecturer_id %}selected{%
+                                    endif %}>{{ lecturer.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">c. Email liên hệ:</label>
+                        <input type="email" class="form-control form-control-sm" name="lecturer_email"
+                               value="{{ syllabus.lecturer.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">d. Phòng làm việc:</label>
+                        <input type="text" class="form-control form-control-sm" name="lecturer_room"
+                               value="{{ syllabus.lecturer.room }}">
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary btn-sm"
+                                onclick="toggleFieldEdit('director-{{ sub_item.id }}', false)">Hủy
+                        </button>
+                        <button type="submit" class="btn btn-success btn-sm">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </td>
 </tr>

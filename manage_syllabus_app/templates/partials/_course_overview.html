@@ -2,7 +2,7 @@
     {% from 'partials/_macros.html' import editable_section_header %}
 
     {{ editable_section_header(part, syllabus) }}
-    <table class="table table-striped align-middle info-table-fresh">
+    <table class="table align-middle info-table-fresh">
         <tbody>
         {% for sub_item in part.sub_sections %}
         {% with item_index = loop.index %}

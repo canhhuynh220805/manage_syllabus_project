@@ -218,6 +218,8 @@ class Lecturer(db.Model):
     # cấp mã tự động để test
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), unique=True)
+    email: Mapped[str] = mapped_column(String(100), nullable=True)
+    room: Mapped[str] = mapped_column(String(200), nullable=True)
     # 1 giảng viên thuộc 1 khoa
     faculty_id: Mapped[int] = mapped_column(ForeignKey('faculty.id'), nullable=False)
     faculty: Mapped[Faculty] = relationship(back_populates="lecturers")

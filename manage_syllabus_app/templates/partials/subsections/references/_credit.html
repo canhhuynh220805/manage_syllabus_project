@@ -1,7 +1,7 @@
 <tr>
-    <th scope="row">{{ item_index }}. {{ sub_item.name }}</th>
-    <td class="editable-cell" onclick="activateEditMode(this)">
-        <div class="display-view">
+    <th scope="row" style="width: 300px;">{{ item_index }}. {{ sub_item.name }}</th>
+    <td id="editable-container-credit-{{ sub_item.id }}">
+        <div class="display-view editable-container">
             <div class="credit-horizontal-bar">
                 <div class="credit-item">
                     <span class="credit-label">Tổng tín chỉ</span>
@@ -20,8 +20,12 @@
                     <span class="credit-value">{{ syllabus.subject.credit.hourSelfStudy }} giờ</span>
                 </div>
             </div>
+            <button type="button" class="btn btn-outline-primary btn-sm ms-3 flex-shrink-0 edit-trigger-button"
+                    onclick="toggleFieldEdit('credit-{{ sub_item.id }}', true)">
+                <i class="fas fa-pencil-alt"></i> Chỉnh sửa
+            </button>
         </div>
-        <div class="edit-view">
+        <div class="edit-view" style="display: none">
             <form method="post" action="{{url_for('update_generic_field')}}">
                 <input type="hidden" name="model_name" value="Credit">
                 <input type="hidden" name="object_id" value="{{ syllabus.subject.credit.id }}">
@@ -33,21 +37,24 @@
                     </div>
                     <div class="credit-item">
                         <span class="credit-label">Lý thuyết</span>
-                        <input name="numberTheory" class="credit-value" style="width:150px;" type="number" value="{{ syllabus.subject.credit.numberTheory }}">
+                        <input name="numberTheory" class="credit-value" style="width:150px;" type="number"
+                               value="{{ syllabus.subject.credit.numberTheory }}">
                     </div>
                     <div class="credit-item">
                         <span class="credit-label">Thực hành</span>
-                        <input name="numberPractice" class="credit-value" style="width:150px;" type="number" value="{{ syllabus.subject.credit.numberPractice }}">
+                        <input name="numberPractice" class="credit-value" style="width:150px;" type="number"
+                               value="{{ syllabus.subject.credit.numberPractice }}">
                     </div>
                     <div class="credit-item">
                         <span class="credit-label">Tự học</span>
-                        <input name="hourSelfStudy" class="credit-value" style="width:150px;" type="number" value="{{ syllabus.subject.credit.hourSelfStudy }}">
+                        <input name="hourSelfStudy" class="credit-value" style="width:150px;" type="number"
+                               value="{{ syllabus.subject.credit.hourSelfStudy }}">
                     </div>
                 </div>
 
                 <div class="text-end mt-2">
                     <button type="button" class="btn btn-secondary btn-sm"
-                            onclick="cancelEditMode(this, event)">Hủy
+                            onclick="toggleFieldEdit('credit-{{ sub_item.id }}', false)">Hủy
                     </button>
                     <button type="submit" class="btn btn-success btn-sm">Lưu</button>
                 </div>
