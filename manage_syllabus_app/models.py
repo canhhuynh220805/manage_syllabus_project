@@ -283,10 +283,10 @@ class RequirementSubject(db.Model):
     __tablename__ = 'requirement_subject'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     # môn học bị yêu cầu ( có yêu cầu )
-    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'), primary_key=True)
+    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'))
     subject: Mapped[Subject] = relationship(foreign_keys=[subject_id], back_populates="required_by_relation")
     # môn học điều kiện
-    require_subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'), primary_key=True)
+    require_subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'))
     require_subject: Mapped[Subject] = relationship(foreign_keys=[require_subject_id],
                                                     back_populates="required_relation")
     # loại điều kiện

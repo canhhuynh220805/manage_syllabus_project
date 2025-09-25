@@ -3,21 +3,55 @@
     <th scope="row" style="width: 300px;">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
         <table class="table table-bordered">
-        <thead class="table-light">
+            <thead class="table-light">
             <tr>
-                <th scope="col" style="width: 10%;">STT</th>
-                <th scope="col" style="width: 60%;">Tên tài liệu</th>
-                <th scope="col" style="width: 30%;">Loại tài liệu</th>
+                <th class="text-center align-middle" scope="col" style="width: 10%;">STT</th>
+                <th class="text-center align-middle" scope="col" style="width: 60%;">Tên tài liệu</th>
+                <th class="text-center align-middle" scope="col" style="width: 30%;">Loại tài liệu</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for material in syllabus.learning_materials %}
             <tr>
-                <td class="text-center">{{ loop.index }}</td>
+                <td class="text-center align-middle">{{ loop.index }}</td>
                 <td>
                     {{editable_field(material, 'name', 'LearningMaterial', syllabus, input_type='input')}}
                 </td>
-                <td>{{ material.type_material.name }}</td>
+                <td>
+                    <div id="editable-container-LearningMaterial-{{ material.id }}-type" class="editable-container">
+                        <div class="display-view">
+                            <div class="d-flex align-items-center">
+                                <p class="mb-0 me-auto">{{ material.type_material.name }}</p>
+                                <button type="button"
+                                        class="btn btn-outline-primary btn-sm ms-3 flex-shrink-0 edit-trigger-button"
+                                        onclick="toggleFieldEdit('LearningMaterial-{{ material.id }}-type', true)">
+                                    <i class="fas fa-pencil-alt"></i> Chỉnh sửa
+                                </button>
+                            </div>
+                        </div>
+                        <div class="edit-view" style="display: none;">
+                            <form method="post" action="{{url_for('update_learning_material_type', material_id=material.id)}}">
+                                <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
+                                <div class="input-group">
+                                    <select class="form-select" name="type_material_id">
+                                        {# Lặp qua tất cả các loại tài liệu có sẵn #}
+                                        {% for type_option in learning_materials %}
+                                        <option value="{{ type_option.id }}" {% if material.type_material_id==
+                                                type_option.id %}selected{% endif %}>
+                                            {{ type_option.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-success btn-sm">Lưu</button>
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                            onclick="toggleFieldEdit('LearningMaterial-{{ material.id }}-type', false)">
+                                        Hủy
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
             {% if not syllabus.learning_materials %}
@@ -25,7 +59,7 @@
                 <td colspan="3" class="text-center">Chưa có tài liệu tham khảo.</td>
             </tr>
             {% endif %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
     </td>
 </tr>

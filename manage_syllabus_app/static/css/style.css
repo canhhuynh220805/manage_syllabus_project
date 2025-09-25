@@ -410,11 +410,12 @@ main {
     position: absolute;
     bottom: 8px;
     right: 8px;
-    opacity: 0; /* Mặc định ẩn nút đi */
+    opacity: 0;
     transition: opacity 0.2s ease-in-out;
 }
 
-/* 3. Khi di chuột vào container, nút "Chỉnh sửa" sẽ hiện ra */
 .editable-container:hover .edit-trigger-button {
     opacity: 1;
 }
+
+

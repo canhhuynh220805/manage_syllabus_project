@@ -134,10 +134,34 @@ function addPillForCO(coId, ploId, event){
     pill.className = "selection-pill";
     pill.innerHTML = `
         <span class="badge bg-success">${ploId}</span>
-        <button type="button" onclick="removeSelection(this)"><i
+        <button type="button" onclick="removeSelection(this)" class="btn btn-danger btn-sm sm-2"><i
                 class="fa-solid fa-trash"></i>
         </button>
         <input type="hidden" name="plo_ids" value="${ploId}">
     `;
     container.appendChild(pill);
 }
+
+
+document.addEventListener('DOMContentLoaded', ()=>{
+
+    const addFormContainers = document.querySelectorAll('.add-form-container');
+
+    addFormContainers.forEach( container =>{
+        const addBtn = document.querySelector('.add-btn');
+        const addForm = document.querySelector('.add-form');
+        const cancelBtn = document.querySelector('.cancel-btn');
+
+        if(addBtn && addForm && cancelBtn){
+            addBtn.addEventListener('click', () =>{
+                addForm.style.display = 'block';
+                addBtn.style.display = 'none';
+            })
+
+            cancelBtn.addEventListener('click', () =>{
+                addForm.style.display = 'none';
+                addBtn.style.display = 'block';
+            })
+        }
+    })
+})

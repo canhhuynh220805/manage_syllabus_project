@@ -3,75 +3,106 @@
     <th scope="row" style="width: 300px;">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
         <table class="table table-bordered">
-          <thead class="table-light">
-              <tr>
-                  <th scope="col" style="width: 20%;" class="text-center align-middle">Mục tiêu môn học/Course Objectives</th>
-                  <th scope="col" style="width: 20%;" class="text-center align-middle">CĐR môn học - CLO</th>
-                  <th scope="col" style="width: 60%;" class="text-center align-middle">Mô tả CĐR - description</th>
-              </tr>
-          </thead>
-                    <tbody>
-                        {% set ns = namespace(cnt=1) %}
-                        {% for co in syllabus.subject.course_objectives %}
-                            {% set clo_count = co.course_learning_outcomes|length %}
-                            {% for clo in co.course_learning_outcomes %}
-                                <tr>
-                                    {% if loop.first %}
-                                        <td class="text-center align-middle" rowspan="{{ clo_count }}">{{ co.name }}</td>
-                                    {% endif %}
-                                    <td class="text-center align-middle">{{ ns.cnt }}</td>
-                                    <td class="align-middle">
-                                        {{editable_field(clo, 'content','CourseLearningOutcome', syllabus, input_type='textarea')}}
-                                    </td>
-                                </tr>
-                                {% set ns.cnt = ns.cnt + 1 %}
-                            {% endfor %}
-                        {% endfor %}
-                    </tbody>
-      </table>
-        <h6 class="mt-4 text-center">Ma trận tích hợp giữa chuẩn đầu ra của môn học và chuẩn đầu ra của chương trình đào tạo</h6>
+            <thead class="table-light">
+            <tr>
+                <th scope="col" style="width: 20%;" class="text-center align-middle">Mục tiêu môn học/Course
+                    Objectives
+                </th>
+                <th scope="col" style="width: 20%;" class="text-center align-middle">CĐR môn học - CLO</th>
+                <th scope="col" style="width: 60%;" class="text-center align-middle">Mô tả CĐR - description</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set ns = namespace(cnt=1) %}
+            {% for co in syllabus.subject.course_objectives %}
+            {% set clo_count = co.course_learning_outcomes|length %}
+            {% for clo in co.course_learning_outcomes %}
+            <tr>
+                {% if loop.first %}
+                <td class="text-center align-middle" rowspan="{{ clo_count }}">{{ co.name }}</td>
+                {% endif %}
+                <td class="text-center align-middle">{{ ns.cnt }}</td>
+                <td class="align-middle">
+                    {{editable_field(clo, 'content','CourseLearningOutcome', syllabus, input_type='textarea')}}
+                </td>
+            </tr>
+            {% set ns.cnt = ns.cnt + 1 %}
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <h6 class="mt-4 text-center">Ma trận tích hợp giữa chuẩn đầu ra của môn học và chuẩn đầu ra của chương trình đào
+            tạo</h6>
         {% set unique_plos = [] %}
         {% for co in syllabus.subject.course_objectives %}
-            {% for plo in co.programme_learning_outcomes %}
-                {% if plo not in unique_plos %}
-                    {% do unique_plos.append(plo) %}
-                {% endif %}
-            {% endfor %}
+        {% for plo in co.programme_learning_outcomes %}
+        {% if plo not in unique_plos %}
+        {% do unique_plos.append(plo) %}
+        {% endif %}
+        {% endfor %}
         {% endfor %}
         <table border="1" class="table table-bordered text-center align-middle">
             <thead>
-                <tr>
-                    <td>CLOs</td>
-                    {% for plo in unique_plos %}
-                        <td>{{plo.id}}</td>
-                    {% endfor %}
-                </tr>
+            <tr>
+                <td>CLOs</td>
+                {% for plo in unique_plos %}
+                <td>{{plo.id}}</td>
+                {% endfor %}
+            </tr>
             </thead>
             <tbody>
+            <div>
                 {% set ns = namespace(cnt=1) %}
                 {% for co in syllabus.subject.course_objectives %}
-                    {% for clo in co.course_learning_outcomes %}
-                        <tr>
-                            <td>{{ ns.cnt }}</td>
-                            {% set ns.cnt = ns.cnt + 1 %}
+                {% for clo in co.course_learning_outcomes %}
+                <tr>
+                    <td>{{ ns.cnt }}</td>
+                    {% set ns.cnt = ns.cnt + 1 %}
 
-                            {# Lặp qua từng cột PLO để điền rating #}
-                            {% for plo_header in unique_plos %}
-                                <td>
-                                    {% set found_rating = namespace(value=none) %}
-                                    {# Tìm trong association của CLO hiện tại #}
-                                    {% for assoc in clo.plo_association %}
-                                        {% if assoc.plo.id == plo_header.id %}
-                                            {% set found_rating.value = assoc.rating %}
-                                        {% endif %}
-                                    {% endfor %}
-
-                                    {{ found_rating.value if found_rating.value is not none else '' }}
-                                </td>
-                            {% endfor %}
-                        </tr>
+                    {# Lặp qua từng cột PLO để điền rating #}
+                    {% for plo in unique_plos %}
+                    <td>
+                        {# tìm rating tương ứng#}
+                        {% set assoc = clo.plo_association | selectattr('plo_id', 'equalto', plo.id)|first%}
+                        <div id="editable-container-rating-{{clo.id}}-{{plo.id}}" class="editable-container">
+                            <div class="display-view">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    {% if assoc %}
+                                    <span>{{ assoc.rating }}</span>
+                                    <button type="button"
+                                            class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0 edit-trigger-button"
+                                            onclick="toggleFieldEdit('rating-{{ clo.id }}-{{ plo.id }}', true)">
+                                        <i class="fas fa-pencil-alt"></i>Chỉnh sửa
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="edit-view" style="display: none;">
+                                <form action="{{ url_for('update_rating') }}" method="post" >
+                                    <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
+                                    <input type="hidden" name="clo_id" value="{{clo.id}}">
+                                    <input type="hidden" name="plo_id" value="{{plo.id}}">
+                                    {% if assoc %}
+                                    <div class="input-group rating-input-group">
+                                        <input type="number" class="form-control w-auto" name="rating"
+                                               min='0' max='5' step='1' value="{{ assoc.rating }}">
+                                        <button type="submit" class="btn btn-success">Lưu
+                                        </button>
+                                        <button type="button" class="btn btn-secondary"
+                                                onclick="toggleFieldEdit('rating-{{ clo.id }}-{{ plo.id }}', false)">
+                                            Hủy
+                                        </button>
+                                    </div>
+                                    {% endif%}
+                                </form>
+                            </div>
+                        </div>
+                    </td>
                     {% endfor %}
+                </tr>
                 {% endfor %}
+                {% endfor %}
+            </div>
             </tbody>
         </table>
     </td>
