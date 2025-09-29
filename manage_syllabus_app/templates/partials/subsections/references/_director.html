@@ -1,15 +1,15 @@
 <tr>
-    <th scope="row" style="width: 300px;">{{ item_index }}. {{ sub_item.name }}</th>
+    <th scope="row" style="width: 300px;" class="fs-6">{{ item_index }}. {{ sub_item.name }}</th>
     <td >
         <div id="editable-container-director-{{ sub_item.id }}" class="editable-container ">
 
-            <div class="display-view">
+            <div class="display-view mt-5">
                 <div class="d-flex justify-content-between align-items-start">
                     <div class="mb-0 d-flex flex-column" style="white-space: pre-line;">
-                        <span>a. Khoa/Bộ môn: <strong>{{ syllabus.faculty.name }}</strong></span>
-                        <span>b. Giảng viên: <strong>{{ syllabus.lecturer.name }}</strong></span>
-                        <span>c. Email liên hệ: <strong>{{ syllabus.lecturer.email or 'Chưa có' }}</strong></span>
-                        <span>d. Phòng làm việc: <strong>{{ syllabus.lecturer.room or 'Chưa có' }}</strong></span>
+                        <span><strong>a. Khoa/Bộ môn:</strong> {{ syllabus.faculty.name }}</span>
+                        <span><strong>b. Giảng viên:</strong> {{ syllabus.lecturer.name }}</span>
+                        <span><strong>c. Email liên hệ:</strong> {{ syllabus.lecturer.email or 'Chưa có' }}</span>
+                        <span><strong>d. Phòng làm việc:</strong> {{ syllabus.lecturer.room or 'Chưa có' }}</span>
                     </div>
                     <button type="button" class="btn btn-outline-primary btn-sm ms-3 flex-shrink-0  edit-trigger-button"
                             onclick="toggleFieldEdit('director-{{ sub_item.id }}', true)">
@@ -43,12 +43,12 @@
                     </div>
                     <div class="mb-2">
                         <label class="form-label fw-bold">c. Email liên hệ:</label>
-                        <input type="email" class="form-control form-control-sm" name="lecturer_email"
+                        <input type="email" class="form-control form-control-sm input-style" name="lecturer_email"
                                value="{{ syllabus.lecturer.email }}">
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">d. Phòng làm việc:</label>
-                        <input type="text" class="form-control form-control-sm" name="lecturer_room"
+                        <input type="text" class="form-control form-control-sm input-style" name="lecturer_room"
                                value="{{ syllabus.lecturer.room }}">
                     </div>
                     <div class="text-end">

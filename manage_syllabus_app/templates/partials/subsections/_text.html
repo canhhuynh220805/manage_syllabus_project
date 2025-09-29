@@ -1,7 +1,7 @@
 {% from 'partials/_macros.html' import editable_field %}
 <tr>
     {# Sửa lại: Dùng 'item_index' thay vì 'loop.index' #}
-    <th scope="row" >{{ item_index }}. {{ sub_item.name }}</th>
+    <th scope="row" class="fs-6">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
         {{ editable_field(sub_item, 'content', 'TextSubSection', syllabus, input_type='textarea') }}
     </td>

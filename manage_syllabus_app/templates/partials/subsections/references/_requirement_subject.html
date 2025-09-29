@@ -1,10 +1,10 @@
 <tr>
-    <th scope="row" style="width: 300px;">{{ item_index }}. {{ sub_item.name }}</th>
+    <th scope="row" style="width: 300px;" class="fs-6">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
         {% set subjects = syllabus.subject.required_by_relation %}
         <table class="table table-bordered">
             <thead class="table-light">
-            <tr>
+            <tr class="text-center">
                 <th scope="col" style="width: 10%;">STT/No.</th>
                 <th scope="col" style="width: 50%;">Môn học điều kiện/Requirements</th>
                 <th scope="col" style="width: 40%;">Mã môn học/Code</th>

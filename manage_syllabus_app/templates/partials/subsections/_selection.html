@@ -1,12 +1,12 @@
 <tr>
     {# Sửa lại: Dùng 'item_index' thay vì 'loop.index' #}
-    <th scope="row" style="width: 300px;">{{ item_index }}. {{ sub_item.name }}</th>
+    <th scope="row" style="width: 300px;" class="fs-6">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
         <div id="selection-container-{{ sub_item.id }}" class="editable-container">
-            <div class="display-view">
+            <div class="display-view mt-5">
                 <div class="d-flex flex-wrap gap-2 mb-2 align">
                     {% for value in sub_item.selected_values %}
-                    <span class="badge bg-success d-flex align-items-center">{{value.name_value}}</span>
+                    <span class="badge bg-success d-flex align-items-center fs-6">{{value.name_value}}</span>
                     {% else %}
                     <span class="text-muted">Chưa có lựa chọn</span>
                     {% endfor %}
@@ -33,6 +33,7 @@
                             <button type="button" class="btn btn-outline-secondary dropdown-toggle"
                                     data-bs-toggle="dropdown">
                                 Chọn {{ sub_item.name }}
+                                <i class="fa fa-caret-down"></i>
                             </button>
                             <ul class="dropdown-menu">
                                 {% for option in sub_item.attribute_group.attribute_values %}

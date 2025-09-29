@@ -183,7 +183,10 @@ class Subject(db.Model):
     required_relation: Mapped[List['RequirementSubject']] = relationship(
         foreign_keys='RequirementSubject.require_subject_id', cascade="all, delete-orphan",
         back_populates="require_subject")
-    course_objectives: Mapped[List["CourseObjective"]] = relationship(back_populates="subject")
+    course_objectives: Mapped[List["CourseObjective"]] = relationship(
+        back_populates="subject",
+        cascade="all, delete-orphan"
+    )
 
     def to_dict(self):
         return {
@@ -326,7 +329,10 @@ class CourseLearningOutcome(db.Model):
     course_objective: Mapped[CourseObjective] = relationship(back_populates="course_learning_outcomes")
     course_objective_id: Mapped[int] = mapped_column(ForeignKey('course_objective.id'))
 
-    plo_association: Mapped[List["CloPloAssociation"]] = relationship(back_populates="clo")
+    plo_association: Mapped[List["CloPloAssociation"]] = relationship(
+        back_populates="clo",
+        cascade="all, delete-orphan",
+    )
 
 
 # LỚP PLO

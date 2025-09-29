@@ -134,7 +134,7 @@ function addPillForCO(coId, ploId, event){
     pill.className = "selection-pill";
     pill.innerHTML = `
         <span class="badge bg-success">${ploId}</span>
-        <button type="button" onclick="removeSelection(this)" class="btn btn-danger btn-sm sm-2"><i
+        <button type="button" onclick="removePill(this)" class="btn btn-danger btn-sm sm-2"><i
                 class="fa-solid fa-trash"></i>
         </button>
         <input type="hidden" name="plo_ids" value="${ploId}">
@@ -148,9 +148,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const addFormContainers = document.querySelectorAll('.add-form-container');
 
     addFormContainers.forEach( container =>{
-        const addBtn = document.querySelector('.add-btn');
-        const addForm = document.querySelector('.add-form');
-        const cancelBtn = document.querySelector('.cancel-btn');
+        const addBtn = container.querySelector('.add-btn');
+        const addForm = container.querySelector('.add-form');
+        const cancelBtn = container.querySelector('.cancel-btn');
 
         if(addBtn && addForm && cancelBtn){
             addBtn.addEventListener('click', () =>{
