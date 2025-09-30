@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import List, Optional
-from xmlrpc.client import MAXINT
 
 from sqlalchemy import String, ForeignKey, Table, Column, Integer, UniqueConstraint, Text
 from sqlalchemy.orm import Mapped, relationship, mapped_column
-
+from enum import Enum as UserEnum
+from flask_login import UserMixin
 from manage_syllabus_app import db, app
 
 # quan hệ nhiều - nhiều giữa đề cương và học liệu
@@ -315,7 +316,10 @@ class CourseObjective(db.Model):
     content: Mapped[str] = mapped_column(Text, nullable=False)
     subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate="CASCADE"))
     subject: Mapped[Subject] = relationship(back_populates="course_objectives")
-    course_learning_outcomes: Mapped[List["CourseLearningOutcome"]] = relationship(back_populates="course_objective")
+    course_learning_outcomes: Mapped[List["CourseLearningOutcome"]] = relationship(
+        back_populates="course_objective",
+        cascade="all, delete-orphan",
+    )
     programme_learning_outcomes: Mapped[List["ProgrammeLearningOutcome"]] = relationship(
         secondary=CourseObjective_ProgrammeLearningOutcome
         , back_populates="course_objectives")
@@ -357,7 +361,25 @@ class CloPloAssociation(db.Model):
     plo: Mapped[ProgrammeLearningOutcome] = relationship(back_populates="clo_association")
 
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        print("tạo thành công")
+#========================= USER ===============================
+
+class UserRole(UserEnum):
+    ADMIN = 1
+    USER = 2
+
+
+class User(db.Model, UserMixin):
+    __tablename__ = 'user'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    username: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(Text, nullable=False)
+    active: Mapped[bool] = mapped_column(default=True)
+    joined_date: Mapped[datetime] = mapped_column(default=datetime.now)
+    avatar: Mapped[str] = mapped_column(String(100), nullable=True)
+    user_role: Mapped[UserRole] = mapped_column(default=UserRole.USER)
+
+    def __str__(self):
+        return self.username
+
+

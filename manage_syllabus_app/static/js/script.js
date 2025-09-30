@@ -32,6 +32,62 @@ window.addEventListener('DOMContentLoaded', event => {
             }
         });
     });
+
+
+    const addFormContainers = document.querySelectorAll('.add-form-container');
+
+    addFormContainers.forEach( container =>{
+        const addBtn = container.querySelector('.add-btn');
+        const addForm = container.querySelector('.add-form');
+        const cancelBtn = container.querySelector('.cancel-btn');
+
+        if(addBtn && addForm && cancelBtn){
+            addBtn.addEventListener('click', () =>{
+                addForm.style.display = 'block';
+                addBtn.style.display = 'none';
+            })
+
+            cancelBtn.addEventListener('click', () =>{
+                addForm.style.display = 'none';
+                addBtn.style.display = 'block';
+            })
+        }
+    })
+
+     document.querySelectorAll('.ajax-form').forEach(form => {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Ngăn tải lại trang
+
+            const formData = new FormData(this);
+            const url = this.action;
+            const method = this.method;
+
+            fetch(url, {
+                method: method,
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message || 'Có lỗi xảy ra'); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Tải lại trang để thấy thay đổi
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                alert('Không thể gửi yêu cầu: ' + error.message);
+            });
+        });
+    });
 });
 
 
@@ -142,26 +198,3 @@ function addPillForCO(coId, ploId, event){
     container.appendChild(pill);
 }
 
-
-document.addEventListener('DOMContentLoaded', ()=>{
-
-    const addFormContainers = document.querySelectorAll('.add-form-container');
-
-    addFormContainers.forEach( container =>{
-        const addBtn = container.querySelector('.add-btn');
-        const addForm = container.querySelector('.add-form');
-        const cancelBtn = container.querySelector('.cancel-btn');
-
-        if(addBtn && addForm && cancelBtn){
-            addBtn.addEventListener('click', () =>{
-                addForm.style.display = 'block';
-                addBtn.style.display = 'none';
-            })
-
-            cancelBtn.addEventListener('click', () =>{
-                addForm.style.display = 'none';
-                addBtn.style.display = 'block';
-            })
-        }
-    })
-})

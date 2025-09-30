@@ -28,7 +28,7 @@
                     {{ editable_field(clo, 'content', 'CourseLearningOutcome', syllabus, input_type='textarea') }}
                 </td>
                 <td class="text-center align-middle">
-                    <form action="{{ url_for('delete_course_learning_outcome', clo_id=clo.id) }}" method="post">
+                    <form action="{{ url_for('delete_course_learning_outcome', clo_id=clo.id) }}" method="post" class="ajax-form">
                         <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
                         <input type="hidden" name="co_id" value="{{ co.id }}">
                         <button type="submit" class="btn btn-danger btn-sm"
@@ -56,7 +56,7 @@
 
                         <div class="card mt-2 add-form text-start" style="display: none;">
                             <div class="card-body">
-                                <form action="{{url_for('add_clo',co_id = co.id)}}" method="post">
+                                <form action="{{url_for('add_clo',co_id = co.id)}}" method="post" class="ajax-form">
                                     <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
                                     <div class="mb-2">
                                         <label class="form-label">Nội dung CLO mới:</label>
@@ -123,7 +123,7 @@
                                 </div>
                             </div>
                             <div class="edit-view" style="display: none;">
-                                <form action="{{ url_for('update_rating') }}" method="post">
+                                <form action="{{ url_for('update_rating') }}" method="post" class="ajax-form">
                                     <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
                                     <input type="hidden" name="clo_id" value="{{clo.id}}">
                                     <input type="hidden" name="plo_id" value="{{plo.id}}">

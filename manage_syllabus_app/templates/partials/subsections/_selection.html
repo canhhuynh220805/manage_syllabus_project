@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div class="edit-view" style="display: none">
-                <form action="{{ url_for('update_selection', subsection_id=sub_item.id)}}" method="POST"
+                <form action="{{ url_for('update_selection', subsection_id=sub_item.id)}}" method="POST" class="ajax-form"
                       id="form-{{sub_item.id}}">
                     <div id="edit-selected-values-{{ sub_item.id }}" class="d-flex flex-wrap gap-2 mb-2">
                         {% for value in sub_item.selected_values %}

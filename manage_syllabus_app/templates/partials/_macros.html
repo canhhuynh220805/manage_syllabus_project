@@ -44,7 +44,7 @@
     </div>
 
     <div class="edit-view" style="display: none;">
-        <form method="post" action="{{ url_for('update_generic_field') }}">
+        <form method="post" action="{{ url_for('update_generic_field') }}" class="ajax-form">
             <input type="hidden" name="model_name" value="{{ model_name }}">
             <input type="hidden" name="object_id" value="{{ object.id }}">
             <input type="hidden" name="syllabus_id" value="{{ syllabus_object.id }}">

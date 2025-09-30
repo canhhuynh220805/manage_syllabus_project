@@ -29,17 +29,6 @@
                 <span>OU</span>
             </div>
             Quản lí đề cương
-            <div class="banter-loader">
-                <div class="banter-loader__box"></div>
-                <div class="banter-loader__box"></div>
-                <div class="banter-loader__box"></div>
-                <div class="banter-loader__box"></div>
-                <div class="banter-loader__box"></div>
-                <div class="banter-loader__box"></div>
-                <div class="banter-loader__box"></div>
-                <div class="banter-loader__box"></div>
-                <div class="banter-loader__box"></div>
-            </div>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
                 aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +39,18 @@
             <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Trang chủ</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('editor') }}">Tạo đề cương</a></li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item d-flex align-items-center">
+                    <a class="nav-link text-warning" href="#">Chào, {{ current_user.name }}!</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('user_logout') }}">Đăng xuất</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('user_login') }}">Đăng nhập</a>
+                </li>
+                {% endif %}
                 <li class="nav-item d-flex align-items-center">
                     <button class="btn btn-link text-white me-2" data-bs-toggle="modal" data-bs-toggle="tooltip"
                             data-bs-placement="bottom" title="Thông báo">

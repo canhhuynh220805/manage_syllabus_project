@@ -24,7 +24,7 @@
                         </button>
                     </div>
                     <div class="edit-view" style="display: none;">
-                        <form action="{{ url_for('update_requirement_subject', subject_id=sub.id) }}" method="post">
+                        <form action="{{ url_for('update_requirement_subject', subject_id=sub.id) }}" method="post" class="ajax-form">
                             <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
                             <div class="d-flex flex-column gap-2">
                                 <select class="form-select form-select-sm" name="requirement_subject_id">
@@ -55,7 +55,7 @@
                             </div>
                         </form>
                         <form action=" {{url_for('delete_requirement_subject', subject_id=sub.id)}}" method="post"
-                              class="d-inline mt-2 text-end">
+                              class="d-inline mt-2 text-end ajax-form">
                             <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
                             <button type="submit" class="btn btn-danger btn-sm p-1 mt-2"
                                     onclick="return confirm('Bạn có chắc chắn muốn xóa môn học điều kiện này không?');">
@@ -84,7 +84,7 @@
             <div style="display: none;" class="card mt-2 text-start add-form">
                 <div class="card-body">
                     <form method="post"
-                          action="{{ url_for('add_requirement_subject', subject_id=syllabus.subject.id) }}">
+                          action="{{ url_for('add_requirement_subject', subject_id=syllabus.subject.id) }}" class="ajax-form">
                         <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
                         <div class="d-flex flex-column gap-2">
                             <select class="form-select form-select-sm" name="require_subject_id">
