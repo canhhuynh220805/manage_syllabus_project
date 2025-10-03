@@ -5,9 +5,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # =========== CÁC HÀM LIÊN QUAN ĐẾN USER ===========
+def get_user_by_id(user_id):
+    return User.query.get(int(user_id))
+
 def get_user_by_username(username):
     """Lấy người dùng theo username."""
-    return User.query.filter_by(username=username).first()
+    return User.query.filter_by(username=username.strip()).first()
 
 
 def check_password(user, password):
@@ -17,7 +20,7 @@ def check_password(user, password):
     return False
 
 
-def add_user(name, username, password, avatar=None, role='LECTURER'):
+def add_user(name, username, password, avatar=None, role='2'):
     """Thêm người dùng mới."""
     hashed_password = generate_password_hash(password)
     new_user = User(name=name, username=username, password=hashed_password, avatar=avatar, role=role)

@@ -1,7 +1,7 @@
 from manage_syllabus_app import app, dao, login
 import functools
 from flask import render_template, request, url_for, flash, jsonify
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import redirect
 from manage_syllabus_app import db
 from manage_syllabus_app.decorators import handle_ajax_request
@@ -11,18 +11,18 @@ from manage_syllabus_app.models import Faculty, Lecturer, Credit, Subject, Sylla
     CourseLearningOutcome, CourseObjective, SelectionSubSection, AttributeValue, ProgrammeLearningOutcome, \
     CloPloAssociation, User
 
-@app.before_request
-def require_login():
-    """
-    Hàm này chạy trước MỌI request.
-    Nó sẽ chuyển hướng người dùng về trang đăng nhập nếu họ chưa xác thực.
-    """
-    # Danh sách các trang KHÔNG cần đăng nhập
-    allowed_endpoints = ['user_login', 'user_register', 'static']
-
-    # Nếu người dùng chưa đăng nhập VÀ trang họ muốn vào không nằm trong danh sách được phép
-    if not current_user.is_authenticated and request.endpoint not in allowed_endpoints:
-        return redirect(url_for('user_login'))
+# @app.before_request
+# def require_login():
+#     """
+#     Hàm này chạy trước MỌI request.
+#     Nó sẽ chuyển hướng người dùng về trang đăng nhập nếu họ chưa xác thực.
+#     """
+#     # Danh sách các trang KHÔNG cần đăng nhập
+#     allowed_endpoints = ['user_login', 'user_register', 'static']
+#
+#     # Nếu người dùng chưa đăng nhập VÀ trang họ muốn vào không nằm trong danh sách được phép
+#     if not current_user.is_authenticated and request.endpoint not in allowed_endpoints:
+#         return redirect(url_for('user_login'))
 
 def to_roman(n):
     """Chuyển một số nguyên sang số La Mã."""
@@ -85,6 +85,7 @@ def syllabus_detail(syllabus_id):
 
 # CÁC ROUTE XÁC THỰC
 @app.route('/login', methods=['GET', 'POST'])
+
 def user_login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -126,6 +127,16 @@ def user_logout():
     logout_user()
     return redirect(url_for('user_login'))
 
+@app.route('/admin-login', methods=['POST'])
+def admin_login():
+    username = request.form['username']
+    password = request.form['password']
+    user = dao.get_user_by_username(username)
+    if user and dao.check_password(user, password):
+        login_user(user=user)
+    else:
+        flash('Tên đăng nhập hoặc mật khẩu không chính xác!', 'danger')
+    return redirect('/admin')
 
 # CÁC ROUTE XỬ LÝ DỮ LIỆU (Thêm, sửa, xóa)
 # Chúng ta sẽ di chuyển các hàm này vào một blueprint riêng ở bước sau

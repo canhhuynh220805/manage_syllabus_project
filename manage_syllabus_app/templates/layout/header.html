@@ -1,0 +1,53 @@
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <div class="custom-logo text-center d-inline-block me-2 d-flex justify-content-center align-items-center">
+                <span>OU</span>
+            </div>
+            Quản lí đề cương
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars ms-1"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('editor') }}">Tạo đề cương</a></li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item d-flex align-items-center">
+                    <a class="nav-link text-warning" href="#">Chào, {{ current_user.name }}!</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('user_logout') }}">Đăng xuất</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('user_login') }}">Đăng nhập</a>
+                </li>
+                {% endif %}
+                <li class="nav-item d-flex align-items-center">
+                    <button class="btn btn-link text-white me-2" data-bs-toggle="modal" data-bs-toggle="tooltip"
+                            data-bs-placement="bottom" title="Thông báo">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="bg-info rounded-circle d-flex align-items-center justify-content-center"
+                         style="width: 32px; height: 32px;">
+                        <span class="text-dark fw-bold small">AD</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

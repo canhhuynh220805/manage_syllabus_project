@@ -1,9 +1,4 @@
-{% extends 'base_bare.html' %}
-
-{% block content %}
 <div class="container" style="max-width: 500px; margin-top: 100px;">
-    <h1 class="text-center mb-4">Đăng nhập</h1>
-
     {# Hiển thị thông báo lỗi nếu có #}
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -13,7 +8,7 @@
     {% endif %}
     {% endwith %}
 
-    <form method="post" action="{{ url_for('user_login') }}">
+    <form method="post" action="{{ url_for('admin_login') }}">
         <div class="mb-3">
             <label for="username" class="form-label">Tên đăng nhập</label>
             <input type="text" class="form-control" id="username" name="username" required>
@@ -28,4 +23,3 @@
         <p>Chưa có tài khoản? <a href="{{ url_for('user_register') }}">Đăng ký ngay</a></p>
     </div>
 </div>
-{% endblock %}

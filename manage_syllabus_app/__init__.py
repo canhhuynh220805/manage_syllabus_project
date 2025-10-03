@@ -22,11 +22,9 @@ app.jinja_env.add_extension('jinja2.ext.do')
 
 login = LoginManager(app=app)
 db = SQLAlchemy(app=app)
+login.login_view = 'user_login'
 
-from manage_syllabus_app import commands
-from manage_syllabus_app.models import User
-@login.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+from manage_syllabus_app import controllers, commands, admin
+
 
 
