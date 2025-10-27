@@ -1,0 +1,9 @@
+{% extends 'admin/base.html' %} {# Kế thừa từ file base gốc của Flask-Admin #}
+
+{% block head %}
+    {{ super() }} {# Giữ lại tất cả CSS/JS gốc của trang admin #}
+
+    {# Thêm link CSS của user (style.css) vào đây #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}

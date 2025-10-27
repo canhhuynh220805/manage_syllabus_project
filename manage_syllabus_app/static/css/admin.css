@@ -1,0 +1,20 @@
+/* * manage_syllabus_app/static/css/admin_overrides.css
+ * File này sẽ ẩn tất cả các nút tương tác trong đề cương mẫu.
+ */
+
+/* Ẩn tất cả nút "Chỉnh sửa" */
+.edit-trigger-button {
+    display: none !important;
+}
+
+/* Ẩn tất cả các nút "Thêm" (có icon dấu cộng) */
+.add-form-container {
+    display: none !important;
+}
+
+/* Ẩn tất cả các nút "Xóa" (icon thùng rác) */
+form.ajax-form button[type="submit"][onclick*="confirm"],
+form.ajax-form[action*="/delete_"],
+.delete-co-form {
+    display: none !important;
+}

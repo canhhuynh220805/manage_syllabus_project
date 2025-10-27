@@ -9,7 +9,8 @@ from manage_syllabus_app.decorators import handle_ajax_request
 from manage_syllabus_app.models import Faculty, Lecturer, Credit, Subject, Syllabus, RequirementSubject, \
     TypeRequirement, MainSection, LearningMaterial, TypeLearningMaterial, TextSubSection, \
     CourseLearningOutcome, CourseObjective, SelectionSubSection, AttributeValue, ProgrammeLearningOutcome, \
-    CloPloAssociation, User
+    CloPloAssociation, User, UserRole
+
 
 # @app.before_request
 # def require_login():
@@ -55,10 +56,14 @@ app.jinja_env.filters['roman'] = to_roman
 # CÁC ROUTE GỐC
 @app.route('/')
 def index():
-    syllabuses = dao.get_all_syllabuses()
+    syllabus = []
+    if current_user.is_authenticated:
+        if current_user.user_role == UserRole.ADMIN:
+            syllabus = dao.get_all_syllabuses()
+        elif current_user.user_role == UserRole.USER and current_user.lecturer_id:
+            syllabus = dao.get_syllabuses_by_lecturer_id(lecturer_id=current_user.lecturer_id)
     all_faculties = dao.get_all_faculties()
-    all_lecturers = dao.get_all_lecturers()
-    return render_template('index.html', syllabuses=syllabuses, faculty=all_faculties, lecturer=all_lecturers)
+    return render_template('index.html', syllabuses=syllabus, all_faculties=all_faculties)
 
 
 @app.route('/editor')

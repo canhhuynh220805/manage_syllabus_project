@@ -64,6 +64,10 @@ def get_all_learning_material_types():
     """Lấy tất cả các loại tài liệu học tập."""
     return TypeLearningMaterial.query.all()
 
+def get_syllabuses_by_lecturer_id(lecturer_id):
+    """Lấy tất cả đề cương do một giảng viên phụ trách."""
+    return Syllabus.query.filter_by(lecturer_id=lecturer_id).all()
+
 # =================================================================
 # CÁC HÀM CẬP NHẬT VÀ XÓA (UPDATE/DELETE)
 # =================================================================

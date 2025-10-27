@@ -189,12 +189,8 @@ class Subject(db.Model):
         cascade="all, delete-orphan"
     )
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'credit': self.credit.to_dict()
-        }
+    def __str__(self):
+        return self.name
 
 
 # LỚP KHOA
@@ -207,11 +203,8 @@ class Faculty(db.Model):
     # 1 khoa có nhiều giảng viên
     lecturers: Mapped[List["Lecturer"]] = relationship(back_populates='faculty')
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'faculty_name': self.name
-        }
+    def __str__(self):
+        return self.name
 
 
 # LỚP GIẢNG VIÊN
@@ -229,13 +222,9 @@ class Lecturer(db.Model):
     faculty: Mapped[Faculty] = relationship(back_populates="lecturers")
     # 1 giảng viên phụ trách nhiều đề cương
     syllabuses: Mapped[Optional[List[Syllabus]]] = relationship(back_populates='lecturer')
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'faculty': self.faculty.to_dict()
-        }
+    user: Mapped["User"] = relationship(back_populates="lecturer")  # Mối quan hệ 1-1 ngược lại
+    def __str__(self):
+        return self.name
 
 
 # LỚP TÀI LIỆU THAM KHẢO
@@ -273,13 +262,9 @@ class Credit(db.Model):
     def getTotalCredit(self):
         return self.numberTheory + self.numberPractice;
 
-    def to_dict(self):
-        return {
-            'totalCredit': self.getTotalCredit(),
-            'number theory': self.numberTheory,
-            'number practice': self.numberPractice,
-            'hour self study': self.hourSelfStudy
-        }
+    def __str__(self):
+        return f"TC: {self.getTotalCredit()} (LT: {self.numberTheory} - TH: {self.numberPractice})"
+
 
 
 # LỚP MÔN HỌC ĐIỀU KIỆN
@@ -378,7 +363,8 @@ class User(db.Model, UserMixin):
     joined_date: Mapped[datetime] = mapped_column(default=datetime.now)
     avatar: Mapped[str] = mapped_column(String(100), nullable=True)
     user_role: Mapped[UserRole] = mapped_column(default=UserRole.USER)
-
+    lecturer_id: Mapped[Optional[int]] = mapped_column(ForeignKey('lecturer.id'), nullable=True)
+    lecturer: Mapped[Optional["Lecturer"]] = relationship(back_populates="user")
     def __str__(self):
         return self.username
 
