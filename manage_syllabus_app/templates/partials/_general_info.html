@@ -9,7 +9,7 @@
         <tr>
             <th scope="row" class="fs-6">1. Tên môn học tiếng Việt/Course title in Vietnamese</th>
             <td>
-                {{editable_field(syllabus.subject, 'name','Subject', syllabus, input_type='input')}}
+                {{editable_field(syllabus.subject, 'name','Subject', syllabus, input_type='input', data_rest_url=url_for('api.update_subject', subject_id=syllabus.subject.id))}}
             </td>
         </tr>
 
@@ -17,7 +17,7 @@
         <tr>
             <th scope="row" class="fs-6">Mã môn học/Course code</th>
             <td>
-                {{editable_field(syllabus.subject, 'id','Subject', syllabus, input_type='input')}}
+                {{syllabus.subject.id}}
             </td>
         </tr>
 

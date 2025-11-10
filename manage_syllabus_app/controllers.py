@@ -77,8 +77,8 @@ def editor():
 def syllabus_detail(syllabus_id):
     syllabus = dao.get_syllabus_by_id(syllabus_id)
     all_faculties = dao.get_all_faculties()
-    all_lecturers = dao.get_all_lecturers()
-    all_subjects = dao.get_all_subjects()
+    all_lecturers = dao.get_lecturers()
+    all_subjects = dao.get_subjects()
     all_type_subjects = dao.get_all_type_subjects()
     learning_materials = dao.get_all_learning_material_types()
     # plos = dao.get_all_plos() # Bạn sẽ cần tạo hàm này trong dao.py

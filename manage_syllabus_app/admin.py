@@ -1,6 +1,7 @@
+import os
 from types import SimpleNamespace
 
-from flask import redirect, request, url_for, flash
+from flask import redirect, request, url_for, flash, json
 from flask_admin import BaseView, expose, AdminIndexView, Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_login import logout_user, current_user
@@ -9,7 +10,7 @@ from wtforms import PasswordField
 
 from manage_syllabus_app import app, db, dao
 from manage_syllabus_app.models import UserRole, User, Faculty, Lecturer, Subject, Credit
-from manage_syllabus_app.syllabus_layout import MASTER_STRUCTURE
+
 
 
 # Lớp Index View tùy chỉnh để xử lý đăng nhập
@@ -102,20 +103,39 @@ class SubjectAdminView(AuthenticatedAdminView):
 class SampleSyllabusView(AuthenticatedBaseView):
     @expose('/')
     def index(self):
-        # 1. Tự động xây dựng "Syllabus giả" từ MASTER_STRUCTURE
+        # 1. Đọc cấu trúc từ tệp JSON mặc định
+        default_structure_file = 'syllabus_2025.json'  # Tên tệp JSON mẫu
+        structures_dir = os.path.join(app.root_path, 'data', 'structures')
+        json_path = os.path.join(structures_dir, default_structure_file)
+
+        master_structure_data = []
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                master_structure_data = json.load(f)
+        except Exception as e:
+            flash(f"LỖI NGHIÊM TRỌNG: Không thể tải tệp cấu trúc mẫu '{default_structure_file}'. Lỗi: {e}", "danger")
+            # Trả về một trang lỗi đơn giản
+            return self.render('admin/sample_syllabus_view.html', syllabus=None, is_sample=True)
+
+        # 2. Tự động xây dựng "Syllabus giả" từ dữ liệu JSON
         mock_main_sections = []
-        for part_def in MASTER_STRUCTURE:
+        # Thay thế MASTER_STRUCTURE bằng master_structure_data
+        for part_def in master_structure_data:
             mock_sub_sections = []
             for i, sub_def in enumerate(part_def['sub_sections']):
-                sub_def['id'] = (part_def['position'] * 100) + i
-                if sub_def.get('type') == 'selection':
-                    sub_def['attribute_group'] = SimpleNamespace(
+                # Tạo một bản sao để tránh thay đổi dữ liệu gốc (nếu sub_def là dict)
+                mock_sub_def = sub_def.copy()
+                mock_sub_def['id'] = (part_def['position'] * 100) + i
+
+                if mock_sub_def.get('type') == 'selection':
+                    # Dữ liệu giả cho nhóm lựa chọn
+                    mock_sub_def['attribute_group'] = SimpleNamespace(
                         attribute_values=[
                             SimpleNamespace(id=1, name_value='[Lựa chọn mẫu 1]'),
                             SimpleNamespace(id=2, name_value='[Lựa chọn mẫu 2]')
                         ]
                     )
-                mock_sub_sections.append(SimpleNamespace(**sub_def))
+                mock_sub_sections.append(SimpleNamespace(**mock_sub_def))
 
             mock_part = SimpleNamespace(
                 id=part_def['position'],
@@ -125,18 +145,19 @@ class SampleSyllabusView(AuthenticatedBaseView):
                 sub_sections=mock_sub_sections
             )
             mock_main_sections.append(mock_part)
+
+        # 3. (Giữ nguyên) Xây dựng các đối tượng dữ liệu giả phức tạp
         mock_plos = [
             SimpleNamespace(id='PLO.1'),
             SimpleNamespace(id='PLO.2'),
             SimpleNamespace(id='PLO.3')
         ]
-        # 2. Xây dựng các đối tượng dữ liệu giả phức tạp cho các mục tham chiếu
+
         mock_subject = SimpleNamespace(
             id='SAMPLE',
             name='[Tên môn học]',
             credit=SimpleNamespace(id=0, getTotalCredit=lambda: 0, numberTheory=0, numberPractice=0, hourSelfStudy=0),
 
-            # Dữ liệu giả cho Môn học điều kiện (Requirement Subject)
             required_by_relation=[
                 SimpleNamespace(id=1, require_subject=SimpleNamespace(id='PRE101', name='[Tên môn tiên quyết 1]'),
                                 type_requirement=SimpleNamespace(name='Tiên quyết')),
@@ -144,14 +165,12 @@ class SampleSyllabusView(AuthenticatedBaseView):
                                 type_requirement=SimpleNamespace(name='Học trước')),
             ],
 
-            # Dữ liệu giả cho Mục tiêu (CO) và Chuẩn đầu ra (CLO)
             course_objectives=[
                 SimpleNamespace(
                     id=1, name='CO1', content='[Mô tả mục tiêu môn học 1]',
-                    programme_learning_outcomes=mock_plos,  # CO1 ánh xạ tới cả 3 PLO
+                    programme_learning_outcomes=mock_plos,
                     course_learning_outcomes=[
                         SimpleNamespace(id=101, content='[Mô tả chuẩn đầu ra 1.1]',
-                                        # Dữ liệu giả cho ma trận CLO-PLO
                                         plo_association=[
                                             SimpleNamespace(plo_id='PLO.1', rating=4),
                                             SimpleNamespace(plo_id='PLO.2', rating=3),
@@ -167,7 +186,7 @@ class SampleSyllabusView(AuthenticatedBaseView):
                 ),
                 SimpleNamespace(
                     id=2, name='CO2', content='[Mô tả mục tiêu môn học 2]',
-                    programme_learning_outcomes=[mock_plos[2]],  # CO2 chỉ ánh xạ tới PLO.3
+                    programme_learning_outcomes=[mock_plos[2]],
                     course_learning_outcomes=[
                         SimpleNamespace(id=201, content='[Mô tả chuẩn đầu ra 2.1]',
                                         plo_association=[
@@ -186,7 +205,6 @@ class SampleSyllabusView(AuthenticatedBaseView):
             faculty=SimpleNamespace(id=0, name='[Tên Khoa]'),
             subject_id=0, lecturer_id=0, faculty_id=0,
 
-            # Dữ liệu giả cho Học liệu (Learning Materials)
             learning_materials=[
                 SimpleNamespace(id=1, name='[Tên sách giáo trình chính]',
                                 type_material=SimpleNamespace(name='Sách giáo trình')),
@@ -195,12 +213,13 @@ class SampleSyllabusView(AuthenticatedBaseView):
             ]
         )
 
-        # 3. Render template syllabus_detail.html
+        # 4. Render template
         return self.render('admin/sample_syllabus_view.html',
                            syllabus=mock_syllabus,
                            is_sample=True,
                            all_faculties=[], all_lecturers=[], learning_materials=[], all_subjects=[],
-                           all_type_subjects=[], plos=[])
+                           all_type_subjects=[],
+                           plos=[])  # `plos` ở đây là để render form, mock_plos ở trên là cho dữ liệu
 
 
 class LogoutView(AuthenticatedBaseView):

@@ -49,6 +49,7 @@ class Syllabus(db.Model):
     # 1 đề cương xây dựng bởi nhiều học liệu
     learning_materials: Mapped[List["LearningMaterial"]] = relationship(secondary=Syllabus_LearningMaterial,
                                                                         back_populates="syllabuses")
+    structure_file: Mapped[Optional[str]] = mapped_column(String(100), default="syllabus_2025.json")
 
     def to_dict(self):
         return {
@@ -192,6 +193,13 @@ class Subject(db.Model):
     def __str__(self):
         return self.name
 
+    def to_dict(self):
+        """Chuyển đổi đối tượng Subject sang định dạng JSON (dictionary)."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'credit_id': self.credit_id
+        }
 
 # LỚP KHOA
 class Faculty(db.Model):

@@ -45,15 +45,19 @@ def get_all_faculties():
     return Faculty.query.all()
 
 
-def get_all_lecturers():
-    """Lấy tất cả giảng viên."""
-    return Lecturer.query.all()
+def get_lecturers(lecturer_id=None):
+    lecturers = Lecturer.query
+    if lecturer_id:
+        lecturers = lecturers.filter_by(id=lecturer_id)
+    return lecturers.all()
 
 
-def get_all_subjects():
-    """Lấy tất cả môn học."""
-    return Subject.query.all()
+def get_subjects():
+    subjects = Subject.query
+    return subjects.all()
 
+def get_subject_by_id(subject_id):
+    return Subject.query.filter_by(id=subject_id).first()
 
 def get_all_type_subjects():
     """Lấy tất cả các loại môn học điều kiện."""

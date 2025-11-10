@@ -120,7 +120,7 @@ table{
     background-color: var(--main);
 }
 
-.tanle-custom thead th{
+.table-custom thead th{
     background-color: var(--secondary);
     color: var(--headline);
     font-weight: 600;

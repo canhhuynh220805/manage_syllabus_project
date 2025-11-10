@@ -32,7 +32,7 @@
 </div>
 {% endmacro %}
 
-{% macro editable_field(object, field_name, model_name, syllabus_object, input_type='input') %}
+{% macro editable_field(object, field_name, model_name, syllabus_object, input_type='input', data_rest_url=None) %}
 <div id="editable-container-{{ model_name }}-{{ object.id }}-{{ field_name }}" class="editable-container">
 
     <div class="display-view mt-5">
@@ -44,7 +44,18 @@
     </div>
 
     <div class="edit-view" style="display: none;">
-        <form method="post" action="{{ url_for('update_generic_field') }}" class="ajax-form">
+        {#
+           Kiểm tra xem data_rest_url có được truyền vào không.
+           - Nếu CÓ: Dùng 'rest-form' mới và phương thức 'PATCH'.
+           - Nếu KHÔNG: Dùng 'ajax-form' cũ và action '/update_generic_field'.
+        #}
+        <form method="post"
+              class="{{ 'rest-form' if data_rest_url else 'ajax-form' }}"
+              data-method="{{ 'PATCH' if data_rest_url else 'POST' }}"
+              data-url="{{ data_rest_url if data_rest_url else url_for('update_generic_field') }}"
+              action="{{ url_for('update_generic_field') if not data_rest_url else '#' }}">
+
+            {# Các trường ẩn này vẫn cần thiết để JavaScript (cả cũ và mới) có thể hoạt động #}
             <input type="hidden" name="model_name" value="{{ model_name }}">
             <input type="hidden" name="object_id" value="{{ object.id }}">
             <input type="hidden" name="syllabus_id" value="{{ syllabus_object.id }}">

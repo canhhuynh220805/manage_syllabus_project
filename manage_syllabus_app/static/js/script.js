@@ -88,6 +88,60 @@ window.addEventListener('DOMContentLoaded', event => {
             });
         });
     });
+
+    document.querySelectorAll('.rest-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Luôn ngăn tải lại trang
+
+                const url = this.dataset.url; // Lấy URL từ data-url
+                const method = this.dataset.method.toUpperCase(); // Lấy Method từ data-method (PATCH, POST, DELETE)
+
+                console.log(`Đang gửi qua 'rest-form' (API mới) tới ${method} ${url}`);
+
+                const formData = new FormData(this);
+                // Chuyển FormData thành một đối tượng JSON
+                let jsonData = {};
+                formData.forEach((value, key) => {
+                    // Chỉ lấy các trường có thể chỉnh sửa, không phải trường ẩn
+                    const inputField = form.querySelector(`[name="${key}"]`);
+                    // Chỉ lấy các trường có thể gõ vào (không phải hidden, ...)
+                    if (inputField && !inputField.disabled && inputField.type !== 'hidden') {
+                        jsonData[key] = value;
+                    }
+                });
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json', // Báo cho server biết chúng ta gửi JSON
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(jsonData) // Gửi body dạng JSON
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // Nếu lỗi, đọc lỗi JSON từ server
+                        return response.json().then(err => {
+                            throw new Error(err.message || err.description || 'Có lỗi từ server');
+                        });
+                    }
+                    // Nếu thành công (200 OK, 201 Created), đọc data JSON
+                    return response.json();
+                })
+                .then(data => {
+                    // 'data' là đối tượng JSON được cập nhật (từ hàm to_dict())
+                    console.log('Thành công! Dữ liệu trả về:', data);
+
+                    // Tạm thời vẫn reload để thấy kết quả
+                    alert('Cập nhật (qua API mới) thành công!');
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Lỗi REST API:', error);
+                    alert('Không thể gửi yêu cầu: ' + error.message);
+                });
+            });
+        });
 });
 
 
@@ -119,9 +173,19 @@ function updateLecturerInfo(selectElement) {
     const emailInput = form.querySelector('input[name="lecturer_email"]');
     const roomInput = form.querySelector('input[name="lecturer_room"]');
 
-    // Gọi đến API endpoint mới mà chúng ta đã tạo ở backend
-    fetch('/get_lecturer_detail/' + lecturerId)
-        .then(response => response.json())
+    // Gọi đến API endpoint
+    const api_url = `/api/lectures/${lecturerId}`
+    fetch(api_url)
+        .then(response => {
+            if (!response.ok) {
+                // Nếu API trả về lỗi (404, 500), lấy message từ JSON
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Lỗi không xác định');
+                });
+            }
+            // Nếu thành công (200), trả về JSON data
+            return response.json();
+        })
         .then(data => {
             if (data) {
                 // Cập nhật giá trị của các ô input với thông tin mới
@@ -129,7 +193,13 @@ function updateLecturerInfo(selectElement) {
                 roomInput.value = data.room;
             }
         })
-        .catch(error => console.error('Error fetching lecturer details:', error));
+        .catch(error => {
+            console.error('Error fetching lecturer details:', error);
+            // Hiển thị lỗi cho người dùng
+            alert(`Không thể tải thông tin giảng viên: ${error.message}`);
+        });
+
+
 }
 
 function removePill(button){
