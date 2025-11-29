@@ -2,8 +2,8 @@
 {% block body %}
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-end my-4">
-        <a class="btn btn-custom-primary px-4 py-2 shadow-sm fw-bold" href="{{ url_for('syllabus.create_view') }}">
-            Thêm đề cương
+        <a class="btn btn-custom-primary px-4 py-2 shadow-sm fw-bold"
+           href="{{ url_for('syllabus.create_view') }}">Thêm đề cương
         </a>
     </div>
     <form class="row g-3 align-items-center mb-4">
@@ -83,17 +83,22 @@
                 <td>
                     <div class="d-flex justify-content-center gap-2">
                         <a href="{{ url_for('syllabus_detail', syllabus_id=item.id) }}"
-                           class="btn btn-outline-primary btn-sm px-3" target="_blank">
+                           class="btn btn-outline-primary btn-sm px-3" target="_blank" title="Xem chi tiết">
                             Xem
                         </a>
-                        <!--method="POST" action="{{ url_for('syllabus.delete_view') }}"-->
+
+                        <a href="{{ url_for('syllabus.edit_view', id=item.id) }}"
+                           class="btn btn-outline-warning btn-sm px-3" title="Sửa thông tin">
+                            Sửa
+                        </a>
+
                         <form method="POST" action="{{ url_for('syllabus.delete_view') }}" class="form-delete">
                             <input type="hidden" name="id" value="{{ item.id }}">
                             <input type="hidden" name="url" value="{{ url_for('syllabus.index_view') }}">
 
                             <button type="button" class="btn btn-outline-danger btn-sm px-3" title="Xóa"
                                     onclick="confirmDelete(this)">
-                                <i class="fa fa-trash"></i>
+                                Xóa
                             </button>
                         </form>
                     </div>

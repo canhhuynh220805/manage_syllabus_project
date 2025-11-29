@@ -78,8 +78,7 @@ class LecturerAdminView(AuthenticatedAdminView):
 # Ló view tùy chỉnh đề cương
 class SyllabusAdminView(AuthenticatedAdminView):
     list_template = 'admin/custom_syllabus_list.html'
-    create_template = 'admin/custom_syllabus_form.html'
-    edit_template = 'admin/custom_syllabus_form.html'
+
 
     form_columns = ['name', 'subject', 'faculty','lecturer', 'structure_file', 'training_programs']
     form_args = {
