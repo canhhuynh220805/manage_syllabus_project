@@ -15,11 +15,15 @@
 {% block header %}
 {% include 'layout/header.html' %}
 {% endblock %}
-
+{%if current_user.is_authenticated%}
 <main>
     {# Đây là khối nội dung chính mà các file con sẽ thay thế #}
     {% block content %}{% endblock %}
 </main>
+{%else%}
+<main>
+</main>
+{% endif %}
 {% block footer %}
 {% include 'layout/footer.html' %}
 {% endblock %}

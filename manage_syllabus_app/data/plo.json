@@ -1,43 +1,33 @@
 {
   "programme_learning_outcomes": [
     {
-      "id": "PLO.1",
       "description": "Thể hiện hiểu biết các kiến thức cơ bản về khoa học tự nhiên và khoa học xã hội để làm nền tảng phát triển tư duy phản biện."
     },
     {
-      "id": "PLO.2",
       "description": "Có khả năng áp dụng kiến thức toán học, khoa học máy tính và các nguyên tắc thuật toán để xác định và giải quyết các vấn đề tính toán phức tạp."
     },
     {
-      "id": "PLO.3",
       "description": "Có khả năng phân tích, thiết kế, triển khai và đánh giá một hệ thống, quy trình, hoặc thành phần máy tính để đáp ứng các nhu cầu mong muốn."
     },
     {
-      "id": "PLO.4",
       "description": "Làm việc hiệu quả với vai trò cá nhân hoặc thành viên trong nhóm, kể cả trong môi trường đa ngành."
     },
     {
-      "id": "PLO.5",
       "description": "Hiểu biết về các trách nhiệm nghề nghiệp, đạo đức, pháp lý, an ninh và xã hội."
     },
     {
-      "id": "PLO.6",
       "description": "Giao tiếp hiệu quả với nhiều đối tượng khác nhau."
     },
     {
-      "id": "PLO.7",
       "description": "Phân tích tác động cục bộ và toàn cầu của máy tính đối với các cá nhân, tổ chức và xã hội."
     },
     {
-      "id": "PLO.8",
       "description": "Nhận thức về sự cần thiết và có năng lực tham gia vào việc phát triển chuyên môn liên tục và học tập suốt đời."
     },
     {
-      "id": "PLO.9",
       "description": "Sử dụng các kỹ thuật, kỹ năng và công cụ hiện đại cần thiết cho thực hành kỹ thuật máy tính."
     },
     {
-      "id": "PLO.10",
       "description": "Áp dụng các nguyên tắc thiết kế và phát triển để xây dựng các hệ thống phần mềm có độ phức tạp khác nhau."
     }
   ]

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy import String, ForeignKey, Table, Column, Integer, UniqueConstraint, Text
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy.orm import Mapped, relationship, mapped_column, declared_attr
 from enum import Enum as UserEnum
 from flask_login import UserMixin
 from manage_syllabus_app import db, app
@@ -18,13 +18,19 @@ SubSection_AttributeValue = Table("subsection_attribute_value",
                                   db.metadata,
                                   Column("subsection_id", ForeignKey("sub_section.id"), primary_key=True),
                                   Column("attribute_value_id", ForeignKey("attribute_value.id"), primary_key=True))
-
+# quan hệ nhiều - nhiều mục tiêu môn học và PLO
 CourseObjective_ProgrammeLearningOutcome = Table("course_objective_programme_learning_outcome",
                                                  db.metadata,
                                                  Column("course_objective_id", ForeignKey("course_objective.id"),
                                                         primary_key=True),
                                                  Column("programme_learning_outcome_id",
                                                         ForeignKey("programme_learning_outcome.id"), primary_key=True))
+
+# quan hệ nhiều - nhiều đề cương và chương trình đào tạo
+TrainingProgram_Syllabus = Table("training_program_syllabus",
+                                 db.metadata,
+                                 Column("training_program_id", ForeignKey("training_program.id"), primary_key=True),
+                                 Column("syllabus_id", ForeignKey("syllabus.id"), primary_key=True))
 
 
 # LỚP ĐỀ CƯƠNG
@@ -50,7 +56,12 @@ class Syllabus(db.Model):
     learning_materials: Mapped[List["LearningMaterial"]] = relationship(secondary=Syllabus_LearningMaterial,
                                                                         back_populates="syllabuses")
     structure_file: Mapped[Optional[str]] = mapped_column(String(100), default="syllabus_2025.json")
-
+    status: Mapped[str] = mapped_column(String(100), nullable=True)
+    training_programs: Mapped[List["TrainingProgram"]] = relationship(
+        secondary=TrainingProgram_Syllabus,
+        back_populates="syllabuses"
+    )
+    created_date: Mapped[datetime] = mapped_column(default=datetime.now)
     def to_dict(self):
         return {
             'id': self.id,
@@ -113,6 +124,7 @@ class TextSubSection(SubSection):
 
 
 # LỚP TIỂU MỤC LỰA CHỌN
+
 class SelectionSubSection(SubSection):
     __tablename__ = 'selection_sub_section'
     id: Mapped[int] = mapped_column(ForeignKey('sub_section.id'), primary_key=True, nullable=False)
@@ -126,6 +138,20 @@ class SelectionSubSection(SubSection):
     __mapper_args__ = {
         'polymorphic_identity': 'selection'
     }
+
+    def to_dict(self):
+        """Chuyển đổi đối tượng SelectionSubSection sang dict."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'position': self.position,
+            'type': self.type,
+            'attribute_group_id': self.attribute_group_id,
+            'selected_values': [
+                {'id': val.id, 'name_value': val.name_value}
+                for val in self.selected_values
+            ]
+        }
 
 
 # --- LỚP MỚI: TIỂU MỤC THAM CHIẾU ---
@@ -166,6 +192,12 @@ class AttributeValue(db.Model):
         back_populates="selected_values"
     )
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name_value': self.name_value,
+        }
+
 
 # LỚP MÔN HỌC
 class Subject(db.Model):
@@ -201,6 +233,7 @@ class Subject(db.Model):
             'credit_id': self.credit_id
         }
 
+
 # LỚP KHOA
 class Faculty(db.Model):
     __tablename__ = 'faculty'
@@ -210,7 +243,7 @@ class Faculty(db.Model):
     syllabuses: Mapped[List[Syllabus]] = relationship(back_populates='faculty')
     # 1 khoa có nhiều giảng viên
     lecturers: Mapped[List["Lecturer"]] = relationship(back_populates='faculty')
-
+    majors: Mapped[List["Major"]] = relationship(back_populates='faculty')
     def __str__(self):
         return self.name
 
@@ -231,8 +264,18 @@ class Lecturer(db.Model):
     # 1 giảng viên phụ trách nhiều đề cương
     syllabuses: Mapped[Optional[List[Syllabus]]] = relationship(back_populates='lecturer')
     user: Mapped["User"] = relationship(back_populates="lecturer")  # Mối quan hệ 1-1 ngược lại
+
     def __str__(self):
         return self.name
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'room': self.room,
+            'faculty_id': self.faculty_id,
+        }
 
 
 # LỚP TÀI LIỆU THAM KHẢO
@@ -247,6 +290,13 @@ class LearningMaterial(db.Model):
     syllabuses: Mapped[List[Syllabus]] = relationship(secondary=Syllabus_LearningMaterial,
                                                       back_populates='learning_materials')
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'type_material_id': self.type_material_id,
+        }
+
 
 # LỚP LOẠI TÀI LIỆU THAM KHẢO
 class TypeLearningMaterial(db.Model):
@@ -255,6 +305,12 @@ class TypeLearningMaterial(db.Model):
     name: Mapped[str] = mapped_column(String(100), unique=True)
     # 1 loại học liệu có nhiều học liệu
     learningMaterials: Mapped[Optional[List["LearningMaterial"]]] = relationship(back_populates="type_material")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
 
 
 # LỚP TÍN CHỈ
@@ -273,6 +329,14 @@ class Credit(db.Model):
     def __str__(self):
         return f"TC: {self.getTotalCredit()} (LT: {self.numberTheory} - TH: {self.numberPractice})"
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'numberTheory': self.numberTheory,
+            'numberPractice': self.numberPractice,
+            'hourSelfStudy': self.hourSelfStudy,
+            'totalCredit': self.getTotalCredit()
+        }
 
 
 # LỚP MÔN HỌC ĐIỀU KIỆN
@@ -290,6 +354,14 @@ class RequirementSubject(db.Model):
     type_requirement_id: Mapped[int] = mapped_column(ForeignKey("requirement_type.id"), nullable=False)
     type_requirement: Mapped["TypeRequirement"] = relationship(foreign_keys=[type_requirement_id],
                                                                back_populates="requirement_subjects")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'subject_id': self.subject_id,
+            'require_subject_id': self.require_subject_id,
+            'type_requirement_id': self.type_requirement_id,
+        }
 
 
 # LỚP LOẠI MÔN HỌC ĐIỀU KIỆN
@@ -317,6 +389,17 @@ class CourseObjective(db.Model):
         secondary=CourseObjective_ProgrammeLearningOutcome
         , back_populates="course_objectives")
 
+    def to_dict(self):
+        """Chuyển đổi đối tượng CourseObjective sang dict."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'content': self.content,
+            'subject_id': self.subject_id,
+            # Trả về danh sách ID của các PLO đã chọn
+            'plo_ids': [plo.id for plo in self.programme_learning_outcomes]
+        }
+
 
 # LỚP CHUẨN ĐẦU RA MÔN HỌC
 class CourseLearningOutcome(db.Model):
@@ -331,11 +414,19 @@ class CourseLearningOutcome(db.Model):
         cascade="all, delete-orphan",
     )
 
+    def to_dict(self):
+        """Chuyển đổi đối tượng CLO sang dict."""
+        return {
+            'id': self.id,
+            'content': self.content,
+            'course_objective_id': self.course_objective_id
+        }
+
 
 # LỚP PLO
 class ProgrammeLearningOutcome(db.Model):
     __tablename__ = 'programme_learning_outcome'
-    id: Mapped[str] = mapped_column(String(10), primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     course_objectives: Mapped[List[CourseObjective]] = relationship(secondary=CourseObjective_ProgrammeLearningOutcome
                                                                     , back_populates="programme_learning_outcomes")
@@ -353,8 +444,39 @@ class CloPloAssociation(db.Model):
     clo: Mapped[CourseLearningOutcome] = relationship(back_populates="plo_association")
     plo: Mapped[ProgrammeLearningOutcome] = relationship(back_populates="clo_association")
 
+# LỚP CHUYÊN NGÀNH
+class Major(db.Model):
+    __tablename__ = 'major'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(150), nullable=False, unique=True)
+    code: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
+    faculty_id: Mapped[int] = mapped_column(ForeignKey('faculty.id'))
+    faculty: Mapped[Faculty] = relationship(back_populates="majors")
+    training_programs: Mapped[List['TrainingProgram']] = relationship(back_populates='major')
 
-#========================= USER ===============================
+# LỚP CHƯƠNG TRÌNH ĐÀO TẠO
+class TrainingProgram(db.Model):
+    __tablename__ = 'training_program'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(150), nullable=False)
+    academic_year: Mapped[int] = mapped_column(nullable=False)
+    major_id: Mapped[int] = mapped_column(ForeignKey('major.id'))
+    major: Mapped[Major] = relationship(back_populates="training_programs")
+    syllabuses: Mapped[List[Syllabus]] = relationship(
+        secondary=TrainingProgram_Syllabus,
+        back_populates="training_programs",
+    )
+    def __str__(self):
+        return self.name
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'academic_year': self.academic_year,
+            'major': self.major.name
+        }
+
+# ========================= USER ===============================
 
 class UserRole(UserEnum):
     ADMIN = 1
@@ -373,7 +495,6 @@ class User(db.Model, UserMixin):
     user_role: Mapped[UserRole] = mapped_column(default=UserRole.USER)
     lecturer_id: Mapped[Optional[int]] = mapped_column(ForeignKey('lecturer.id'), nullable=True)
     lecturer: Mapped[Optional["Lecturer"]] = relationship(back_populates="user")
+
     def __str__(self):
         return self.username
-
-

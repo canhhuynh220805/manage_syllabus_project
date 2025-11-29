@@ -25,12 +25,10 @@
                 {% endif %}
                 <td class="text-center align-middle">{{ ns.cnt }}</td>
                 <td class="align-middle">
-                    {{ editable_field(clo, 'content', 'CourseLearningOutcome', syllabus, input_type='textarea') }}
+                    {{ editable_field(clo, 'content', 'CourseLearningOutcome', syllabus, input_type='textarea', data_rest_url=url_for('api.update_course_learning_outcome', clo_id=clo.id)) }}
                 </td>
                 <td class="text-center align-middle">
-                    <form action="{{ url_for('delete_course_learning_outcome', clo_id=clo.id) }}" method="post" class="ajax-form">
-                        <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
-                        <input type="hidden" name="co_id" value="{{ co.id }}">
+                    <form data-method="delete" data-url="{{url_for('api.delete_course_learning_outcome', clo_id=clo.id)}}" class="rest-form">
                         <button type="submit" class="btn btn-danger btn-sm"
                                 onclick="return confirm('Bạn có chắc chắn muốn xóa CLO này? Mọi liên kết rating cũng sẽ bị xóa vĩnh viễn.');">
                             <i class="fa-solid fa-trash"></i>
@@ -56,8 +54,7 @@
 
                         <div class="card mt-2 add-form text-start" style="display: none;">
                             <div class="card-body">
-                                <form action="{{url_for('add_clo',co_id = co.id)}}" method="post" class="ajax-form">
-                                    <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
+                                <form data-method="post" data-url="{{url_for('api.add_course_learning_outcome', co_id=co.id)}}" class="rest-form">
                                     <div class="mb-2">
                                         <label class="form-label">Nội dung CLO mới:</label>
                                         <textarea name="clo_content" class="form-control" rows="3" required></textarea>
@@ -78,20 +75,12 @@
         </table>
         <h6 class="mt-4 text-center">Ma trận tích hợp giữa chuẩn đầu ra của môn học và chuẩn đầu ra của chương trình đào
             tạo</h6>
-        {% set unique_plos = [] %}
-        {% for co in syllabus.subject.course_objectives %}
-        {% for plo in co.programme_learning_outcomes %}
-        {% if plo not in unique_plos %}
-        {% do unique_plos.append(plo) %}
-        {% endif %}
-        {% endfor %}
-        {% endfor %}
         <table border="1" class="table table-bordered text-center align-middle">
             <thead>
             <tr>
                 <td>CLOs</td>
                 {% for plo in unique_plos %}
-                <td>{{plo.id}}</td>
+                <td class="fw-bold">PLO.{{plo.id}}</td>
                 {% endfor %}
             </tr>
             </thead>
@@ -123,10 +112,10 @@
                                 </div>
                             </div>
                             <div class="edit-view" style="display: none;">
-                                <form action="{{ url_for('update_rating') }}" method="post" class="ajax-form">
-                                    <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
-                                    <input type="hidden" name="clo_id" value="{{clo.id}}">
-                                    <input type="hidden" name="plo_id" value="{{plo.id}}">
+                                <form class="rest-form"
+                                  data-method="PUT"
+                                  data-url="{{ url_for('api.update_rating_api', clo_id=clo.id, plo_id=plo.id) }}"
+                                  action="#">
                                     {% if assoc %}
                                     <div class="input-group rating-input-group">
                                         <input type="number" class="form-control w-auto" name="rating"

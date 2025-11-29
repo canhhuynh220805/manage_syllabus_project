@@ -6,176 +6,59 @@
       "subject": {
         "id": "CSE101",
         "name": "Cấu trúc dữ liệu và giải thuật",
-        "credit": {
-          "number_theory": 3,
-          "number_practice": 1,
-          "hour_self_study": 90
-        },
-        "required_subjects": [
-          {
-            "require_subject_id": "PRG101",
-            "require_subject_name": "Nhập môn lập trình",
-            "type_requirement": "Tiên quyết"
-          }
-        ]
+        "credit": { "number_theory": 3, "number_practice": 1, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "PRG101", "require_subject_name": "Nhập môn lập trình", "type_requirement": "Tiên quyết" }]
       },
-      "faculty": {
-        "id": 1,
-        "name": "Khoa Công nghệ thông tin"
-      },
-      "lecturer": {
-        "id": 201,
-        "name": "Trần Thị B"
-      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 201, "name": "Trần Thị B" },
       "main_sections": [
         {
-          "position": 1,
-          "name": "Thông tin tổng quát - General Information",
-          "code": "general_info",
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
           "sub_sections": [
-            {
-              "position": 1,
-              "name": "Tên môn học tiếng Anh/Course title in English",
-              "type": "text",
-              "content": "Data Structures and Algorithms"
-            },
-            {
-              "position": 2,
-              "name": "Phương thức giảng dạy",
-              "type": "selection",
-              "attribute_group_id": 1,
-              "selected_value_ids": [101]
-            },
-            {
-              "position": 3,
-              "name": "Ngôn ngữ giảng dạy",
-              "type": "selection",
-              "attribute_group_id": 3,
-              "selected_value_ids": [301]
-            },
-            {
-              "position": 4,
-              "name": "Thành phần kiến thức",
-              "type": "selection",
-              "attribute_group_id": 2,
-              "selected_value_ids": [205, 206]
-            },
-            {
-              "position": 5,
-              "name": "Số tín chỉ / Credits",
-              "type": "reference",
-              "reference_code": "credit"
-            },
-            {
-              "position": 6,
-              "name": "Phụ trách môn học/ Administration of the course",
-              "type": "reference",
-              "reference_code": "director"
-            }
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Data Structures and Algorithms" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [101] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [205, 206] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
           ]
         },
         {
-          "position": 2,
-          "name": "Mô tả môn học",
-          "code": "course_overview",
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
           "sub_sections": [
-            {
-              "position": 1,
-              "name": "Mô tả chi tiết",
-              "type": "text",
-              "content": "Môn học trang bị cho sinh viên các kiến thức về cấu trúc dữ liệu cơ bản và các giải thuật phổ biến, làm nền tảng cho các môn học chuyên ngành."
-            },
-            {
-              "position": 2,
-              "name": "Môn học điều kiện/Requirements",
-              "type": "reference",
-              "reference_code": "requirement_subject"
-            },
-            {
-              "position": 3,
-              "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs",
-              "type": "reference",
-              "reference_code": "objectives_and_outcomes"
-            },
-            {
-              "position": 4,
-              "name": "Chuẩn đầu ra môn học - Course Learning Outcomes",
-              "type": "reference",
-              "reference_code": "course_learning_outcomes"
-            }
-            ,{
-              "position": 5,
-              "name": "Học liệu - Textbook and materials",
-              "type": "reference",
-              "reference_code": "learning_material"
-            }
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học cung cấp kiến thức nền tảng về tổ chức dữ liệu (stack, queue, linked list, tree, graph) và các thuật toán cơ bản (sorting, searching). Sinh viên sẽ học cách phân tích độ phức tạp thuật toán và áp dụng để giải quyết vấn đề hiệu quả." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
           ]
         }
       ],
       "course_objectives": [
         {
-          "name": "CO1",
-          "description": "Hiểu và trình bày được các cấu trúc dữ liệu cơ bản như danh sách liên kết, ngăn xếp, hàng đợi, cây và đồ thị.",
-          "plos": ["PLO.2", "PLO.3"],
+          "name": "CO1", "description": "Hiểu và trình bày được nguyên lý hoạt động của các cấu trúc dữ liệu cơ bản.", "plos": [2],
           "clos": [
-            {
-              "description": "Trình bày được khái niệm và cách hoạt động của các cấu trúc dữ liệu tuyến tính.",
-              "ratings": [
-                { "plo_id": "PLO.2", "level": 4 }
-              ]
-            },
-            {
-              "description": "Trình bày được khái niệm và cách hoạt động của các cấu trúc dữ liệu phi tuyến.",
-              "ratings": [
-                { "plo_id": "PLO.3", "level": 4 }
-              ]
-            }
+             { "description": "Mô tả được cơ chế hoạt động của Stack và Queue.", "ratings": [{ "plo_id": 2, "level": 4 }] },
+             { "description": "Phân biệt được sự khác nhau giữa Mảng và Danh sách liên kết.", "ratings": [{ "plo_id": 2, "level": 3 }] }
           ]
         },
         {
-          "name": "CO2",
-          "description": "Phân tích và đánh giá được độ phức tạp của các giải thuật sắp xếp, tìm kiếm và duyệt đồ thị.",
-          "plos": ["PLO.9"],
+          "name": "CO2", "description": "Phân tích và đánh giá độ phức tạp của giải thuật.", "plos": [3, 9],
           "clos": [
-            {
-              "description": "Vận dụng được các giải thuật sắp xếp và tìm kiếm trên các cấu trúc dữ liệu khác nhau.",
-              "ratings": [
-                { "plo_id": "PLO.9", "level": 4 }
-              ]
-            }
+             { "description": "Tính toán được Big-O của một đoạn mã nguồn cho trước.", "ratings": [{ "plo_id": 3, "level": 4 }] }
           ]
         },
         {
-          "name": "CO3",
-          "description": "Vận dụng kiến thức đã học để giải quyết các bài toán thực tế bằng cách lựa chọn cấu trúc dữ liệu và giải thuật phù hợp.",
-          "plos": ["PLO.10"],
+          "name": "CO3", "description": "Vận dụng cấu trúc dữ liệu phù hợp để giải quyết bài toán thực tế.", "plos": [3, 10],
           "clos": [
-            {
-              "description": "Có khả năng hiện thực các cấu trúc dữ liệu và giải thuật bằng một ngôn ngữ lập trình cụ thể.",
-              "ratings": [
-                { "plo_id": "PLO.10", "level": 5 }
-              ]
-            }
+             { "description": "Cài đặt thành công thuật toán tìm kiếm đường đi ngắn nhất trên đồ thị.", "ratings": [{ "plo_id": 10, "level": 5 }] }
           ]
         }
       ],
       "learning_materials": [
-        {
-          "id": 10,
-          "name": "Cấu trúc Dữ liệu và Giải thuật - Robert Lafore",
-          "type_material": {
-            "id": 1,
-            "name": "Sách giáo trình"
-          }
-        },
-        {
-          "id": 11,
-          "name": "Introduction to Algorithms - CLRS",
-          "type_material": {
-            "id": 2,
-            "name": "Sách tham khảo"
-          }
-        }
+        { "id": 10, "name": "Data Structures and Algorithms in Java - Robert Lafore", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 11, "name": "Introduction to Algorithms - CLRS", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 12, "name": "Algorithms (4th Edition) - Robert Sedgewick", "type_material": { "id": 2, "name": "Sách tham khảo" } }
       ]
     },
     {
@@ -184,168 +67,58 @@
       "subject": {
         "id": "DBM201",
         "name": "Cơ sở dữ liệu",
-        "credit": {
-          "number_theory": 2,
-          "number_practice": 1,
-          "hour_self_study": 60
-        },
-        "required_subjects": [
-          {
-            "require_subject_id": "PRG101",
-            "require_subject_name": "Nhập môn lập trình",
-            "type_requirement": "Tiên quyết"
-          }
-        ]
+        "credit": { "number_theory": 2, "number_practice": 1, "hour_self_study": 60 },
+        "required_subjects": [{ "require_subject_id": "PRG101", "require_subject_name": "Nhập môn lập trình", "type_requirement": "Tiên quyết" }]
       },
-      "faculty": {
-        "id": 1,
-        "name": "Khoa Công nghệ thông tin"
-      },
-      "lecturer": {
-        "id": 202,
-        "name": "Lê Văn C"
-      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 202, "name": "Lê Văn C" },
       "main_sections": [
         {
-          "position": 1,
-          "name": "Thông tin tổng quát - General Information",
-          "code": "general_info",
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
           "sub_sections": [
-            {
-              "position": 1,
-              "name": "Tên môn học tiếng Anh/Course title in English",
-              "type": "text",
-              "content": "Database Systems"
-            },
-            {
-              "position": 2,
-              "name": "Phương thức giảng dạy",
-              "type": "selection",
-              "attribute_group_id": 1,
-              "selected_value_ids": [102]
-            },
-            {
-              "position": 3,
-              "name": "Ngôn ngữ giảng dạy",
-              "type": "selection",
-              "attribute_group_id": 3,
-              "selected_value_ids": [301]
-            },
-            {
-              "position": 4,
-              "name": "Thành phần kiến thức",
-              "type": "selection",
-              "attribute_group_id": 2,
-              "selected_value_ids": [201]
-            },
-            {
-              "position": 5,
-              "name": "Số tín chỉ / Credits",
-              "type": "reference",
-              "reference_code": "credit"
-            },
-            {
-              "position": 6,
-              "name": "Phụ trách môn học/ Administration of the course",
-              "type": "reference",
-              "reference_code": "director"
-            }
+             { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Database Systems" },
+             { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [102] },
+             { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+             { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [203] },
+             { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+             { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
           ]
         },
         {
-          "position": 2,
-          "name": "Mô tả môn học",
-          "code": "course_overview",
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
           "sub_sections": [
-            {
-              "position": 1,
-              "name": "Mô tả chi tiết",
-              "type": "text",
-              "content": "Cung cấp kiến thức nền tảng về hệ cơ sở dữ liệu, mô hình quan hệ, ngôn ngữ truy vấn SQL và các nguyên tắc thiết kế cơ sở dữ liệu."
-            },
-            {
-              "position": 2,
-              "name": "Môn học điều kiện/Requirements",
-              "type": "reference",
-              "reference_code": "requirement_subject"
-            },
-            {
-              "position": 3,
-              "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs",
-              "type": "reference",
-              "reference_code": "objectives_and_outcomes"
-            },
-            {
-              "position": 4,
-              "name": "Chuẩn đầu ra môn học - Course Learning Outcomes",
-              "type": "reference",
-              "reference_code": "course_learning_outcomes"
-            }
-            ,{
-              "position": 5,
-              "name": "Học liệu - Textbook and materials",
-              "type": "reference",
-              "reference_code": "learning_material"
-            }
+             { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học giới thiệu các khái niệm cơ bản về hệ quản trị cơ sở dữ liệu, mô hình dữ liệu quan hệ, đại số quan hệ và ngôn ngữ truy vấn SQL. Sinh viên cũng sẽ học về lý thuyết thiết kế cơ sở dữ liệu thông qua các dạng chuẩn." },
+             { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+             { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+             { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+             { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
           ]
         }
       ],
-     "course_objectives": [
+      "course_objectives": [
         {
-          "name": "CO1",
-          "description": "Hiểu rõ các khái niệm về cơ sở dữ liệu quan hệ và mô hình thực thể kết hợp (ERD).",
-          "plos": ["PLO.2"],
+          "name": "CO1", "description": "Hiểu và áp dụng các nguyên lý thiết kế cơ sở dữ liệu.", "plos": [2, 3],
           "clos": [
-            {
-              "description": "Thiết kế được mô hình ERD cho một bài toán quản lý thực tế.",
-              "ratings": [
-                { "plo_id": "PLO.2", "level": 4 }
-              ]
-            }
+             { "description": "Vẽ được sơ đồ ERD cho bài toán quản lý thực tế.", "ratings": [{ "plo_id": 3, "level": 4 }] }
           ]
         },
         {
-          "name": "CO2",
-          "description": "Sử dụng thành thạo ngôn ngữ truy vấn có cấu trúc (SQL) để truy vấn và thao tác dữ liệu.",
-          "plos": ["PLO.9"],
+          "name": "CO2", "description": "Sử dụng thành thạo ngôn ngữ SQL để thao tác dữ liệu.", "plos": [9],
           "clos": [
-            {
-              "description": "Viết được các câu lệnh SQL phức tạp bao gồm JOIN, subquery và các hàm tổng hợp.",
-              "ratings": [
-                { "plo_id": "PLO.9", "level": 5 }
-              ]
-            },
-            {
-              "description": "Thực hiện được các thao tác thêm, xóa, sửa dữ liệu.",
-              "ratings": [
-                { "plo_id": "PLO.9", "level": 4 }
-              ]
-            }
+             { "description": "Viết được các câu lệnh SELECT phức tạp với JOIN và Subquery.", "ratings": [{ "plo_id": 9, "level": 5 }] }
           ]
         },
         {
-          "name": "CO3",
-          "description": "Nắm vững các nguyên tắc về chuẩn hóa cơ sở dữ liệu và quản lý giao dịch.",
-          "plos": ["PLO.3"],
+          "name": "CO3", "description": "Thực hiện chuẩn hóa dữ liệu để tối ưu hóa hệ thống.", "plos": [3],
           "clos": [
-            {
-              "description": "Áp dụng được các dạng chuẩn (1NF, 2NF, 3NF) để tối ưu hóa thiết kế CSDL.",
-              "ratings": [
-                { "plo_id": "PLO.3", "level": 4 }
-              ]
-            }
+             { "description": "Chuyển đổi lược đồ quan hệ về dạng chuẩn 3NF.", "ratings": [{ "plo_id": 3, "level": 4 }] }
           ]
         }
-      ]
-      ,"learning_materials": [
-        {
-          "id": 12,
-          "name": "Fundamentals of Database Systems - Elmasri, Navathe",
-          "type_material": {
-            "id": 1,
-            "name": "Sách giáo trình"
-          }
-        }
+      ],
+      "learning_materials": [
+        { "id": 13, "name": "Fundamentals of Database Systems - Elmasri & Navathe", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 14, "name": "Database System Concepts - Silberschatz", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 15, "name": "SQL Performance Explained - Markus Winand", "type_material": { "id": 2, "name": "Sách tham khảo" } }
       ]
     },
     {
@@ -354,164 +127,1085 @@
       "subject": {
         "id": "PRG101",
         "name": "Nhập môn Lập trình",
-        "credit": {
-          "number_theory": 2,
-          "number_practice": 2,
-          "hour_self_study": 90
-        },
+        "credit": { "number_theory": 2, "number_practice": 2, "hour_self_study": 90 },
         "required_subjects": []
       },
-      "faculty": {
-        "id": 1,
-        "name": "Khoa Công nghệ thông tin"
-      },
-      "lecturer": {
-        "id": 203,
-        "name": "Nguyễn Văn An"
-      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 203, "name": "Nguyễn Văn An" },
       "main_sections": [
         {
-          "position": 1,
-          "name": "Thông tin tổng quát - General Information",
-          "code": "general_info",
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
           "sub_sections": [
-            {
-              "position": 1,
-              "name": "Tên môn học tiếng Anh/Course title in English",
-              "type": "text",
-              "content": "Introduction to Programming"
-            },
-            {
-              "position": 2,
-              "name": "Phương thức giảng dạy",
-              "type": "selection",
-              "attribute_group_id": 1,
-              "selected_value_ids": [103]
-            },
-            {
-              "position": 3,
-              "name": "Ngôn ngữ giảng dạy",
-              "type": "selection",
-              "attribute_group_id": 3,
-              "selected_value_ids": [302]
-            },
-            {
-              "position": 4,
-              "name": "Thành phần kiến thức",
-              "type": "selection",
-              "attribute_group_id": 2,
-              "selected_value_ids": [203]
-            },
-            {
-              "position": 5,
-              "name": "Số tín chỉ / Credits",
-              "type": "reference",
-              "reference_code": "credit"
-            },
-            {
-              "position": 6,
-              "name": "Phụ trách môn học/ Administration of the course",
-              "type": "reference",
-              "reference_code": "director"
-            }
+             { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Introduction to Programming" },
+             { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [101] },
+             { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+             { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [202] },
+             { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+             { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
           ]
         },
         {
-          "position": 2,
-          "name": "Mô tả môn học",
-          "code": "course_overview",
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
           "sub_sections": [
-            {
-              "position": 1,
-              "name": "Mô tả chi tiết",
-              "type": "text",
-              "content": "Môn học cung cấp các khái niệm cơ bản về lập trình, tư duy giải quyết vấn đề và ngôn ngữ lập trình Python."
-            },
-            {
-              "position": 2,
-              "name": "Môn học điều kiện/Requirements",
-              "type": "reference",
-              "reference_code": "requirement_subject"
-            },
-            {
-              "position": 3,
-              "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs",
-              "type": "reference",
-              "reference_code": "objectives_and_outcomes"
-            },
-            {
-              "position": 4,
-              "name": "Chuẩn đầu ra môn học - Course Learning Outcomes",
-              "type": "reference",
-              "reference_code": "course_learning_outcomes"
-            }
-            ,{
-              "position": 5,
-              "name": "Học liệu - Textbook and materials",
-              "type": "reference",
-              "reference_code": "learning_material"
-            }
+             { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học cung cấp kiến thức nền tảng về lập trình máy tính sử dụng ngôn ngữ C/C++. Nội dung bao gồm: biến, kiểu dữ liệu, cấu trúc điều khiển, vòng lặp, mảng và hàm." },
+             { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+             { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+             { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+             { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
           ]
         }
       ],
       "course_objectives": [
         {
-          "name": "CO1",
-          "description": "Hiểu và sử dụng được các cấu trúc lập trình cơ bản: biến, kiểu dữ liệu, toán tử, cấu trúc điều kiện và vòng lặp.",
-          "plos": ["PLO.1", "PLO.2"],
+          "name": "CO1", "description": "Hiểu các khái niệm cơ bản về lập trình cấu trúc.", "plos": [1],
           "clos": [
-            {
-              "description": "Viết được các chương trình đơn giản sử dụng các cấu trúc điều khiển.",
-              "ratings": [
-                { "plo_id": "PLO.1", "level": 4 },
-                { "plo_id": "PLO.2", "level": 4 }
-              ]
-            }
+             { "description": "Giải thích được lưu đồ thuật toán (Flowchart).", "ratings": [{ "plo_id": 1, "level": 3 }] }
           ]
         },
         {
-          "name": "CO2",
-          "description": "Làm việc được với các cấu trúc dữ liệu cơ bản như danh sách, chuỗi và sử dụng hàm để cấu trúc hóa chương trình.",
-          "plos": ["PLO.9"],
+          "name": "CO2", "description": "Xây dựng chương trình máy tính giải quyết bài toán đơn giản.", "plos": [2, 9],
           "clos": [
-            {
-              "description": "Xây dựng và sử dụng được các hàm tự định nghĩa để giải quyết các bài toán nhỏ.",
-              "ratings": [
-                { "plo_id": "PLO.9", "level": 4 }
-              ]
-            },
-            {
-              "description": "Thao tác được trên các kiểu dữ liệu có cấu trúc như list, tuple, dictionary.",
-              "ratings": [
-                { "plo_id": "PLO.9", "level": 5 }
-              ]
-            }
+             { "description": "Viết chương trình nhập xuất dữ liệu và tính toán cơ bản.", "ratings": [{ "plo_id": 9, "level": 4 }] }
           ]
         },
         {
-          "name": "CO3",
-          "description": "Phát triển tư duy logic và kỹ năng giải quyết vấn đề thông qua việc phân tích và hiện thực các thuật toán đơn giản.",
-          "plos": ["PLO.8"],
+          "name": "CO3", "description": "Phát triển tư duy logic và kỹ năng gỡ lỗi (debug).", "plos": [4],
           "clos": [
-            {
-              "description": "Áp dụng được phương pháp đệ quy để giải quyết các bài toán phù hợp.",
-              "ratings": [
-                { "plo_id": "PLO.8", "level": 4 }
-              ]
-            }
+             { "description": "Phát hiện và sửa lỗi cú pháp trong code.", "ratings": [{ "plo_id": 4, "level": 3 }] }
           ]
         }
+      ],
+      "learning_materials": [
+        { "id": 16, "name": "C++ How to Program - Deitel & Deitel", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 17, "name": "Programming: Principles and Practice Using C++", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 18, "name": "Head First C - Griffiths", "type_material": { "id": 2, "name": "Sách tham khảo" } }
       ]
-      ,"learning_materials": [
+    },
+    {
+      "id": 4,
+      "name": "Đề cương Lập trình Hướng đối tượng",
+      "subject": {
+        "id": "OOP202",
+        "name": "Lập trình Hướng đối tượng",
+        "credit": { "number_theory": 3, "number_practice": 1, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "PRG101", "require_subject_name": "Nhập môn lập trình", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 201, "name": "Trần Thị B" },
+      "main_sections": [
         {
-          "id": 14,
-          "name": "Python Crash Course - Eric Matthes",
-          "type_material": {
-            "id": 1,
-            "name": "Sách giáo trình"
-          }
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Object Oriented Programming" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [103] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301, 302] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [203] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Học phần trang bị kiến thức và kỹ năng lập trình theo tư duy hướng đối tượng (OOP) sử dụng ngôn ngữ Java. Các chủ đề bao gồm: Lớp và đối tượng, Đóng gói, Kế thừa, Đa hình và Xử lý ngoại lệ." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
         }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu các nguyên lý cơ bản của lập trình hướng đối tượng.", "plos": [2],
+          "clos": [
+            { "description": "Phân biệt được lập trình hướng thủ tục và hướng đối tượng.", "ratings": [{ "plo_id": 2, "level": 3 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Thiết kế và cài đặt ứng dụng phần mềm bằng Java.", "plos": [3, 9],
+          "clos": [
+            { "description": "Xây dựng lớp (Class) với các thuộc tính và phương thức phù hợp.", "ratings": [{ "plo_id": 9, "level": 4 }] },
+            { "description": "Áp dụng cơ chế kế thừa để tái sử dụng mã nguồn.", "ratings": [{ "plo_id": 3, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Sử dụng các design pattern cơ bản.", "plos": [10],
+          "clos": [
+            { "description": "Cài đặt mẫu thiết kế Singleton trong ứng dụng.", "ratings": [{ "plo_id": 10, "level": 4 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 19, "name": "Java: How to Program - Deitel", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 20, "name": "Effective Java - Joshua Bloch", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 21, "name": "Head First Design Patterns", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Đề cương Mạng máy tính",
+      "subject": {
+        "id": "NWK301",
+        "name": "Mạng máy tính",
+        "credit": { "number_theory": 3, "number_practice": 1, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "CSE101", "require_subject_name": "Cấu trúc dữ liệu và giải thuật", "type_requirement": "Học trước" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 202, "name": "Lê Văn C" },
+      "main_sections": [
+        {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Computer Networks" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [101] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [203] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học nghiên cứu về kiến trúc mạng, mô hình OSI/TCP-IP và các giao thức mạng phổ biến. Sinh viên sẽ được thực hành cấu hình mạng LAN/WAN cơ bản và phân tích gói tin." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu nguyên lý hoạt động của mạng Internet và các tầng giao thức.", "plos": [1],
+          "clos": [
+            { "description": "Mô tả chức năng của từng tầng trong mô hình OSI.", "ratings": [{ "plo_id": 1, "level": 3 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Phân tích và thiết kế hệ thống mạng LAN cơ bản.", "plos": [3, 9],
+          "clos": [
+            { "description": "Thiết kế sơ đồ mạng cho một văn phòng nhỏ.", "ratings": [{ "plo_id": 3, "level": 4 }] },
+            { "description": "Bấm cáp mạng chuẩn RJ45.", "ratings": [{ "plo_id": 9, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Kỹ năng quản trị và xử lý sự cố mạng.", "plos": [7],
+          "clos": [
+            { "description": "Sử dụng Wireshark để bắt và phân tích gói tin.", "ratings": [{ "plo_id": 7, "level": 4 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 22, "name": "Computer Networking: A Top-Down Approach - Kurose & Ross", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 23, "name": "Data Communications and Networking - Forouzan", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 24, "name": "TCP/IP Illustrated - Stevens", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Đề cương Hệ điều hành",
+      "subject": {
+        "id": "OS302",
+        "name": "Hệ điều hành",
+        "credit": { "number_theory": 3, "number_practice": 1, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "CSE101", "require_subject_name": "Cấu trúc dữ liệu và giải thuật", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 203, "name": "Nguyễn Văn An" },
+      "main_sections": [
+         {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Operating Systems" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [102] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [203] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học trình bày các nguyên lý cơ bản của hệ điều hành: quản lý tiến trình, quản lý bộ nhớ, lập lịch CPU và hệ thống file. Sinh viên sẽ thực hành trên hệ điều hành Linux." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu kiến trúc và các thành phần của hệ điều hành.", "plos": [2],
+          "clos": [
+            { "description": "Giải thích vai trò của Kernel trong Hệ điều hành.", "ratings": [{ "plo_id": 2, "level": 3 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Giải quyết các vấn đề về đồng bộ hóa và quản lý tài nguyên.", "plos": [3, 10],
+          "clos": [
+            { "description": "Đề xuất giải pháp tránh tắc nghẽn (Deadlock).", "ratings": [{ "plo_id": 3, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Sử dụng dòng lệnh Shell để quản trị hệ thống.", "plos": [9],
+          "clos": [
+            { "description": "Viết Shell script tự động hóa tác vụ cơ bản.", "ratings": [{ "plo_id": 9, "level": 4 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 25, "name": "Operating System Concepts - Silberschatz", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 26, "name": "Modern Operating Systems - Tanenbaum", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 27, "name": "Linux Kernel Development - Robert Love", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Đề cương Trí tuệ nhân tạo",
+      "subject": {
+        "id": "AI401",
+        "name": "Trí tuệ nhân tạo",
+        "credit": { "number_theory": 3, "number_practice": 0, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "CSE101", "require_subject_name": "Cấu trúc dữ liệu và giải thuật", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 201, "name": "Trần Thị B" },
+      "main_sections": [
+        {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Artificial Intelligence" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [103] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [302] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [204] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học giới thiệu lịch sử và các lĩnh vực của AI. Tập trung vào các kỹ thuật giải quyết vấn đề: Tìm kiếm không gian trạng thái, Biểu diễn tri thức và Học máy cơ bản." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu các phương pháp tìm kiếm trong AI.", "plos": [2],
+          "clos": [
+            { "description": "Cài đặt thuật toán tìm kiếm A* (A-Star).", "ratings": [{ "plo_id": 2, "level": 5 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Áp dụng logic để biểu diễn tri thức.", "plos": [3, 9],
+          "clos": [
+            { "description": "Xây dựng hệ chuyên gia đơn giản sử dụng luật (Rule-based).", "ratings": [{ "plo_id": 3, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Nắm bắt các khái niệm cơ bản về Học máy.", "plos": [8],
+          "clos": [
+            { "description": "Giải thích quy trình huấn luyện mô hình máy học.", "ratings": [{ "plo_id": 8, "level": 3 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 28, "name": "Artificial Intelligence: A Modern Approach - Russell & Norvig", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 29, "name": "Machine Learning - Tom Mitchell", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 30, "name": "Deep Learning - Ian Goodfellow", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Đề cương Công nghệ phần mềm",
+      "subject": {
+        "id": "SWE301",
+        "name": "Công nghệ phần mềm",
+        "credit": { "number_theory": 3, "number_practice": 1, "hour_self_study": 90 },
+        "required_subjects": []
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 202, "name": "Lê Văn C" },
+      "main_sections": [
+         {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Software Engineering" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [101] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [203] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học cung cấp cái nhìn tổng quan về quy trình sản xuất phần mềm chuyên nghiệp. Bao gồm: Thu thập yêu cầu, Phân tích, Thiết kế, Kiểm thử và Bảo trì phần mềm." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu các mô hình quy trình phần mềm (Thác nước, Agile).", "plos": [2],
+          "clos": [
+            { "description": "So sánh ưu nhược điểm của mô hình Waterfall và Scrum.", "ratings": [{ "plo_id": 2, "level": 3 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Kỹ năng làm việc nhóm và quản lý dự án.", "plos": [4, 6],
+          "clos": [
+            { "description": "Tham gia hiệu quả vào một dự án phần mềm theo nhóm.", "ratings": [{ "plo_id": 4, "level": 5 }] },
+            { "description": "Viết tài liệu đặc tả yêu cầu (SRS) chuẩn xác.", "ratings": [{ "plo_id": 6, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Áp dụng kỹ thuật kiểm thử để đảm bảo chất lượng.", "plos": [10],
+          "clos": [
+            { "description": "Viết các Test Case cho một chức năng cụ thể.", "ratings": [{ "plo_id": 10, "level": 4 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 31, "name": "Software Engineering - Ian Sommerville", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 32, "name": "Clean Code - Robert C. Martin", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 33, "name": "The Mythical Man-Month - Brooks", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Đề cương Lập trình Web",
+      "subject": {
+        "id": "WEB301",
+        "name": "Lập trình Web",
+        "credit": { "number_theory": 2, "number_practice": 2, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "PRG101", "require_subject_name": "Nhập môn lập trình", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 203, "name": "Nguyễn Văn An" },
+      "main_sections": [
+         {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Web Development" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [102] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [204] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Học phần trang bị kiến thức phát triển ứng dụng web Full-stack. Frontend: HTML, CSS, JavaScript. Backend: Python/NodeJS và cơ sở dữ liệu." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Thiết kế giao diện web (Frontend) hiện đại.", "plos": [9],
+          "clos": [
+            { "description": "Tạo trang web Responsive hoạt động trên mobile và desktop.", "ratings": [{ "plo_id": 9, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Xây dựng hệ thống xử lý phía máy chủ (Backend).", "plos": [3, 10],
+          "clos": [
+            { "description": "Viết API RESTful để cung cấp dữ liệu cho frontend.", "ratings": [{ "plo_id": 3, "level": 5 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Triển khai ứng dụng web lên môi trường thực tế.", "plos": [9],
+          "clos": [
+            { "description": "Deploy ứng dụng web lên nền tảng Cloud (Heroku/AWS).", "ratings": [{ "plo_id": 9, "level": 3 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 34, "name": "HTML & CSS: Design and Build Websites - Jon Duckett", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 35, "name": "Eloquent JavaScript - Marijn Haverbeke", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 36, "name": "Learning React - Alex Banks", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Đề cương An toàn thông tin",
+      "subject": {
+        "id": "SEC401",
+        "name": "An toàn thông tin",
+        "credit": { "number_theory": 3, "number_practice": 0, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "NWK301", "require_subject_name": "Mạng máy tính", "type_requirement": "Học trước" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 201, "name": "Trần Thị B" },
+      "main_sections": [
+         {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Information Security" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [103] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [204] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học cung cấp kiến thức về bảo mật hệ thống thông tin, các thuật toán mã hóa, xác thực và chữ ký số. Sinh viên sẽ tìm hiểu về các mối đe dọa an ninh mạng và cách phòng chống." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu các nguyên lý cơ bản về an toàn thông tin.", "plos": [5],
+          "clos": [
+            { "description": "Giải thích tam giác bảo mật CIA (Confidentiality, Integrity, Availability).", "ratings": [{ "plo_id": 5, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Áp dụng các kỹ thuật mã hóa để bảo vệ dữ liệu.", "plos": [9],
+          "clos": [
+            { "description": "Thực hiện mã hóa và giải mã dữ liệu sử dụng AES/RSA.", "ratings": [{ "plo_id": 9, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Phân tích rủi ro và đề xuất giải pháp bảo mật.", "plos": [7],
+          "clos": [
+            { "description": "Đánh giá lỗ hổng bảo mật của một website đơn giản.", "ratings": [{ "plo_id": 7, "level": 4 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 37, "name": "Security in Computing - Pfleeger", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 38, "name": "Cryptography and Network Security - Stallings", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 39, "name": "Hacking: The Art of Exploitation", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Đề cương Lập trình Di động",
+      "subject": {
+        "id": "MOB301",
+        "name": "Lập trình Di động",
+        "credit": { "number_theory": 2, "number_practice": 2, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "OOP202", "require_subject_name": "Lập trình Hướng đối tượng", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 202, "name": "Lê Văn C" },
+      "main_sections": [
+         {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Mobile Development" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [102] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [204] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học hướng dẫn phát triển ứng dụng trên nền tảng di động (Android hoặc iOS). Sinh viên sẽ học về vòng đời ứng dụng, thiết kế giao diện UI/UX mobile và tương tác với phần cứng thiết bị." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu đặc thù của lập trình trên thiết bị di động.", "plos": [2],
+          "clos": [
+            { "description": "Mô tả vòng đời Activity/Fragment trong Android.", "ratings": [{ "plo_id": 2, "level": 3 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Phát triển ứng dụng di động hoàn chỉnh.", "plos": [3, 9],
+          "clos": [
+            { "description": "Xây dựng ứng dụng quản lý công việc cá nhân.", "ratings": [{ "plo_id": 9, "level": 5 }] },
+            { "description": "Sử dụng SQLite để lưu trữ dữ liệu cục bộ.", "ratings": [{ "plo_id": 3, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Tối ưu hóa hiệu năng và trải nghiệm người dùng.", "plos": [6],
+          "clos": [
+            { "description": "Thiết kế giao diện tuân thủ Material Design.", "ratings": [{ "plo_id": 6, "level": 4 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 40, "name": "Android Programming: The Big Nerd Ranch Guide", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 41, "name": "Head First Android Development", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 42, "name": "Flutter in Action", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Đề cương Toán rời rạc",
+      "subject": {
+        "id": "MAT101",
+        "name": "Toán rời rạc",
+        "credit": { "number_theory": 3, "number_practice": 0, "hour_self_study": 90 },
+        "required_subjects": []
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 203, "name": "Nguyễn Văn An" },
+      "main_sections": [
+         {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Discrete Mathematics" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [101] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [202] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học cung cấp nền tảng toán học cho Tin học. Nội dung bao gồm: Logic mệnh đề, Lý thuyết tập hợp, Lý thuyết đồ thị, Đại số Boole và Các phương pháp đếm." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu và vận dụng các kiến thức logic toán học.", "plos": [1],
+          "clos": [
+            { "description": "Thực hiện các phép toán trên tập hợp và mệnh đề logic.", "ratings": [{ "plo_id": 1, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Mô hình hóa bài toán thực tế bằng cấu trúc rời rạc.", "plos": [2],
+          "clos": [
+            { "description": "Biểu diễn bài toán mạng lưới giao thông bằng đồ thị.", "ratings": [{ "plo_id": 2, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Phát triển tư duy thuật toán.", "plos": [3],
+          "clos": [
+            { "description": "Áp dụng nguyên lý quy nạp để chứng minh toán học.", "ratings": [{ "plo_id": 3, "level": 3 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 43, "name": "Discrete Mathematics and Its Applications - Rosen", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 44, "name": "Concrete Mathematics - Knuth", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 45, "name": "Discrete Mathematics with Applications - Epp", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Đề cương Kiến trúc máy tính",
+      "subject": {
+        "id": "ARC201",
+        "name": "Kiến trúc máy tính",
+        "credit": { "number_theory": 3, "number_practice": 0, "hour_self_study": 90 },
+        "required_subjects": []
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 201, "name": "Trần Thị B" },
+      "main_sections": [
+         {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Computer Architecture" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [101] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [203] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học nghiên cứu về tổ chức phần cứng máy tính. Nội dung: Hệ thống số, Cổng logic, Bộ vi xử lý (CPU), Bộ nhớ, Bus và Kỹ thuật ống dẫn (Pipelining)." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu nguyên lý hoạt động của máy tính điện tử.", "plos": [1],
+          "clos": [
+            { "description": "Trình bày chu kỳ lệnh (Fetch-Decode-Execute) của CPU.", "ratings": [{ "plo_id": 1, "level": 3 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Phân tích hiệu năng hệ thống máy tính.", "plos": [2],
+          "clos": [
+            { "description": "Tính toán thời gian thực thi dựa trên xung nhịp và CPI.", "ratings": [{ "plo_id": 2, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Lập trình hợp ngữ (Assembly) cơ bản.", "plos": [9],
+          "clos": [
+            { "description": "Viết chương trình Assembly MIPS để thực hiện phép toán số học.", "ratings": [{ "plo_id": 9, "level": 3 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 46, "name": "Computer Organization and Design - Patterson & Hennessy", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 47, "name": "Computer Architecture: A Quantitative Approach", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 48, "name": "Structured Computer Organization - Tanenbaum", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Đề cương Phân tích Thiết kế Hệ thống",
+      "subject": {
+        "id": "SAD301",
+        "name": "Phân tích Thiết kế Hệ thống",
+        "credit": { "number_theory": 3, "number_practice": 1, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "DBM201", "require_subject_name": "Cơ sở dữ liệu", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 202, "name": "Lê Văn C" },
+      "main_sections": [
+         {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Systems Analysis and Design" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [102] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [203] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học trang bị phương pháp luận để phát triển hệ thống thông tin. Sinh viên sẽ học cách mô hình hóa yêu cầu nghiệp vụ sử dụng UML (Use Case, Class, Sequence Diagram)." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Thu thập và phân tích yêu cầu người dùng.", "plos": [2],
+          "clos": [
+            { "description": "Viết tài liệu đặc tả yêu cầu nghiệp vụ.", "ratings": [{ "plo_id": 2, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Mô hình hóa hệ thống bằng ngôn ngữ UML.", "plos": [3, 9],
+          "clos": [
+            { "description": "Vẽ biểu đồ Use Case và Activity Diagram.", "ratings": [{ "plo_id": 3, "level": 5 }] },
+            { "description": "Thiết kế cơ sở dữ liệu từ biểu đồ lớp.", "ratings": [{ "plo_id": 9, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Thiết kế giao diện và kiến trúc hệ thống.", "plos": [3],
+          "clos": [
+            { "description": "Thiết kế Mockup/Prototype giao diện người dùng.", "ratings": [{ "plo_id": 3, "level": 4 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 49, "name": "Systems Analysis and Design - Kendall & Kendall", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 50, "name": "UML Distilled - Martin Fowler", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 51, "name": "Applying UML and Patterns - Craig Larman", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Đề cương Quản trị dự án CNTT",
+      "subject": {
+        "id": "PMT401",
+        "name": "Quản trị dự án CNTT",
+        "credit": { "number_theory": 3, "number_practice": 0, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "SWE301", "require_subject_name": "Công nghệ phần mềm", "type_requirement": "Học trước" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 203, "name": "Nguyễn Văn An" },
+      "main_sections": [
+         {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "IT Project Management" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [103] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [203] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Môn học trang bị kiến thức quản lý dự án theo chuẩn PMBOK. Các nội dung chính: Quản lý phạm vi, thời gian, chi phí, chất lượng, nhân lực và rủi ro trong dự án CNTT." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Lập kế hoạch dự án chi tiết.", "plos": [4, 5],
+          "clos": [
+            { "description": "Xây dựng bảng phân rã công việc (WBS).", "ratings": [{ "plo_id": 4, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Kiểm soát và theo dõi tiến độ dự án.", "plos": [6],
+          "clos": [
+            { "description": "Sử dụng biểu đồ Gantt để quản lý lịch trình.", "ratings": [{ "plo_id": 6, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Quản lý rủi ro và chất lượng dự án.", "plos": [7],
+          "clos": [
+            { "description": "Lập bảng đánh giá rủi ro và kế hoạch ứng phó.", "ratings": [{ "plo_id": 7, "level": 3 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 52, "name": "Information Technology Project Management - Kathy Schwalbe", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 53, "name": "PMBOK Guide (Project Management Body of Knowledge)", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 54, "name": "Head First PMP", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Đề cương Điện toán đám mây",
+      "subject": {
+        "id": "CLD401",
+        "name": "Điện toán đám mây",
+        "credit": { "number_theory": 3, "number_practice": 0, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "NWK301", "require_subject_name": "Mạng máy tính", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 201, "name": "Trần Thị B" },
+      "main_sections": [
+        {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Cloud Computing" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [102] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [204] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Giới thiệu các mô hình dịch vụ đám mây (IaaS, PaaS, SaaS) và các nền tảng phổ biến như AWS, Azure. Sinh viên sẽ học cách triển khai và quản lý ứng dụng trên cloud." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu kiến trúc và các mô hình dịch vụ đám mây.", "plos": [1],
+          "clos": [
+            { "description": "Phân biệt được sự khác nhau giữa IaaS, PaaS và SaaS.", "ratings": [{ "plo_id": 1, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Triển khai ứng dụng trên nền tảng đám mây.", "plos": [3, 9],
+          "clos": [
+            { "description": "Cấu hình máy ảo (EC2) và lưu trữ (S3) trên AWS.", "ratings": [{ "plo_id": 9, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Đánh giá hiệu năng và chi phí sử dụng cloud.", "plos": [2],
+          "clos": [
+            { "description": "Tính toán chi phí ước tính cho một giải pháp cloud cụ thể.", "ratings": [{ "plo_id": 2, "level": 3 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 55, "name": "Cloud Computing: Concepts, Technology & Architecture", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 56, "name": "Architecting the Cloud - Kavis", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 57, "name": "AWS Certified Solutions Architect Study Guide", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Đề cương Học máy",
+      "subject": {
+        "id": "ML402",
+        "name": "Học máy",
+        "credit": { "number_theory": 3, "number_practice": 1, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "AI401", "require_subject_name": "Trí tuệ nhân tạo", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 202, "name": "Lê Văn C" },
+      "main_sections": [
+        {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Machine Learning" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [103] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [302] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [204] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Cung cấp kiến thức chuyên sâu về các thuật toán học máy: Hồi quy tuyến tính, SVM, Decision Tree, Neural Network và Deep Learning." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu toán học đằng sau các thuật toán ML.", "plos": [1],
+          "clos": [
+            { "description": "Giải thích ý nghĩa của Gradient Descent.", "ratings": [{ "plo_id": 1, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Xây dựng và huấn luyện mô hình dự đoán.", "plos": [3, 9],
+          "clos": [
+            { "description": "Sử dụng thư viện Scikit-Learn để huấn luyện model phân loại.", "ratings": [{ "plo_id": 9, "level": 5 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Đánh giá và cải tiến hiệu năng mô hình.", "plos": [2],
+          "clos": [
+            { "description": "Sử dụng Cross-Validation để đánh giá độ chính xác.", "ratings": [{ "plo_id": 2, "level": 4 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 58, "name": "Pattern Recognition and Machine Learning - Bishop", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 59, "name": "Hands-On Machine Learning with Scikit-Learn & TensorFlow", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 60, "name": "Deep Learning - Ian Goodfellow", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "Đề cương Dữ liệu lớn",
+      "subject": {
+        "id": "BDA403",
+        "name": "Dữ liệu lớn",
+        "credit": { "number_theory": 3, "number_practice": 1, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "DBM201", "require_subject_name": "Cơ sở dữ liệu", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 203, "name": "Nguyễn Văn An" },
+      "main_sections": [
+        {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Big Data Analytics" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [101] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [204] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Nghiên cứu các công nghệ lưu trữ và xử lý dữ liệu lớn như Hadoop, Spark, NoSQL. Tập trung vào việc khai phá dữ liệu từ các tập dữ liệu khổng lồ." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu đặc điểm 5V của Big Data.", "plos": [1],
+          "clos": [
+            { "description": "Phân biệt cơ sở dữ liệu quan hệ và NoSQL.", "ratings": [{ "plo_id": 1, "level": 3 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Sử dụng các framework xử lý dữ liệu phân tán.", "plos": [9],
+          "clos": [
+            { "description": "Viết chương trình MapReduce trên Hadoop.", "ratings": [{ "plo_id": 9, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Phân tích và trực quan hóa dữ liệu lớn.", "plos": [3],
+          "clos": [
+            { "description": "Tạo Dashboard báo cáo từ dữ liệu phân tích được.", "ratings": [{ "plo_id": 3, "level": 4 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 61, "name": "Big Data: Principles and best practices of scalable realtime data systems", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 62, "name": "Hadoop: The Definitive Guide", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 63, "name": "Learning Spark", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 19,
+      "name": "Đề cương Internet vạn vật (IoT)",
+      "subject": {
+        "id": "IOT401",
+        "name": "Internet vạn vật",
+        "credit": { "number_theory": 2, "number_practice": 2, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "NWK301", "require_subject_name": "Mạng máy tính", "type_requirement": "Học trước" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 201, "name": "Trần Thị B" },
+      "main_sections": [
+        {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Internet of Things" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [102] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [301] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [204] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Tìm hiểu về kiến trúc hệ thống IoT, các giao thức truyền thông (MQTT, CoAP) và lập trình vi điều khiển (Arduino/ESP32) để thu thập dữ liệu cảm biến." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu cấu trúc phần cứng của các thiết bị nhúng.", "plos": [1],
+          "clos": [
+            { "description": "Mô tả sơ đồ chân (Pinout) của mạch Arduino.", "ratings": [{ "plo_id": 1, "level": 3 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Lập trình điều khiển thiết bị và thu thập dữ liệu.", "plos": [9],
+          "clos": [
+            { "description": "Lập trình đọc dữ liệu từ cảm biến nhiệt độ và gửi lên server.", "ratings": [{ "plo_id": 9, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Xây dựng hệ thống IoT hoàn chỉnh.", "plos": [3],
+          "clos": [
+            { "description": "Thiết kế hệ thống nhà thông minh đơn giản.", "ratings": [{ "plo_id": 3, "level": 5 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 64, "name": "Designing the Internet of Things - McEwen", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 65, "name": "Getting Started with Arduino", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 66, "name": "Internet of Things for Architects", "type_material": { "id": 2, "name": "Sách tham khảo" } }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Đề cương Công nghệ Blockchain",
+      "subject": {
+        "id": "BLK405",
+        "name": "Công nghệ Blockchain",
+        "credit": { "number_theory": 3, "number_practice": 0, "hour_self_study": 90 },
+        "required_subjects": [{ "require_subject_id": "SEC401", "require_subject_name": "An toàn thông tin", "type_requirement": "Tiên quyết" }]
+      },
+      "faculty": { "id": 1, "name": "Khoa Công nghệ thông tin" },
+      "lecturer": { "id": 202, "name": "Lê Văn C" },
+      "main_sections": [
+        {
+          "position": 1, "name": "Thông tin tổng quát - General Information", "code": "general_info",
+          "sub_sections": [
+            { "position": 1, "name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "content": "Blockchain Technology" },
+            { "position": 2, "name": "Phương thức giảng dạy", "type": "selection", "attribute_group_id": 1, "selected_value_ids": [101] },
+            { "position": 3, "name": "Ngôn ngữ giảng dạy", "type": "selection", "attribute_group_id": 3, "selected_value_ids": [302] },
+            { "position": 4, "name": "Thành phần kiến thức", "type": "selection", "attribute_group_id": 2, "selected_value_ids": [204] },
+            { "position": 5, "name": "Số tín chỉ / Credits", "type": "reference", "reference_code": "credit" },
+            { "position": 6, "name": "Phụ trách môn học/ Administration of the course", "type": "reference", "reference_code": "director" }
+          ]
+        },
+        {
+          "position": 2, "name": "Mô tả môn học", "code": "course_overview",
+          "sub_sections": [
+            { "position": 1, "name": "Mô tả chi tiết", "type": "text", "content": "Tìm hiểu cơ chế hoạt động của Blockchain, Smart Contract và các ứng dụng phi tập trung (DApp). Nghiên cứu nền tảng Ethereum và Solidity." },
+            { "position": 2, "name": "Môn học điều kiện/Requirements", "type": "reference", "reference_code": "requirement_subject" },
+            { "position": 3, "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "reference_code": "objectives_and_outcomes" },
+            { "position": 4, "name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "reference_code": "course_learning_outcomes" },
+            { "position": 5, "name": "Học liệu - Textbook and materials", "type": "reference", "reference_code": "learning_material" }
+          ]
+        }
+      ],
+      "course_objectives": [
+        {
+          "name": "CO1", "description": "Hiểu nguyên lý sổ cái phân tán và đồng thuận.", "plos": [1],
+          "clos": [
+            { "description": "Giải thích cơ chế Proof of Work và Proof of Stake.", "ratings": [{ "plo_id": 1, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO2", "description": "Phát triển hợp đồng thông minh (Smart Contract).", "plos": [3, 9],
+          "clos": [
+            { "description": "Viết và deploy Smart Contract bằng ngôn ngữ Solidity.", "ratings": [{ "plo_id": 9, "level": 4 }] }
+          ]
+        },
+        {
+          "name": "CO3", "description": "Đánh giá tính bảo mật và ứng dụng của Blockchain.", "plos": [7],
+          "clos": [
+            { "description": "Phân tích tiềm năng ứng dụng Blockchain trong tài chính.", "ratings": [{ "plo_id": 7, "level": 3 }] }
+          ]
+        }
+      ],
+      "learning_materials": [
+        { "id": 67, "name": "Mastering Bitcoin - Antonopoulos", "type_material": { "id": 1, "name": "Sách giáo trình" } },
+        { "id": 68, "name": "Mastering Ethereum", "type_material": { "id": 2, "name": "Sách tham khảo" } },
+        { "id": 69, "name": "Blockchain Basics", "type_material": { "id": 2, "name": "Sách tham khảo" } }
       ]
     }
   ]
+
 }

@@ -1,8 +1,9 @@
 <div class="mb-5">
     {% from 'partials/_macros.html' import editable_section_header %}
     {% from 'partials/_macros.html' import editable_field %}
-    {{ editable_section_header(part, syllabus) }}
-
+    <h3 class="section-title-fresh mb-3">
+            <i class="fas fa-info-circle me-2"></i>{{part.position | roman}}. {{ part.name }}
+    </h3>
     <table class="table align-middle info-table-fresh">
         <tbody>
         {# 1. Tên môn học tiếng Việt #}

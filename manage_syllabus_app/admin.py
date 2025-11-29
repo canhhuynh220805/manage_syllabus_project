@@ -1,3 +1,4 @@
+import math
 import os
 from types import SimpleNamespace
 
@@ -5,12 +6,13 @@ from flask import redirect, request, url_for, flash, json
 from flask_admin import BaseView, expose, AdminIndexView, Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_login import logout_user, current_user
+from sqlalchemy import desc
 from werkzeug.security import generate_password_hash
 from wtforms import PasswordField
 
-from manage_syllabus_app import app, db, dao
-from manage_syllabus_app.models import UserRole, User, Faculty, Lecturer, Subject, Credit
-
+from manage_syllabus_app import app, db, dao, services
+from manage_syllabus_app.models import UserRole, User, Faculty, Lecturer, Subject, Credit, TrainingProgram, Major, \
+    Syllabus
 
 
 # Lớp Index View tùy chỉnh để xử lý đăng nhập
@@ -45,7 +47,7 @@ class AuthenticatedAdminView(ModelView):
         return redirect(url_for('admin.index', next=request.url))
 
 
-# --- CÁC VIEW TÙY CHỈNH CHO TỪNG MODEL (PHIÊN BẢN HOÀN CHỈNH) ---
+# --- CÁC VIEW TÙY CHỈNH CHO TỪNG MODEL ---
 
 # Lớp view tùy chỉnh cho quản lý Người dùng
 class UserAdminView(AuthenticatedAdminView):
@@ -53,27 +55,16 @@ class UserAdminView(AuthenticatedAdminView):
     form_overrides = {
         'password': PasswordField
     }
-    column_list = ['name', 'username', 'user_role', 'active', 'lecturer_id']
+    column_list = ['name', 'username', 'user_role', 'active', 'lecturer']
     column_searchable_list = ['name', 'username']
     column_filters = ['user_role', 'active']
     column_exclude_list = ['avatar', 'joined_date', 'password']  # Ẩn cột password đã hash khỏi danh sách
 
     # Quy tắc hiển thị form khi TẠO MỚI
-    form_create_rules = ('name', 'username', 'password', 'user_role', 'active')
+    form_create_rules = ('name', 'username', 'user_role', 'active', 'lecturer')
     # Quy tắc hiển thị form khi CHỈNH SỬA
-    form_edit_rules = ('name', 'username', 'password', 'user_role', 'active')
+    form_edit_rules = ('name', 'username' ,'user_role', 'active', 'lecturer')
 
-    def on_model_change(self, form, model, is_created):
-        # Chỉ mã hóa lại mật khẩu nếu người dùng nhập mật khẩu mới vào form
-        if form.password.data:
-            model.password = generate_password_hash(form.password.data)
-
-
-# Lớp view tùy chỉnh cho Khoa
-class FacultyAdminView(AuthenticatedAdminView):
-    column_list = ['name', 'lecturers']  # Hiển thị tên khoa và danh sách giảng viên thuộc khoa
-    form_columns = ['name']
-    column_searchable_list = ['name']
 
 
 # Lớp view tùy chỉnh cho Giảng viên
@@ -84,11 +75,57 @@ class LecturerAdminView(AuthenticatedAdminView):
     column_filters = ['faculty']
     column_auto_select_related = True  # Tự động load và hiển thị tên Khoa
 
+# Ló view tùy chỉnh đề cương
+class SyllabusAdminView(AuthenticatedAdminView):
+    list_template = 'admin/custom_syllabus_list.html'
+    create_template = 'admin/custom_syllabus_form.html'
+    edit_template = 'admin/custom_syllabus_form.html'
 
-# Lớp view tùy chỉnh cho Tín chỉ
-class CreditAdminView(AuthenticatedAdminView):
-    column_list = ['numberTheory', 'numberPractice', 'hourSelfStudy']
-    form_columns = ['numberTheory', 'numberPractice', 'hourSelfStudy']
+    form_columns = ['name', 'subject', 'faculty','lecturer', 'structure_file', 'training_programs']
+    form_args = {
+        'name': {'label': 'Tên đề cương'},
+        'subject': {'label': 'Môn học'},
+        'faculty': {'label': 'Khoa'},
+        'lecturer': {'label': 'Giảng viên'},
+        'structure_file': {'label': 'Đề cương mẫu'},
+        'training_programs': {'label': 'Chương trình đào tạo'}
+    }
+
+    @expose('/')
+    def index(self):
+        page_size = app.config["PAGE_SIZE"]
+        total = dao.count_syllabuses()
+        page = request.args.get('page', 1, type=int)
+        # Lấy tham số tìm kiếm từ URL
+        key = request.args.get('key', '')
+        selected_year = request.args.get('year')
+        selected_program = request.args.get('programs_name')
+        selected_template = request.args.get('template')
+
+        syllabuses = dao.get_all_syllabuses(page=page, page_size=page_size, key=key, year=selected_year, program=selected_program, template=selected_template)
+        # Lấy dữ liệu cho các ô lọc (Dropdown)
+        years = db.session.query(TrainingProgram.academic_year).distinct().all()
+        years = [y[0] for y in years]
+        programs = TrainingProgram.query.all()
+        # Mockup danh sách template file (thực tế bạn có thể quét thư mục)
+        templates = ['syllabus_2025.json']
+
+        return self.render(
+            self.list_template,
+            syllabuses=syllabuses,
+            years=years,
+            programs=programs,
+            templates=templates,
+            pages=math.ceil(total / page_size)
+        )
+
+    def after_model_change(self, form, model, is_created):
+        if is_created:
+            try:
+                services.init_structure_syllabus(model)
+                flash(f'Đã khởi tạo cấu trúc cho đề cương "{model.name}" thành công!', 'success')
+            except Exception as e:
+                flash(f'Lỗi khi tạo cấu trúc: {str(e)}', 'warning')
 
 
 # Lớp view tùy chỉnh cho Môn học
@@ -222,6 +259,7 @@ class SampleSyllabusView(AuthenticatedBaseView):
                            plos=[])  # `plos` ở đây là để render form, mock_plos ở trên là cho dữ liệu
 
 
+
 class LogoutView(AuthenticatedBaseView):
     @expose('/')
     def index(self):
@@ -232,12 +270,11 @@ class LogoutView(AuthenticatedBaseView):
 # --- KHỞI TẠO TRANG ADMIN VÀ THÊM CÁC VIEW ---
 
 
-admin = Admin(app=app, name='QUẢN TRỊ ĐỀ CƯƠNG', template_mode='bootstrap4', index_view=MyAdminIndex())
+admin = Admin(app=app, name='QUẢN TRỊ ĐỀ CƯƠNG', index_view=MyAdminIndex())
 
-admin.add_view(UserAdminView(User, db.session, name='Người dùng'), )
-admin.add_view(FacultyAdminView(Faculty, db.session, name='Khoa'))
+admin.add_view(UserAdminView(User, db.session, name='Người dùng'))
+admin.add_view(SyllabusAdminView(Syllabus, db.session, name="Đề cương"))
 admin.add_view(LecturerAdminView(Lecturer, db.session, name='Giảng viên'))
-admin.add_view(CreditAdminView(Credit, db.session, name='Tín chỉ'))  # Thêm view quản lý Tín chỉ
 admin.add_view(SubjectAdminView(Subject, db.session, name='Môn học'))
 admin.add_view(SampleSyllabusView(name='Đề cương mẫu', endpoint='sample-syllabus'))
 admin.add_view(LogoutView(name='Đăng xuất'))

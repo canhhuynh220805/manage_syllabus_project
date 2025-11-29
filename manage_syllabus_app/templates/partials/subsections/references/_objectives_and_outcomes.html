@@ -21,8 +21,9 @@
                 <td class="align-middle">
                     <div class="co-name-container ms-4">
                         <span class="me-2">{{ co.name }}</span>
-                        <form action="{{ url_for('delete_course_objective', co_id = co.id)}}" method="post" class="delete-co-form ajax-form">
-                            <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
+                        <form data-method="delete"
+                              data-url="{{url_for('api.delete_course_objective', co_id=co.id)}}"
+                                class="delete-co-form rest-form">
                             <button type="submit" class="btn btn-danger btn-sm p-1"
                                     onclick="return confirm('Bạn có chắc chắn muốn xóa {{ co.name }}? Mọi CLO và rating liên quan sẽ bị xóa vĩnh viễn.');">
                                 <i class="fa-solid fa-trash"></i>
@@ -32,14 +33,14 @@
                 </td>
 
                 <td class=" align-middle col-sm-6">
-                    {{editable_field(co, 'content', 'CourseObjective', syllabus, input_type='textarea')}}
+                    {{editable_field(co, 'content', 'CourseObjective', syllabus, input_type='textarea', data_rest_url=url_for('api.update_course_objective', co_id=co.id))}}
                 </td>
                 <td class="text-center align-middle col-sm-4">
                     <div id="selection-container-co-{{ co.id }}">
                         <div class="display-view editable-container">
                             <div class="d-flex flex-column align-items-center gap-1">
                                 {% for plo in co.programme_learning_outcomes %}
-                                <span class="badge bg-success fs-6">{{ plo.id }}</span>
+                                <span class="badge bg-success fs-6">PLO.{{ plo.id }}</span>
                                 {% else %}
                                 <span class="text-muted">Chưa có</span>
                                 {% endfor %}
@@ -51,12 +52,11 @@
                             </button>
                         </div>
                         <div class="edit-view" style="display: none">
-                            <form action="{{ url_for('update_co_plos', co_id = co.id)}}" method="POST" class="ajax-form">
-                                <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
+                            <form data-method="put" data-url="{{url_for('api.update_course_objective_plos', co_id=co.id)}}" class="rest-form">
                                 <div id="edit-selected-values-co-{{ co.id }}" class="d-flex flex-wrap gap-2 mb-2">
                                     {% for plo in co.programme_learning_outcomes %}
                                     <div class="selection-pill">
-                                        <span class="badge bg-success">{{ plo.id }}</span>
+                                        <span class="badge bg-success">PLO.{{ plo.id }}</span>
                                         <button type="button" onclick="removePill(this)"
                                                 class="btn btn-danger btn-sm sm-2"><i
                                                 class="fa-solid fa-trash"></i>
@@ -76,7 +76,7 @@
                                             <li>
                                                 <a class="dropdown-item" href="#"
                                                    onclick="addPillForCO('{{ co.id }}', '{{ option_plo.id }}', event)">
-                                                    {{ option_plo.id }}: {{ option_plo.description[:30] }}...
+                                                    PLO.{{ option_plo.id }}: {{ option_plo.description[:30] }}...
                                                 </a>
                                             </li>
                                             {% endfor %}
@@ -107,9 +107,9 @@
             </button>
             <div style="display: none;" class="card mt-2 text-start add-form">
                 <div class="card-body">
-                    <form method="post"
-                          action="{{ url_for('add_course_objective', subject_id = syllabus.subject.id) }}" class="ajax-form">
-                        <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
+                    <form data-url="{{url_for('api.add_course_objective', subject_id = syllabus.subject.id)}}"
+                          data-method="post"
+                          class="rest-form">
                         <div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Mô tả mục tiêu</label>
@@ -129,7 +129,7 @@
                                 <li>
                                     <a class="dropdown-item" href="#"
                                        onclick="addPillForCO('new', '{{ option_plo.id }}', event)">
-                                        {{ option_plo.id }}: {{ option_plo.description[:30] }}...
+                                        PLO.{{ option_plo.id }}: {{ option_plo.description[:30] }}...
                                     </a>
                                 </li>
                                 {% endfor %}

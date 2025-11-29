@@ -19,26 +19,15 @@
             </div>
 
             <div class="edit-view" style="display: none;">
-                <form action="{{ url_for('update_director', syllabus_id=syllabus.id) }}" method="POST" class="ajax-form">
+                <form action="#" data-method="patch" class="rest-form"
+                      data-url="{{ url_for('api.update_syllabus_director', syllabus_id=syllabus.id) }}">
                     <div class="mb-2">
                         <label class="form-label fw-bold">a. Khoa/Bộ môn:</label>
-                        <select class="form-select form-select-sm" name="faculty_id">
-                            {% for faculty in all_faculties %}
-                            <option value="{{ faculty.id }}" {% if faculty.id== syllabus.faculty_id %}selected{% endif
-                                    %}>{{ faculty.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <span>{{ syllabus.faculty.name }}</span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">b. Giảng viên:</label>
-                        <select class="form-select form-select-sm" name="lecturer_id"
-                                onchange="updateLecturerInfo(this)">
-                            {% for lecturer in all_lecturers %}
-                            <option value="{{ lecturer.id }}" {% if lecturer.id== syllabus.lecturer_id %}selected{%
-                                    endif %}>{{ lecturer.name }}
-                            </option>
-                            {% endfor %}
+                        <span>{{ syllabus.lecturer.name }}</span>
                         </select>
                     </div>
                     <div class="mb-2">

@@ -1,0 +1,131 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-end my-4">
+        <a class="btn btn-custom-primary px-4 py-2 shadow-sm fw-bold" href="{{ url_for('syllabus.create_view') }}">
+            Thêm đề cương
+        </a>
+    </div>
+    <form class="row g-3 align-items-center mb-4">
+        <div class="col-auto position-relative">
+            <input type="text" name="key" class="form-control ps-5" placeholder="nhập tên đề cương"
+                   value="{{ search or '' }}" style="min-width: 250px; border-color: var(--headline);">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        </div>
+        <div class="dropdown col-auto">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="height: 38px;">
+                Năm học<i class="fa fa-caret-down" style="margin-left: 5px"></i>
+            </button>
+            <ul class="dropdown-menu">
+                {% for y in years %}
+                <li><a class="dropdown-item"
+                       href="{{ set_param(year=y) }}">
+                    {{ y }}
+                </a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="dropdown col-auto">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="height: 38px;">
+                Chương trình đào tạo<i class="fa fa-caret-down" style="margin-left: 5px"></i>
+            </button>
+            <ul class="dropdown-menu">
+                {% for p in programs %}
+                <li><a class="dropdown-item"
+                       href="{{ set_param(programs_name=p.name) }}">
+                    {{ p.name }}
+                </a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="dropdown col-auto">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="height: 38px;">
+                Đề cương mẫu<i class="fa fa-caret-down" style="margin-left: 5px"></i>
+            </button>
+            <ul class="dropdown-menu">
+                {% for t in templates %}
+                <li><a class="dropdown-item"
+                       href="{{ set_param(template=t) }}">
+                    {{ t }}
+                </a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </form>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover mb-0 text-center align-middle" style="border-color: var(--tertiary);">
+            <thead class="bg-primary text-white">
+            <tr style="background-color: #999;">
+                <th scope="col" class="py-3">STT</th>
+                <th scope="col" class="py-3">Môn học</th>
+                <th scope="col" class="py-3">Giảng viên phụ trách</th>
+                <th scope="col" class="py-3">Thời gian</th>
+                <th scope="col" class="py-3">Trạng thái</th>
+                <th scope="col" class="py-3">Chức năng</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in syllabuses %}
+            <tr class="bg-secondary">
+                <td class="fw-bold">{{ loop.index }}</td>
+                <td class="fw-bold text-start ps-4" style="color: var(--headline);">{{ item.name }}</td>
+                <td>{{ item.lecturer.name }}</td>
+                <td>
+                    12/12/2025 - 20/12/2025
+                </td>
+                <td>
+                    Sửa 12/12/2025
+                </td>
+                <td>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{{ url_for('syllabus_detail', syllabus_id=item.id) }}"
+                           class="btn btn-outline-primary btn-sm px-3" target="_blank">
+                            Xem
+                        </a>
+                        <!--method="POST" action="{{ url_for('syllabus.delete_view') }}"-->
+                        <form method="POST" action="{{ url_for('syllabus.delete_view') }}" class="form-delete">
+                            <input type="hidden" name="id" value="{{ item.id }}">
+                            <input type="hidden" name="url" value="{{ url_for('syllabus.index_view') }}">
+
+                            <button type="button" class="btn btn-outline-danger btn-sm px-3" title="Xóa"
+                                    onclick="confirmDelete(this)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center py-5 text-muted fst-italic">
+                    <i class="fa fa-inbox fa-3x mb-3 opacity-50"></i><br>
+                    Không tìm thấy đề cương nào phù hợp.
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if pages > 1%}
+    <ul class="pagination mt-2 justify-content-center">
+        {% for i in range(1, pages+1) %}
+        <li class="page-item {% if request.args.get('page', 1)|int == i %}active{% endif %}">
+            <a class="page-link" href="{{ url_for('.index',
+                                            page=i,
+                                            key=request.args.get('key'),
+                                            year=y,
+                                            programs_name=request.args.get('programs_name'),
+                                            template=request.args.get('template')) }}">
+                {{ i }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -26,10 +26,8 @@
             </button>
         </div>
         <div class="edit-view" style="display: none">
-            <form method="post" action="{{url_for('update_generic_field')}}" class="ajax-form">
-                <input type="hidden" name="model_name" value="Credit">
-                <input type="hidden" name="object_id" value="{{ syllabus.subject.credit.id }}">
-                <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
+            <form action="#" class="rest-form" data-method="patch"
+            data-url="{{ url_for('api.update_credit', credit_id = syllabus.subject.credit.id)}}">
                 <div class="credit-horizontal-bar">
                     <div class="credit-item">
                         <span class="credit-label">Tổng tín chỉ</span>

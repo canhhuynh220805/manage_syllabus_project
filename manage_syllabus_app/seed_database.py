@@ -7,7 +7,7 @@ from manage_syllabus_app import app, db
 from manage_syllabus_app.models import AttributeGroup, AttributeValue, Syllabus, Faculty, Lecturer, Subject, Credit, \
     TypeRequirement, RequirementSubject, TypeLearningMaterial, LearningMaterial, MainSection, SubSection, \
     TextSubSection, SelectionSubSection, ReferenceSubSection, ProgrammeLearningOutcome, CourseLearningOutcome, \
-    CourseObjective, CloPloAssociation
+    CourseObjective, CloPloAssociation, TrainingProgram, Major
 
 
 def seed_data():
@@ -54,10 +54,9 @@ def seed_data_2():
     cnt = 0;
     print("Bắt đầu gieo dữ liệu...")
     for item in data['programme_learning_outcomes']:
-        id_plo = item['id']
         description = item['description']
 
-        plo = ProgrammeLearningOutcome(id=id_plo, description=description)
+        plo = ProgrammeLearningOutcome(description=description)
         db.session.add(plo)
         cnt += 1
     try:
@@ -249,8 +248,68 @@ def seed_data_3():
     except Exception as e:
         db.session.rollback()
         print(f"❌ Đã xảy ra lỗi khi commit: {e}")
+
+
+def seed_data_4():
+    # 1. Tìm Khoa CNTT (Giả sử đã có từ seed trước)
+    faculty_cntt = Faculty.query.filter_by(name="Khoa Công nghệ thông tin").first()
+    if not faculty_cntt:
+        print("Cần chạy seed_data_3 trước để tạo Khoa CNTT!")
+        return
+
+    # 2. Tạo các Ngành (Major)
+    majors_data = [
+        {"name": "Khoa học máy tính", "code": "7480101"},
+        {"name": "Hệ thống thông tin quản lý", "code": "7340405"},
+        {"name": "Công nghệ thông tin", "code": "7480201"}
+    ]
+
+    for m_data in majors_data:
+        major = Major.query.filter_by(code=m_data['code']).first()
+        if not major:
+            major = Major(name=m_data['name'], code=m_data['code'], faculty=faculty_cntt)
+            db.session.add(major)
+    db.session.commit()
+    print("✅ Đã tạo các Ngành!")
+
+    # 3. Tạo Chương trình đào tạo (TrainingProgram) - Khóa 2023
+    # Lấy lại object ngành
+    cs_major = Major.query.filter_by(code="7480101").first()  # KHMT
+    it_major = Major.query.filter_by(code="7480201").first()  # CNTT
+
+    programs_data = [
+        {"name": "KHMT - Khóa 2023", "year": 2023, "major": cs_major},
+        {"name": "CNTT - Khóa 2023", "year": 2023, "major": it_major},
+        {"name": "CNTT - Khóa 2022", "year": 2022, "major": it_major},
+    ]
+
+    for p_data in programs_data:
+        prog = TrainingProgram.query.filter_by(name=p_data['name']).first()
+        if not prog:
+            prog = TrainingProgram(name=p_data['name'], academic_year=p_data['year'], major=p_data['major'])
+            db.session.add(prog)
+
+    db.session.commit()
+    print("✅ Đã tạo Chương trình đào tạo!")
+
+    # 4. Gán Đề cương vào Chương trình (Demo Many-to-Many)
+    # Giả sử môn "Nhập môn lập trình" (ID=3) dùng chung cho cả KHMT và CNTT khóa 2023
+    syllabus_nmlt = Syllabus.query.get(3)  # ID 3 trong data cũ
+    program_cs_23 = TrainingProgram.query.filter_by(name="KHMT - Khóa 2023").first()
+    program_it_23 = TrainingProgram.query.filter_by(name="CNTT - Khóa 2023").first()
+
+    if syllabus_nmlt and program_cs_23 and program_it_23:
+        if syllabus_nmlt not in program_cs_23.syllabuses:
+            program_cs_23.syllabuses.append(syllabus_nmlt)
+        if syllabus_nmlt not in program_it_23.syllabuses:
+            program_it_23.syllabuses.append(syllabus_nmlt)
+
+        db.session.commit()
+        print(f"✅ Đã gán đề cương '{syllabus_nmlt.name}' vào 2 chương trình đào tạo.")
+
 if __name__ == "__main__":
     with app.app_context():
-         seed_data()
-         seed_data_2()
-         seed_data_3()
+        db.create_all()
+        seed_data()
+        seed_data_2()
+        seed_data_3()

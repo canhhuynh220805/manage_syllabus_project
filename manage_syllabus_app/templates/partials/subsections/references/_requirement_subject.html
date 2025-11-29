@@ -1,6 +1,7 @@
 <tr>
     <th scope="row" style="width: 300px;" class="fs-6">{{ item_index }}. {{ sub_item.name }}</th>
     <td>
+
         {% set subjects = syllabus.subject.required_by_relation %}
         <table class="table table-bordered">
             <thead class="table-light">
@@ -24,17 +25,21 @@
                         </button>
                     </div>
                     <div class="edit-view" style="display: none;">
-                        <form action="{{ url_for('update_requirement_subject', subject_id=sub.id) }}" method="post" class="ajax-form">
-                            <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
+                        <form data-url="{{ url_for('api.update_requirement_subject', req_id=sub.id) }}"
+                              data-method="patch" class="rest-form">
                             <div class="d-flex flex-column gap-2">
+                                {% if all_subjects %}
                                 <select class="form-select form-select-sm" name="requirement_subject_id">
                                     {% for s in all_subjects %}
-                                    <option value="{{ s.id }}" {% if s.id== sub.require_subject.id
-                                            %}selected{% endif
-                                            %}>{{ s.name }}
+                                    <option value="{{ s.id }}" {% if s.id== sub.require_subject.id %}selected{% endif
+                                            %}>
+                                        {{ s.name }}
                                     </option>
                                     {% endfor %}
-                                </select>
+                                </select>{% else %}
+                                <p class="text-danger fst-italic">Không có môn học hợp lệ để chọn.</p>
+                                {% endif %}
+
                                 <select class="form-select form-select-sm" name="type_subject_id">
                                     {% for t in all_type_subjects %}
                                     <option value="{{ t.id }}" {% if t.id==
@@ -54,9 +59,9 @@
                                 </div>
                             </div>
                         </form>
-                        <form action=" {{url_for('delete_requirement_subject', subject_id=sub.id)}}" method="post"
-                              class="d-inline mt-2 text-end ajax-form">
-                            <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
+                        <form data-url="{{url_for('api.delete_requirement_subject', req_id=sub.id)}}"
+                              data-method="delete"
+                              class="d-inline mt-2 text-end rest-form" action="#">
                             <button type="submit" class="btn btn-danger btn-sm p-1 mt-2"
                                     onclick="return confirm('Bạn có chắc chắn muốn xóa môn học điều kiện này không?');">
                                 <i class="fa-solid fa-trash"></i> Xóa
@@ -78,37 +83,34 @@
         </table>
         <div class="d-flex justify-content-center add-form-container">
             <button type="button"
-                    class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0 add-btn" >
+                    class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0 add-btn">
                 <i class="fa-solid fa-plus"></i>
             </button>
             <div style="display: none;" class="card mt-2 text-start add-form">
                 <div class="card-body">
-                    <form method="post"
-                          action="{{ url_for('add_requirement_subject', subject_id=syllabus.subject.id) }}" class="ajax-form">
-                        <input type="hidden" name="syllabus_id" value="{{syllabus.id}}">
+                    <form data-method="post"
+                          data-url="{{ url_for('api.add_requirement_subject', subject_id=syllabus.subject.id) }}"
+                          class="rest-form">
                         <div class="d-flex flex-column gap-2">
-                            <select class="form-select form-select-sm" name="require_subject_id">
-                                {% set existing_req_ids = subjects | map(attribute='require_subject_id') | list %}
-                                <option selected disabled>-- Chọn môn học --</option>
+                            {% if all_subjects %}
+                            <select class="form-select form-select-sm" name="requirement_subject_id">
                                 {% for s in all_subjects %}
-                                {% if s.id != syllabus.subject.id and s.id not in existing_req_ids %}
                                 <option value="{{ s.id }}">{{ s.name }}</option>
-                                {% endif %}
                                 {% endfor %}
                             </select>
+                            {% else %}
+                            <p class="text-danger fst-italic">Không có môn học hợp lệ để chọn.</p>
+                            {% endif %}
+
                             <select class="form-select form-select-sm" name="type_subject_id">
                                 <option selected disabled>-- Chọn loại điều kiện --</option>
                                 {% for t in all_type_subjects %}
-                                <option value="{{ t.id }}">{{ t.name }}
-                                </option>
+                                <option value="{{ t.id }}">{{ t.name }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="button" class="btn btn-secondary btn-sm cancel-btn">
-                                Hủy
-                            </button>
-                            <button type="submit" class="btn btn-success btn-sm">
-                                Lưu
-                            </button>
+
+                            <button type="button" class="btn btn-secondary btn-sm cancel-btn">Hủy</button>
+                            <button type="submit" class="btn btn-success btn-sm">Lưu</button>
                         </div>
                     </form>
                 </div>

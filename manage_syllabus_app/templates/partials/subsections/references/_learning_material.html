@@ -15,7 +15,7 @@
             <tr>
                 <td class="text-center align-middle">{{ loop.index }}</td>
                 <td>
-                    {{editable_field(material, 'name', 'LearningMaterial', syllabus, input_type='input')}}
+                    {{editable_field(material, 'name', 'LearningMaterial', syllabus, input_type='input', data_rest_url=url_for('api.update_learning_material', material_id=material.id))}}
                 </td>
                 <td>
                     <div id="editable-container-LearningMaterial-{{ material.id }}-type" class="editable-container">
@@ -30,8 +30,8 @@
                             </div>
                         </div>
                         <div class="edit-view" style="display: none;">
-                            <form method="post"
-                                  action="{{url_for('update_learning_material_type', material_id=material.id)}}" class="ajax-form">
+                            <form data-method="patch"
+                                  data-url="{{url_for('api.update_learning_material_type', material_id=material.id)}}" class="rest-form" action="">
                                 <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
                                 <div class="input-group">
                                     <select class="form-select" name="type_material_id">
@@ -54,7 +54,7 @@
                     </div>
                 </td>
                 <td class="text-center align-middle">
-                    <form action="{{ url_for('delete_learning_material', material_id=material.id) }}" method="post" class="ajax-form">
+                    <form data-method="delete" data-url="{{url_for('api.delete_learning_material', syllabus_id=syllabus.id, material_id=material.id)}}" class="rest-form">
                         <input type="hidden" name="syllabus_id" value="{{ syllabus.id }}">
                         <button type="submit" class="btn btn-danger btn-sm"
                                 onclick="return confirm('Bạn có chắc chắn muốn xóa tài liệu này khỏi đề cương?');">
@@ -78,7 +78,7 @@
             </button>
             <div style="display: none;" class="card mt-2 text-start add-form">
                 <div class="card-body">
-                    <form method="post" action="{{ url_for('add_learning_material', syllabus_id=syllabus.id)}}" class="ajax-form">
+                    <form data-method="post" data-url="{{url_for('api.add_learning_material', syllabus_id=syllabus.id)}}" class="rest-form">
                         <div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Tên tài liệu</label>

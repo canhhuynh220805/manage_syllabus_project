@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 from manage_syllabus_app import app, db, dao
 from manage_syllabus_app.models import User, UserRole, Lecturer, MainSection, TextSubSection, SelectionSubSection, \
     ReferenceSubSection
-from manage_syllabus_app.seed_database import seed_data, seed_data_2, seed_data_3
+from manage_syllabus_app.seed_database import seed_data, seed_data_2, seed_data_3, seed_data_4
 import unicodedata
 import re
 import traceback
@@ -31,6 +31,7 @@ def seed_db():
         seed_data()
         seed_data_2()
         seed_data_3()
+        seed_data_4()
         print("Đã thêm dữ liệu mẫu thành công!")
 
 @app.cli.command("seed-accounts")
@@ -203,7 +204,8 @@ def sync_structure():
 
 
 '''
-(.venv) PS D:\PythonProject> $env:FLASK_APP="manage_syllabus_app.index"
+(.venv) PS D:\PythonProject> set FLASK_APP=manage_syllabus_app.index
+
 (.venv) PS D:\PythonProject> flask create-db                          
 Đã tạo cơ sở dữ liệu thành công!
 (.venv) PS D:\PythonProject> flask seed-db
@@ -211,5 +213,7 @@ def sync_structure():
 (.venv) PS D:\PythonProject> flask db init
 (.venv) PS D:\PythonProject> flask db migrate -m "Add structure_file column to Syllabus"
 (.venv) PS D:\PythonProject> flask db upgrade
+D:\PythonProject\manage_syllabus>py -3.10 -m venv .venv
+D:\PythonProject\manage_syllabus>.venv\Scripts\activate
 
 '''
