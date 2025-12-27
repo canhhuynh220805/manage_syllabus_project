@@ -25,38 +25,5 @@
                 <i class="fas fa-pencil-alt"></i> Chỉnh sửa
             </button>
         </div>
-        <div class="edit-view" style="display: none">
-            <form action="#" class="rest-form" data-method="patch"
-            data-url="{{ url_for('api.update_credit', credit_id = syllabus.subject.credit.id)}}">
-                <div class="credit-horizontal-bar">
-                    <div class="credit-item">
-                        <span class="credit-label">Tổng tín chỉ</span>
-                        <span class="credit-value total">{{ syllabus.subject.credit.getTotalCredit() }}</span>
-                    </div>
-                    <div class="credit-item">
-                        <span class="credit-label">Lý thuyết</span>
-                        <input name="numberTheory" class="credit-value input-style" style="width:150px;" type="number"
-                               value="{{ syllabus.subject.credit.numberTheory }}">
-                    </div>
-                    <div class="credit-item">
-                        <span class="credit-label">Thực hành</span>
-                        <input name="numberPractice" class="credit-value input-style" style="width:150px;" type="number"
-                               value="{{ syllabus.subject.credit.numberPractice }}">
-                    </div>
-                    <div class="credit-item">
-                        <span class="credit-label">Tự học</span>
-                        <input name="hourSelfStudy" class="credit-value input-style" style="width:150px;" type="number"
-                               value="{{ syllabus.subject.credit.hourSelfStudy }}">
-                    </div>
-                </div>
-
-                <div class="text-end mt-2">
-                    <button type="button" class="btn btn-secondary btn-sm"
-                            onclick="toggleFieldEdit('credit-{{ sub_item.id }}', false)">Hủy
-                    </button>
-                    <button type="submit" class="btn btn-success btn-sm">Lưu</button>
-                </div>
-            </form>
-        </div>
     </td>
 </tr>

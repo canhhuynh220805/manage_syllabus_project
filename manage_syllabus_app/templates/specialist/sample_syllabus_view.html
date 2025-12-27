@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block header %}
+{% include 'specialist/header.html' %}
+{% endblock %}
+{% block content %}
+<div class="container my-3 p-4 p-md-5 content-wrapper shadow-sm rounded bg-light syllabus-detail-card">
+
+    <div class="text-center mb-5 syllabus-header">
+        <h2 class="mt-4">ĐỀ CƯƠNG MÔN HỌC MẪU</h2>
+    </div>
+
+    {% for part in syllabus.main_sections %}
+    {# Include động file linh kiện dựa trên 'part.code' #}
+    {% include 'partials/_' + part.code + '.html' %}
+    {% endfor %}
+
+</div>
+{% endblock %}

@@ -87,15 +87,11 @@
                             Xem
                         </a>
 
-                        <a href="{{ url_for('syllabus.edit_view', id=item.id) }}"
+                        <a href=""
                            class="btn btn-outline-warning btn-sm px-3" title="Sửa thông tin">
                             Sửa
                         </a>
-
-                        <form method="POST" action="{{ url_for('syllabus.delete_view') }}" class="form-delete">
-                            <input type="hidden" name="id" value="{{ item.id }}">
-                            <input type="hidden" name="url" value="{{ url_for('syllabus.index_view') }}">
-
+                        <form method="POST" action="}" class="form-delete">
                             <button type="button" class="btn btn-outline-danger btn-sm px-3" title="Xóa"
                                     onclick="confirmDelete(this)">
                                 Xóa
@@ -119,12 +115,7 @@
     <ul class="pagination mt-2 justify-content-center">
         {% for i in range(1, pages+1) %}
         <li class="page-item {% if request.args.get('page', 1)|int == i %}active{% endif %}">
-            <a class="page-link" href="{{ url_for('.index',
-                                            page=i,
-                                            key=request.args.get('key'),
-                                            year=y,
-                                            programs_name=request.args.get('programs_name'),
-                                            template=request.args.get('template')) }}">
+            <a class="page-link">
                 {{ i }}
             </a>
         </li>

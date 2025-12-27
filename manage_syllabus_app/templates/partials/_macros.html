@@ -1,7 +1,6 @@
 
 {% macro editable_field(object, field_name, model_name, syllabus_object, input_type='input', data_rest_url=None) %}
 <div id="editable-container-{{ model_name }}-{{ object.id }}-{{ field_name }}" class="editable-container">
-
     <div class="display-view mt-5">
         <p class="mb-0" style="white-space: pre-wrap;">{{ object[field_name] or "Chưa có nội dung"}}</p>
         <button type="button" class="btn btn-outline-primary btn-sm ms-3 flex-shrink-0 edit-trigger-button"
@@ -11,11 +10,6 @@
     </div>
 
     <div class="edit-view" style="display: none;">
-        {#
-           Kiểm tra xem data_rest_url có được truyền vào không.
-           - Nếu CÓ: Dùng 'rest-form' mới và phương thức 'PATCH'.
-           - Nếu KHÔNG: Dùng 'ajax-form' cũ và action '/update_generic_field'.
-        #}
         <form
               class="{{ 'rest-form' if data_rest_url else 'ajax-form' }}"
               data-method="{{ 'PATCH' if data_rest_url else 'POST' }}"

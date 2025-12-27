@@ -21,19 +21,11 @@
                 <td class="align-middle">
                     <div class="co-name-container ms-4">
                         <span class="me-2">{{ co.name }}</span>
-                        <form data-method="delete"
-                              data-url="{{url_for('api.delete_course_objective', co_id=co.id)}}"
-                                class="delete-co-form rest-form">
-                            <button type="submit" class="btn btn-danger btn-sm p-1"
-                                    onclick="return confirm('Bạn có chắc chắn muốn xóa {{ co.name }}? Mọi CLO và rating liên quan sẽ bị xóa vĩnh viễn.');">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </form>
                     </div>
                 </td>
 
                 <td class=" align-middle col-sm-6">
-                    {{editable_field(co, 'content', 'CourseObjective', syllabus, input_type='textarea', data_rest_url=url_for('api.update_course_objective', co_id=co.id))}}
+                    {{co.content}}
                 </td>
                 <td class="text-center align-middle col-sm-4">
                     <div id="selection-container-co-{{ co.id }}">
@@ -51,49 +43,6 @@
                                 <i class="fas fa-pencil-alt"></i> Chỉnh sửa
                             </button>
                         </div>
-                        <div class="edit-view" style="display: none">
-                            <form data-method="put" data-url="{{url_for('api.update_course_objective_plos', co_id=co.id)}}" class="rest-form">
-                                <div id="edit-selected-values-co-{{ co.id }}" class="d-flex flex-wrap gap-2 mb-2">
-                                    {% for plo in co.programme_learning_outcomes %}
-                                    <div class="selection-pill">
-                                        <span class="badge bg-success">PLO.{{ plo.id }}</span>
-                                        <button type="button" onclick="removePill(this)"
-                                                class="btn btn-danger btn-sm sm-2"><i
-                                                class="fa-solid fa-trash"></i>
-                                        </button>
-                                        <input type="hidden" name="plo_ids" value="{{ plo.id }}">
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <div class="dropdown">-->
-                                        <button type="button" class="btn btn-outline-secondary dropdown-toggle"
-                                                data-bs-toggle="dropdown">
-                                            Thêm PLO
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-scrollable">
-                                            {% for option_plo in plos %}
-                                            <li>
-                                                <a class="dropdown-item" href="#"
-                                                   onclick="addPillForCO('{{ co.id }}', '{{ option_plo.id }}', event)">
-                                                    PLO.{{ option_plo.id }}: {{ option_plo.description[:30] }}...
-                                                </a>
-                                            </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                    <div class="ms-auto">
-                                        <button type="button" class="btn btn-secondary btn-sm"
-                                                onclick="toggleSelectionEdit('co-{{co.id}}',false)">
-                                            Hủy
-                                        </button>
-                                        <button type="submit" class="btn btn-success btn-sm">
-                                            Lưu
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
                     </div>
                 </td>
             </tr>
@@ -105,47 +54,6 @@
                     class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0 add-btn">
                 <i class="fa-solid fa-plus"></i>
             </button>
-            <div style="display: none;" class="card mt-2 text-start add-form">
-                <div class="card-body">
-                    <form data-url="{{url_for('api.add_course_objective', subject_id = syllabus.subject.id)}}"
-                          data-method="post"
-                          class="rest-form">
-                        <div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Mô tả mục tiêu</label>
-                                <textarea class="form-control" name="co_description" rows="3" required></textarea>
-                            </div>
-                            <div id="edit-selected-values-co-new" class="d-flex flex-wrap gap-2 mb-2 border p-2 rounded"
-                                 style="min-height: 100px; max-width: 200px;">
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <button type="button" class="btn btn-outline-secondary dropdown-toggle"
-                                    data-bs-toggle="dropdown">
-                                Thêm PLO
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-scrollable">
-                                {% for option_plo in plos %}
-                                <li>
-                                    <a class="dropdown-item" href="#"
-                                       onclick="addPillForCO('new', '{{ option_plo.id }}', event)">
-                                        PLO.{{ option_plo.id }}: {{ option_plo.description[:30] }}...
-                                    </a>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        <div class="d-flex flex-column gap-2">
-                            <button type="button" class="btn btn-secondary btn-sm cancel-btn">
-                                Hủy
-                            </button>
-                            <button type="submit" class="btn btn-success btn-sm">
-                                Lưu
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
     </td>
 </tr>

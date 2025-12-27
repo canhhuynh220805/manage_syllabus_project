@@ -18,7 +18,9 @@
 {%if current_user.is_authenticated%}
 <main>
     {# Đây là khối nội dung chính mà các file con sẽ thay thế #}
-    {% block content %}{% endblock %}
+    {% block content %}
+
+    {% endblock %}
 </main>
 {%else%}
 <main>

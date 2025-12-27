@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block header %}
+{% include 'specialist/header.html' %}
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card border-0">
+        <div class="card-header text-white d-flex justify-content-between align-items-center py-3" style="background-color: #00558F">
+            <h4 class="mb-0 text-uppercase fw-bold"> Danh sách Đề cương mẫu</h4>
+        </div>
+
+        <div class="card-body p-4">
+            {% if template_files %}
+            <p class="text-muted fst-italic mb-3">
+                Chọn một cấu trúc bên dưới để xem trước nội dung chi tiết.
+            </p>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="text-center" style="width: 60px;">STT</th>
+                        <th>Tên tệp cấu trúc (JSON)</th>
+                        <th class="text-center" style="width: 150px;">Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for file in template_files %}
+                    <tr>
+                        <td class="text-center fw-bold">{{ loop.index }}</td>
+                        <td>
+                            <i class="fa fa-file-code text-warning me-2"></i>
+                            <span class="fw-bold text-dark">{{ file }}</span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ url_for('specialist_template_detail', filename=file) }}"
+                               class="btn btn-outline-primary btn-sm px-3 shadow-sm">
+                                <i class="fa fa-eye me-1"></i> Xem chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-warning text-center py-4">
+                <i class="fa fa-exclamation-triangle fa-2x mb-2"></i><br>
+                Chưa có tệp cấu trúc nào trong thư mục <code>data/structures/</code>.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

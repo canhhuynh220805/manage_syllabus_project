@@ -1,500 +1,290 @@
+import hashlib
 from datetime import datetime
-from typing import List, Optional
-
-from sqlalchemy import String, ForeignKey, Table, Column, Integer, UniqueConstraint, Text
-from sqlalchemy.orm import Mapped, relationship, mapped_column, declared_attr
-from enum import Enum as UserEnum
 from flask_login import UserMixin
+from sqlalchemy import Column, String, Integer, ForeignKey, Text, JSON, Boolean, DateTime, Table, UniqueConstraint, Enum
+from sqlalchemy.orm import relationship, backref
+import enum
 from manage_syllabus_app import db, app
 
-# quan hệ nhiều - nhiều giữa đề cương và học liệu
-Syllabus_LearningMaterial = Table("syllabus_learning_material",
-                                  db.metadata,
-                                  Column("syllabus_id", ForeignKey("syllabus.id"), primary_key=True),
-                                  Column("learning_material_id", ForeignKey("learning_material.id"), primary_key=True))
 
-# quan hệ nhiều - nhiều giữa tiểu mục lựa chọn và giá trị được chọn của đề cương
-SubSection_AttributeValue = Table("subsection_attribute_value",
-                                  db.metadata,
-                                  Column("subsection_id", ForeignKey("sub_section.id"), primary_key=True),
-                                  Column("attribute_value_id", ForeignKey("attribute_value.id"), primary_key=True))
-# quan hệ nhiều - nhiều mục tiêu môn học và PLO
-CourseObjective_ProgrammeLearningOutcome = Table("course_objective_programme_learning_outcome",
-                                                 db.metadata,
-                                                 Column("course_objective_id", ForeignKey("course_objective.id"),
-                                                        primary_key=True),
-                                                 Column("programme_learning_outcome_id",
-                                                        ForeignKey("programme_learning_outcome.id"), primary_key=True))
+# =============================================================================
+# BASE MODEL (Lớp cha dùng chung)
+# =============================================================================
+class BaseModel(db.Model):
+    __abstract__ = True
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(100), nullable=False)
 
-# quan hệ nhiều - nhiều đề cương và chương trình đào tạo
-TrainingProgram_Syllabus = Table("training_program_syllabus",
-                                 db.metadata,
-                                 Column("training_program_id", ForeignKey("training_program.id"), primary_key=True),
-                                 Column("syllabus_id", ForeignKey("syllabus.id"), primary_key=True))
+    def __str__(self):
+        return self.name
 
 
-# LỚP ĐỀ CƯƠNG
-class Syllabus(db.Model):
-    __tablename__ = 'syllabus'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True)
-    main_sections: Mapped[List["MainSection"]] = relationship(
-        back_populates="syllabus",
-        order_by="MainSection.position",
-        cascade="all, delete-orphan",
-    )
-    # khóa ngoại tham chiếu môn học
-    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'), nullable=False)
-    subject: Mapped["Subject"] = relationship(back_populates="syllabuses", lazy=False)
-    # khóa ngoại tham chiếu khoa quản lí
-    faculty_id: Mapped[int] = mapped_column(ForeignKey('faculty.id'), nullable=False)
-    faculty: Mapped["Faculty"] = relationship(back_populates="syllabuses", lazy=False)
-    # khóa ngoai tham chiếu giảng viên phụ trách
-    lecturer_id: Mapped[int] = mapped_column(ForeignKey('lecturer.id'), nullable=False)
-    lecturer: Mapped["Lecturer"] = relationship(back_populates="syllabuses", lazy=False)
-    # 1 đề cương xây dựng bởi nhiều học liệu
-    learning_materials: Mapped[List["LearningMaterial"]] = relationship(secondary=Syllabus_LearningMaterial,
-                                                                        back_populates="syllabuses")
-    structure_file: Mapped[Optional[str]] = mapped_column(String(100), default="syllabus_2025.json")
-    status: Mapped[str] = mapped_column(String(100), nullable=True)
-    training_programs: Mapped[List["TrainingProgram"]] = relationship(
-        secondary=TrainingProgram_Syllabus,
-        back_populates="syllabuses"
-    )
-    created_date: Mapped[datetime] = mapped_column(default=datetime.now)
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'subject': self.subject.to_dict(),
-            'lecturer': self.lecturer.to_dict(),
-            'main parts': self.main_sections.to_dict(),
-        }
+# =============================================================================
+# ASSOCIATION MODELS (Bảng trung gian dạng Class)
+# Thay thế Table bằng Model để chuẩn OOP và dễ mở rộng
+# =============================================================================
+
+class SyllabusLearningMaterial(db.Model):
+    syllabus_id = Column(Integer, ForeignKey('syllabus.id'), primary_key=True)
+    learning_material_id = Column(Integer, ForeignKey('learning_material.id'), primary_key=True)
 
 
-# LỚP PHẦN CỦA ĐỀ CƯƠNG
-class MainSection(db.Model):
-    __tablename__ = 'main_section'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100))
-    code: Mapped[str] = mapped_column(String(50), nullable=False)
-    position: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
-    syllabus_id: Mapped[int] = mapped_column(ForeignKey('syllabus.id'), nullable=False)
-    syllabus: Mapped["Syllabus"] = relationship(back_populates="main_sections")
-    sub_sections: Mapped[List["SubSection"]] = relationship(
-        back_populates="main_section",
-        order_by="SubSection.position",
-        cascade="all, delete-orphan"
-    )
+class SubSectionAttributeValue(db.Model):
+    subsection_id = Column(Integer, ForeignKey('sub_section.id'), primary_key=True)
+    attribute_value_id = Column(Integer, ForeignKey('attribute_value.id'), primary_key=True)
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'syllabus_id': self.syllabus.id
-        }
 
+class CourseObjectiveProgrammeLearningOutcome(db.Model):
+    course_objective_id = Column(Integer, ForeignKey('course_objective.id'), primary_key=True)
+    programme_learning_outcome_id = Column(Integer, ForeignKey('programme_learning_outcome.id'),
+                                           primary_key=True)
+
+
+class TrainingProgramSyllabus(db.Model):
+    training_program_id = Column(Integer, ForeignKey('training_program.id'), primary_key=True)
+    syllabus_id = Column(Integer, ForeignKey('syllabus.id'), primary_key=True)
+
+
+# =============================================================================
+# MODELS CHÍNH
+# =============================================================================
+
+class TemplateSyllabus(BaseModel):
+    name = Column(String(100), nullable=False, unique=True)
+    structure = Column(JSON, nullable=False)
+    # Quan hệ
+    syllabuses = relationship('Syllabus', backref='template', lazy=True)
+
+
+class Syllabus(BaseModel):
+    name = Column(String(100), unique=True)
+    status = Column(String(100), nullable=True)
+    created_date = Column(DateTime, default=datetime.now)
+    structure_file = Column(String(100), default="syllabus_2025.json")
+    # Khóa ngoại
+    subject_id = Column(String(10), ForeignKey('subject.id', onupdate='CASCADE'), nullable=False)
+    faculty_id = Column(Integer, ForeignKey('faculty.id'), nullable=False)
+    lecturer_id = Column(Integer, ForeignKey('lecturer.id'), nullable=False)
+    template_id = Column(Integer, ForeignKey('template_syllabus.id'), nullable=False)
+    # Quan hệ 1-N (Main Sections)
+    main_sections = relationship('MainSection', backref='syllabus', lazy=True, cascade="all, delete-orphan",
+                                 order_by="MainSection.position")
+    # Quan hệ N-N (Learning Materials) - Dùng secondary là tên bảng (string)
+    learning_materials = relationship('LearningMaterial', secondary='syllabus_learning_material',
+                                      backref='syllabuses', lazy=True)
+
+
+class MainSection(BaseModel):
+    code = Column(String(50), nullable=False)
+    position = Column(Integer, default=1, nullable=False)
+    syllabus_id = Column(Integer, ForeignKey('syllabus.id'), nullable=False)
+    sub_sections = relationship('SubSection', backref='main_section', lazy=True, cascade="all, delete-orphan",
+                                order_by="SubSection.position")
     __table_args__ = (UniqueConstraint('code', 'syllabus_id', name='uq_code_per_syllabus'),)
 
 
-# LỚP TIỂU MỤC CHA
-class SubSection(db.Model):
-    __tablename__ = 'sub_section'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    position: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
-    main_section_id: Mapped[int] = mapped_column(ForeignKey('main_section.id'), nullable=False)
-    main_section: Mapped["MainSection"] = relationship(back_populates="sub_sections")
-    type: Mapped[str] = mapped_column(String(50))
-
+# Kế thừa đa hình (Polymorphism)
+class SubSection(BaseModel):
+    position = Column(Integer, default=1, nullable=False)
+    type = Column(String(50))  # Cột phân loại
+    main_section_id = Column(Integer, ForeignKey('main_section.id'), nullable=False)
     __mapper_args__ = {
         'polymorphic_identity': 'sub_section',
         'polymorphic_on': type
     }
 
 
-# LỚP TIỂU MỤC VĂN BẢN
 class TextSubSection(SubSection):
-    __tablename__ = 'text_sub_section'
-    id: Mapped[int] = mapped_column(ForeignKey('sub_section.id'), primary_key=True, nullable=False)
-    content: Mapped[Optional[str]] = mapped_column(Text)
+    id = Column(Integer, ForeignKey('sub_section.id'), primary_key=True)
+    content = Column(Text, nullable=True)
     __mapper_args__ = {
         'polymorphic_identity': 'text'
     }
 
 
-# LỚP TIỂU MỤC LỰA CHỌN
-
 class SelectionSubSection(SubSection):
-    __tablename__ = 'selection_sub_section'
-    id: Mapped[int] = mapped_column(ForeignKey('sub_section.id'), primary_key=True, nullable=False)
-
-    attribute_group_id: Mapped[int] = mapped_column(ForeignKey('attribute_group.id'), nullable=False)
-    attribute_group: Mapped["AttributeGroup"] = relationship(back_populates="selection_sub_sections")
-    selected_values: Mapped[List["AttributeValue"]] = relationship(
-        secondary=SubSection_AttributeValue,
-        back_populates="selection_sub_sections"
-    )
+    id = Column(Integer, ForeignKey('sub_section.id'), primary_key=True)
+    attribute_group_id = Column(Integer, ForeignKey('attribute_group.id'), nullable=False)
+    # Quan hệ lấy các giá trị đã chọn (N-N)
+    selected_values = relationship('AttributeValue', secondary='sub_section_attribute_value', lazy=True)
+    # Quan hệ tới nhóm thuộc tính (N-1)
+    attribute_group = relationship('AttributeGroup', backref='selection_sub_sections', lazy=True)
     __mapper_args__ = {
         'polymorphic_identity': 'selection'
     }
 
-    def to_dict(self):
-        """Chuyển đổi đối tượng SelectionSubSection sang dict."""
-        return {
-            'id': self.id,
-            'name': self.name,
-            'position': self.position,
-            'type': self.type,
-            'attribute_group_id': self.attribute_group_id,
-            'selected_values': [
-                {'id': val.id, 'name_value': val.name_value}
-                for val in self.selected_values
-            ]
-        }
 
-
-# --- LỚP MỚI: TIỂU MỤC THAM CHIẾU ---
 class ReferenceSubSection(SubSection):
-    """
-    Tiểu mục này không chứa dữ liệu, chỉ chứa một mã để tham chiếu
-    tới một đối tượng dữ liệu phức tạp khác (ví dụ: Credit).
-    """
-    __tablename__ = 'reference_sub_section'
-    id: Mapped[int] = mapped_column(ForeignKey('sub_section.id'), primary_key=True, nullable=False)
-
-    reference_code: Mapped[str] = mapped_column(String(50), nullable=False)
-
+    id = Column(Integer, ForeignKey('sub_section.id'), primary_key=True)
+    reference_code = Column(String(50), nullable=False)
     __mapper_args__ = {
         'polymorphic_identity': 'reference'
     }
 
 
-# LỚP NHÓM THUỘC TÍNH
-class AttributeGroup(db.Model):
-    __tablename__ = 'attribute_group'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name_group: Mapped[str] = mapped_column(String(100), nullable=False)
-    attribute_values: Mapped[List["AttributeValue"]] = relationship(back_populates="attribute_group")
-    selection_sub_sections: Mapped[List["SelectionSubSection"]] = relationship(back_populates="attribute_group")
+# =============================================================================
+# CÁC MODEL MÔN HỌC, KHOA, GIẢNG VIÊN...
+# =============================================================================
 
-
-# LỚP GIÁ TRỊ CỦA NHÓM THUỘC TÍNH
-class AttributeValue(db.Model):
-    __tablename__ = 'attribute_value'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name_value: Mapped[str] = mapped_column(String(50), nullable=False)
-    attribute_group_id: Mapped[int] = mapped_column(ForeignKey('attribute_group.id'), nullable=False)
-    attribute_group: Mapped["AttributeGroup"] = relationship(back_populates="attribute_values")
-
-    selection_sub_sections: Mapped[List["SelectionSubSection"]] = relationship(
-        secondary=SubSection_AttributeValue,
-        back_populates="selected_values"
-    )
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name_value': self.name_value,
-        }
-
-
-# LỚP MÔN HỌC
 class Subject(db.Model):
-    __tablename__ = 'subject'
-    id: Mapped[str] = mapped_column(String(10), primary_key=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True)
-    # 1 môn học có nhiều đề cương
-    syllabuses: Mapped[List[Syllabus]] = relationship(back_populates='subject')
-    # khóa ngoại tham chiếu tới tín chỉ
-    credit_id: Mapped[int] = mapped_column(ForeignKey('credit.id'), nullable=False)
-    credit: Mapped["Credit"] = relationship(back_populates="subjects")
-    # quan hệ các môn là yêu cầu cho môn này
-    required_by_relation: Mapped[List['RequirementSubject']] = relationship(
-        foreign_keys='RequirementSubject.subject_id', back_populates="subject",
-        cascade="all, delete-orphan")
-    # quan hệ các môn mà môn này là điều kiện cho
-    required_relation: Mapped[List['RequirementSubject']] = relationship(
-        foreign_keys='RequirementSubject.require_subject_id', cascade="all, delete-orphan",
-        back_populates="require_subject")
-    course_objectives: Mapped[List["CourseObjective"]] = relationship(
-        back_populates="subject",
-        cascade="all, delete-orphan"
-    )
+    id = Column(String(10), primary_key=True)
+    name = Column(String(100), unique=True)
+    credit_id = Column(Integer, ForeignKey('credit.id'), nullable=False)
+    # Quan hệ
+    syllabuses = relationship('Syllabus', backref='subject', lazy=True)
+    course_objectives = relationship('CourseObjective', backref='subject', lazy=True, cascade="all, delete-orphan")
+    # Quan hệ đệ quy (Môn tiên quyết)
+    required_by_relation = relationship('RequirementSubject',
+                                        foreign_keys='RequirementSubject.subject_id',
+                                        backref='subject', cascade="all, delete-orphan")
+    required_relation = relationship('RequirementSubject',
+                                     foreign_keys='RequirementSubject.require_subject_id',
+                                     backref='require_subject', cascade="all, delete-orphan")
 
     def __str__(self):
         return self.name
 
-    def to_dict(self):
-        """Chuyển đổi đối tượng Subject sang định dạng JSON (dictionary)."""
-        return {
-            'id': self.id,
-            'name': self.name,
-            'credit_id': self.credit_id
-        }
+
+class Faculty(BaseModel):
+    name = Column(String(100), unique=True)
+    syllabuses = relationship('Syllabus', backref='faculty', lazy=True)
+    lecturers = relationship('Lecturer', backref='faculty', lazy=True)
+    majors = relationship('Major', backref='faculty', lazy=True)
 
 
-# LỚP KHOA
-class Faculty(db.Model):
-    __tablename__ = 'faculty'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True)
-    # 1 khoa quản lí nhiều đề cương
-    syllabuses: Mapped[List[Syllabus]] = relationship(back_populates='faculty')
-    # 1 khoa có nhiều giảng viên
-    lecturers: Mapped[List["Lecturer"]] = relationship(back_populates='faculty')
-    majors: Mapped[List["Major"]] = relationship(back_populates='faculty')
-    def __str__(self):
-        return self.name
+class Lecturer(BaseModel):
+    name = Column(String(100), unique=True)
+    email = Column(String(100), nullable=True)
+    room = Column(String(200), nullable=True)
+    faculty_id = Column(Integer, ForeignKey('faculty.id'), nullable=False)
+    syllabuses = relationship('Syllabus', backref='lecturer', lazy=True)
 
 
-# LỚP GIẢNG VIÊN
-class Lecturer(db.Model):
-    __tablename__ = 'lecturer'
-    # tự cung cấp mã
-    # id = Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
-    # cấp mã tự động để test
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True)
-    email: Mapped[str] = mapped_column(String(100), nullable=True)
-    room: Mapped[str] = mapped_column(String(200), nullable=True)
-    # 1 giảng viên thuộc 1 khoa
-    faculty_id: Mapped[int] = mapped_column(ForeignKey('faculty.id'), nullable=False)
-    faculty: Mapped[Faculty] = relationship(back_populates="lecturers")
-    # 1 giảng viên phụ trách nhiều đề cương
-    syllabuses: Mapped[Optional[List[Syllabus]]] = relationship(back_populates='lecturer')
-    user: Mapped["User"] = relationship(back_populates="lecturer")  # Mối quan hệ 1-1 ngược lại
-
-    def __str__(self):
-        return self.name
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'email': self.email,
-            'room': self.room,
-            'faculty_id': self.faculty_id,
-        }
+class LearningMaterial(BaseModel):
+    name = Column(String(100), unique=True)
+    type_material_id = Column(Integer, ForeignKey('type_learning_material.id'), nullable=False)
 
 
-# LỚP TÀI LIỆU THAM KHẢO
-class LearningMaterial(db.Model):
-    __tablename__ = 'learning_material'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True)
-    # 1 học liệu chỉ thuộc 1 loại học liệu, khóa ngoại tham chiếu tới loại học liệu
-    type_material_id: Mapped[int] = mapped_column(ForeignKey('type_learning_material.id'), nullable=False)
-    type_material: Mapped["TypeLearningMaterial"] = relationship(back_populates="learningMaterials")
-    # 1 học liệu có thể thuộc nnhiều đề cương
-    syllabuses: Mapped[List[Syllabus]] = relationship(secondary=Syllabus_LearningMaterial,
-                                                      back_populates='learning_materials')
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'type_material_id': self.type_material_id,
-        }
+class TypeLearningMaterial(BaseModel):
+    name = Column(String(100), unique=True)
+    learning_materials = relationship('LearningMaterial', backref='type_material', lazy=True)
 
 
-# LỚP LOẠI TÀI LIỆU THAM KHẢO
-class TypeLearningMaterial(db.Model):
-    __tablename__ = 'type_learning_material'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True)
-    # 1 loại học liệu có nhiều học liệu
-    learningMaterials: Mapped[Optional[List["LearningMaterial"]]] = relationship(back_populates="type_material")
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-        }
-
-
-# LỚP TÍN CHỈ
 class Credit(db.Model):
-    __tablename__ = 'credit'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    numberTheory: Mapped[int] = mapped_column(Integer, nullable=False)
-    numberPractice: Mapped[int] = mapped_column(Integer, nullable=False)
-    hourSelfStudy: Mapped[int] = mapped_column(Integer, nullable=False)
-    # 1 tín chỉ thuộc nhiều môn học , có thể có hoặc ko
-    subjects: Mapped[List["Subject"]] = relationship(back_populates="credit")
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    numberTheory = Column(Integer, nullable=False)
+    numberPractice = Column(Integer, nullable=False)
+    hourSelfStudy = Column(Integer, nullable=False)
+    subjects = relationship('Subject', backref='credit', lazy=True)
 
     def getTotalCredit(self):
-        return self.numberTheory + self.numberPractice;
+        return self.numberTheory + self.numberPractice
 
     def __str__(self):
         return f"TC: {self.getTotalCredit()} (LT: {self.numberTheory} - TH: {self.numberPractice})"
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'numberTheory': self.numberTheory,
-            'numberPractice': self.numberPractice,
-            'hourSelfStudy': self.hourSelfStudy,
-            'totalCredit': self.getTotalCredit()
-        }
+
+class Major(BaseModel):
+    name = Column(String(150), nullable=False, unique=True)
+    code = Column(String(50), nullable=False, unique=True)
+    faculty_id = Column(Integer, ForeignKey('faculty.id'))
+    training_programs = relationship('TrainingProgram', backref='major', lazy=True)
 
 
-# LỚP MÔN HỌC ĐIỀU KIỆN
+class TrainingProgram(BaseModel):
+    name = Column(String(150), nullable=False)
+    academic_year = Column(Integer, nullable=False)
+    major_id = Column(Integer, ForeignKey('major.id'))
+    # Quan hệ N-N với Syllabus thông qua bảng trung gian (class model)
+    syllabuses = relationship('Syllabus', secondary='training_program_syllabus', backref='training_programs',
+                              lazy=True)
+
+
+# =============================================================================
+# CÁC LỚP PHỤ TRỢ (Attribute, PLO, CLO, Requirement)
+# =============================================================================
+
+class AttributeGroup(BaseModel):
+    name_group = Column(String(100), nullable=False)
+    attribute_values = relationship('AttributeValue', backref='attribute_group', lazy=True)
+
+
+class AttributeValue(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name_value = Column(String(50), nullable=False)
+    attribute_group_id = Column(Integer, ForeignKey('attribute_group.id'), nullable=False)
+
+
 class RequirementSubject(db.Model):
-    __tablename__ = 'requirement_subject'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    # môn học bị yêu cầu ( có yêu cầu )
-    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'))
-    subject: Mapped[Subject] = relationship(foreign_keys=[subject_id], back_populates="required_by_relation")
-    # môn học điều kiện
-    require_subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate='CASCADE'))
-    require_subject: Mapped[Subject] = relationship(foreign_keys=[require_subject_id],
-                                                    back_populates="required_relation")
-    # loại điều kiện
-    type_requirement_id: Mapped[int] = mapped_column(ForeignKey("requirement_type.id"), nullable=False)
-    type_requirement: Mapped["TypeRequirement"] = relationship(foreign_keys=[type_requirement_id],
-                                                               back_populates="requirement_subjects")
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'subject_id': self.subject_id,
-            'require_subject_id': self.require_subject_id,
-            'type_requirement_id': self.type_requirement_id,
-        }
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    subject_id = Column(String(10), ForeignKey('subject.id', onupdate='CASCADE'))
+    require_subject_id = Column(String(10), ForeignKey('subject.id', onupdate='CASCADE'))
+    type_requirement_id = Column(Integer, ForeignKey("requirement_type.id"), nullable=False)
 
 
-# LỚP LOẠI MÔN HỌC ĐIỀU KIỆN
-class TypeRequirement(db.Model):
+class TypeRequirement(BaseModel):
     __tablename__ = 'requirement_type'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(30), unique=True)
-    # 1 loại môn học điều kiện có nhiều môn học điều kiện
-    requirement_subjects: Mapped[List[RequirementSubject]] = relationship(back_populates="type_requirement")
+    name = Column(String(30), unique=True)
+    requirement_subjects = relationship('RequirementSubject', backref='type_requirement', lazy=True)
 
 
-# LỚP MỤC TIÊU MÔN HỌC
-class CourseObjective(db.Model):
-    __tablename__ = 'course_objective'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100))
-    content: Mapped[str] = mapped_column(Text, nullable=False)
-    subject_id: Mapped[str] = mapped_column(ForeignKey('subject.id', onupdate="CASCADE"))
-    subject: Mapped[Subject] = relationship(back_populates="course_objectives")
-    course_learning_outcomes: Mapped[List["CourseLearningOutcome"]] = relationship(
-        back_populates="course_objective",
-        cascade="all, delete-orphan",
-    )
-    programme_learning_outcomes: Mapped[List["ProgrammeLearningOutcome"]] = relationship(
-        secondary=CourseObjective_ProgrammeLearningOutcome
-        , back_populates="course_objectives")
-
-    def to_dict(self):
-        """Chuyển đổi đối tượng CourseObjective sang dict."""
-        return {
-            'id': self.id,
-            'name': self.name,
-            'content': self.content,
-            'subject_id': self.subject_id,
-            # Trả về danh sách ID của các PLO đã chọn
-            'plo_ids': [plo.id for plo in self.programme_learning_outcomes]
-        }
+class CourseObjective(BaseModel):
+    content = Column(Text, nullable=False)
+    subject_id = Column(String(10), ForeignKey('subject.id', onupdate="CASCADE"))
+    course_learning_outcomes = relationship('CourseLearningOutcome', backref='course_objective', lazy=True,
+                                            cascade="all, delete-orphan")
+    # Quan hệ N-N với PLO
+    programme_learning_outcomes = relationship('ProgrammeLearningOutcome',
+                                               secondary='course_objective_programme_learning_outcome',
+                                               backref='course_objectives', lazy=True)
 
 
-# LỚP CHUẨN ĐẦU RA MÔN HỌC
 class CourseLearningOutcome(db.Model):
-    __tablename__ = 'course_learning_outcome'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    content: Mapped[str] = mapped_column(Text, nullable=False)
-    course_objective: Mapped[CourseObjective] = relationship(back_populates="course_learning_outcomes")
-    course_objective_id: Mapped[int] = mapped_column(ForeignKey('course_objective.id'))
-
-    plo_association: Mapped[List["CloPloAssociation"]] = relationship(
-        back_populates="clo",
-        cascade="all, delete-orphan",
-    )
-
-    def to_dict(self):
-        """Chuyển đổi đối tượng CLO sang dict."""
-        return {
-            'id': self.id,
-            'content': self.content,
-            'course_objective_id': self.course_objective_id
-        }
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    content = Column(Text, nullable=False)
+    course_objective_id = Column(Integer, ForeignKey('course_objective.id'))
+    # Quan hệ custom association (CLO - PLO - Rating)
+    plo_association = relationship('CloPloAssociation', backref='clo', lazy=True, cascade="all, delete-orphan")
 
 
-# LỚP PLO
 class ProgrammeLearningOutcome(db.Model):
-    __tablename__ = 'programme_learning_outcome'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    description: Mapped[str] = mapped_column(Text, nullable=False)
-    course_objectives: Mapped[List[CourseObjective]] = relationship(secondary=CourseObjective_ProgrammeLearningOutcome
-                                                                    , back_populates="programme_learning_outcomes")
-
-    clo_association: Mapped[List["CloPloAssociation"]] = relationship(back_populates="plo")
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    description = Column(Text, nullable=False)
+    clo_association = relationship('CloPloAssociation', backref='plo', lazy=True)
 
 
-# LỚP QUAN HỆ NHIỀU NHIỀU GIỮA CLO VÀ PLO (CÓ ĐIỂM RATING)
+# Bảng liên kết CLO-PLO có thêm cột rating (Association Object)
 class CloPloAssociation(db.Model):
-    __tablename__ = 'clo_plo_association'
-    clo_id: Mapped[int] = mapped_column(ForeignKey('course_learning_outcome.id'), primary_key=True)
-    plo_id: Mapped[str] = mapped_column(ForeignKey('programme_learning_outcome.id'), primary_key=True)
-    rating: Mapped[int] = mapped_column(nullable=False)
+    clo_id = Column(Integer, ForeignKey('course_learning_outcome.id'), primary_key=True)
+    plo_id = Column(Integer, ForeignKey('programme_learning_outcome.id'), primary_key=True)
+    rating = Column(Integer, nullable=False)
 
-    clo: Mapped[CourseLearningOutcome] = relationship(back_populates="plo_association")
-    plo: Mapped[ProgrammeLearningOutcome] = relationship(back_populates="clo_association")
 
-# LỚP CHUYÊN NGÀNH
-class Major(db.Model):
-    __tablename__ = 'major'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(150), nullable=False, unique=True)
-    code: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
-    faculty_id: Mapped[int] = mapped_column(ForeignKey('faculty.id'))
-    faculty: Mapped[Faculty] = relationship(back_populates="majors")
-    training_programs: Mapped[List['TrainingProgram']] = relationship(back_populates='major')
+# =============================================================================
+# USER & ROLE
+# =============================================================================
 
-# LỚP CHƯƠNG TRÌNH ĐÀO TẠO
-class TrainingProgram(db.Model):
-    __tablename__ = 'training_program'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(150), nullable=False)
-    academic_year: Mapped[int] = mapped_column(nullable=False)
-    major_id: Mapped[int] = mapped_column(ForeignKey('major.id'))
-    major: Mapped[Major] = relationship(back_populates="training_programs")
-    syllabuses: Mapped[List[Syllabus]] = relationship(
-        secondary=TrainingProgram_Syllabus,
-        back_populates="training_programs",
-    )
-    def __str__(self):
-        return self.name
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'academic_year': self.academic_year,
-            'major': self.major.name
-        }
-
-# ========================= USER ===============================
-
-class UserRole(UserEnum):
+class UserRole(enum.Enum):
     ADMIN = 1
     USER = 2
+    SPECIALIST = 3
 
 
-class User(db.Model, UserMixin):
-    __tablename__ = 'user'
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    username: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
-    password: Mapped[str] = mapped_column(Text, nullable=False)
-    active: Mapped[bool] = mapped_column(default=True)
-    joined_date: Mapped[datetime] = mapped_column(default=datetime.now)
-    avatar: Mapped[str] = mapped_column(String(100), nullable=True)
-    user_role: Mapped[UserRole] = mapped_column(default=UserRole.USER)
-    lecturer_id: Mapped[Optional[int]] = mapped_column(ForeignKey('lecturer.id'), nullable=True)
-    lecturer: Mapped[Optional["Lecturer"]] = relationship(back_populates="user")
+class User(BaseModel, UserMixin):
+    username = Column(String(50), nullable=False, unique=True)
+    password = Column(Text, nullable=False)
+    active = Column(Boolean, default=True)
+    joined_date = Column(DateTime, default=datetime.now)
+    avatar = Column(String(100), nullable=True)
+    user_role = Column(Enum(UserRole), default=UserRole.USER)
+    lecturer_id = Column(Integer, ForeignKey('lecturer.id'), nullable=True)
+    lecturer = relationship('Lecturer', backref=backref('user', uselist=False), lazy=True)
 
     def __str__(self):
         return self.username
+
+
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+        print("Database initialized successfully!")

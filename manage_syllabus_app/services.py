@@ -1,7 +1,7 @@
 import os
 
 from flask import json
-
+from types import SimpleNamespace
 from manage_syllabus_app import app, db
 from manage_syllabus_app.models import MainSection, TextSubSection, AttributeGroup, SelectionSubSection, \
     ReferenceSubSection
@@ -64,3 +64,57 @@ def init_structure_syllabus(syllabus):
     except Exception as e:
         db.session.rollback()
         print(f"Lỗi khi khởi tạo cấu trúc: {e}")
+
+
+
+
+
+def build_mock_syllabus_from_json(structure_data, filename_display="Mẫu"):
+    mock_main_sections = []
+    for part_def in structure_data:
+        mock_sub_sections = []
+        for i, sub_def in enumerate(part_def['sub_sections']):
+            mock_sub_def = sub_def.copy()
+            mock_sub_def['id'] = (part_def['position'] * 100) + i
+
+            # Mock attribute group cho selection
+            if mock_sub_def.get('type') == 'selection':
+                mock_sub_def['attribute_group'] = SimpleNamespace(
+                    attribute_values=[
+                        SimpleNamespace(id=1, name_value='[Lựa chọn mẫu A]'),
+                        SimpleNamespace(id=2, name_value='[Lựa chọn mẫu B]')
+                    ]
+                )
+            mock_sub_sections.append(SimpleNamespace(**mock_sub_def))
+
+        mock_part = SimpleNamespace(
+            id=part_def['position'],
+            name=part_def['name'],
+            code=part_def['code'],
+            position=part_def['position'],
+            sub_sections=mock_sub_sections
+        )
+        mock_main_sections.append(mock_part)
+
+    # Mock Data phụ trợ
+    mock_plos = [SimpleNamespace(id=f'PLO.{i}') for i in range(1, 4)]
+
+    mock_subject = SimpleNamespace(
+        id='MOCK_001',
+        name=f'[Môn học Mẫu theo {filename_display}]',
+        credit=SimpleNamespace(id=0, getTotalCredit=lambda: 3, numberTheory=2, numberPractice=1, hourSelfStudy=90),
+        required_by_relation=[],
+        course_objectives=[]
+    )
+
+    mock_syllabus = SimpleNamespace(
+        id=0,
+        main_sections=mock_main_sections,
+        subject=mock_subject,
+        lecturer=SimpleNamespace(id=0, name='[Giảng viên mẫu]', email='sample@university.edu.vn', room='A.101'),
+        faculty=SimpleNamespace(id=0, name='[Khoa Mẫu]'),
+        subject_id=0, lecturer_id=0, faculty_id=0,
+        learning_materials=[]
+    )
+
+    return mock_syllabus

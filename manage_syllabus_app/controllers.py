@@ -1,4 +1,5 @@
 import math
+import os
 
 from manage_syllabus_app import app, dao, login
 import functools
@@ -6,12 +7,12 @@ from flask import render_template, request, url_for, flash, jsonify, abort, Blue
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import redirect
 from manage_syllabus_app import db
-from manage_syllabus_app.decorators import handle_ajax_request
 
 from manage_syllabus_app.models import Faculty, Lecturer, Credit, Subject, Syllabus, RequirementSubject, \
     TypeRequirement, MainSection, LearningMaterial, TypeLearningMaterial, TextSubSection, \
     CourseLearningOutcome, CourseObjective, SelectionSubSection, AttributeValue, ProgrammeLearningOutcome, \
     CloPloAssociation, User, UserRole
+from manage_syllabus_app.services import build_mock_syllabus_from_json
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -41,8 +42,6 @@ def to_roman(n):
         i += 1
     return roman_num
 
-
-app.jinja_env.filters['roman'] = to_roman
 
 
 # CÁC ROUTE GỐC
@@ -76,6 +75,38 @@ def editor():
     return render_template('editor.html')
 
 
+@app.route('/specialist')
+@login_required
+def specialist_view():
+    if current_user.user_role != UserRole.SPECIALIST:
+        abort(403)
+    template_files = []
+
+    return render_template('specialist/index.html', template_files=template_files)
+
+@app.route('/specialist/template/<filename>')
+@login_required
+def specialist_template_detail(filename):
+    # 1. Kiểm tra quyền
+    if current_user.user_role != UserRole.SPECIALIST:
+        abort(403)
+
+
+    # 3. Gọi hàm xử lý logic
+    try:
+        mock_syllabus = []
+    except ValueError as e:
+        flash(str(e), "danger")
+        return redirect(url_for('specialist_view'))
+
+    return render_template(
+        'specialist/sample_syllabus_view.html',
+        syllabus=mock_syllabus,
+        is_sample=True,
+        all_faculties=[], all_lecturers=[], learning_materials=[],
+        all_subjects=[], all_type_subjects=[], plos=[]
+    )
+
 @app.route('/syllabus/<int:syllabus_id>/')
 @login_required
 def syllabus_detail(syllabus_id):
@@ -93,19 +124,23 @@ def syllabus_detail(syllabus_id):
                            all_type_subjects=all_type_subjects, all_subjects=available_subjects, plos=plos,
                            unique_plos=sorted_plos)
 
+
 @app.context_processor
 def util():
     def set_param(**kwargs):
         args = request.args.to_dict()
         args.update(kwargs)
         return url_for('.index', **args)
+
     return dict(set_param=set_param)
+
 
 @api.route('/faculties/<int:faculty_id>/lecturers', methods=['GET'])
 def get_lecturers_by_faculty(faculty_id):
     lecturers = Lecturer.query.filter_by(faculty_id=faculty_id).all()
     # Trả về list object đơn giản
     return jsonify([{'id': l.id, 'name': l.name} for l in lecturers])
+
 
 # CÁC ROUTE XÁC THỰC
 @app.route('/login', methods=['GET', 'POST'])
@@ -117,10 +152,12 @@ def user_login():
 
         if user and dao.check_password(user, password):
             login_user(user=user)
-            return redirect(url_for('index'))
         else:
             flash('Tên đăng nhập hoặc mật khẩu không chính xác!', 'danger')
 
+        if user.user_role == UserRole.SPECIALIST:
+            return redirect('/specialist')
+        return redirect('/')
     return render_template('login.html')
 
 

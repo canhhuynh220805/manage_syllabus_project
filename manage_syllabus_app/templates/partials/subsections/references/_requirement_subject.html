@@ -24,56 +24,10 @@
                             <i class="fas fa-pencil-alt"></i>Chỉnh sửa
                         </button>
                     </div>
-                    <div class="edit-view" style="display: none;">
-                        <form data-url="{{ url_for('api.update_requirement_subject', req_id=sub.id) }}"
-                              data-method="patch" class="rest-form">
-                            <div class="d-flex flex-column gap-2">
-                                {% if all_subjects %}
-                                <select class="form-select form-select-sm" name="requirement_subject_id">
-                                    {% for s in all_subjects %}
-                                    <option value="{{ s.id }}" {% if s.id== sub.require_subject.id %}selected{% endif
-                                            %}>
-                                        {{ s.name }}
-                                    </option>
-                                    {% endfor %}
-                                </select>{% else %}
-                                <p class="text-danger fst-italic">Không có môn học hợp lệ để chọn.</p>
-                                {% endif %}
-
-                                <select class="form-select form-select-sm" name="type_subject_id">
-                                    {% for t in all_type_subjects %}
-                                    <option value="{{ t.id }}" {% if t.id==
-                                            sub.type_requirement.id
-                                            %}selected{% endif
-                                            %}>{{ t.name }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                                <div class="input-group input-group-sm">
-                                    <button type="submit" class="btn btn-success">Lưu
-                                    </button>
-                                    <button type="button" class="btn btn-secondary"
-                                            onclick="toggleFieldEdit('subject-{{sub.id}}', false)">
-                                        Hủy
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                        <form data-url="{{url_for('api.delete_requirement_subject', req_id=sub.id)}}"
-                              data-method="delete"
-                              class="d-inline mt-2 text-end rest-form" action="#">
-                            <button type="submit" class="btn btn-danger btn-sm p-1 mt-2"
-                                    onclick="return confirm('Bạn có chắc chắn muốn xóa môn học điều kiện này không?');">
-                                <i class="fa-solid fa-trash"></i> Xóa
-                            </button>
-                        </form>
-                    </div>
                 </td>
                 <td>{{ sub.require_subject.id }}</td>
             </tr>
-
             {% endfor %}
-
             {% if subjects is none %}
             <tr>
                 <td colspan="4" class="text-center">Không có môn học điều kiện.</td>
@@ -86,35 +40,6 @@
                     class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0 add-btn">
                 <i class="fa-solid fa-plus"></i>
             </button>
-            <div style="display: none;" class="card mt-2 text-start add-form">
-                <div class="card-body">
-                    <form data-method="post"
-                          data-url="{{ url_for('api.add_requirement_subject', subject_id=syllabus.subject.id) }}"
-                          class="rest-form">
-                        <div class="d-flex flex-column gap-2">
-                            {% if all_subjects %}
-                            <select class="form-select form-select-sm" name="requirement_subject_id">
-                                {% for s in all_subjects %}
-                                <option value="{{ s.id }}">{{ s.name }}</option>
-                                {% endfor %}
-                            </select>
-                            {% else %}
-                            <p class="text-danger fst-italic">Không có môn học hợp lệ để chọn.</p>
-                            {% endif %}
-
-                            <select class="form-select form-select-sm" name="type_subject_id">
-                                <option selected disabled>-- Chọn loại điều kiện --</option>
-                                {% for t in all_type_subjects %}
-                                <option value="{{ t.id }}">{{ t.name }}</option>
-                                {% endfor %}
-                            </select>
-
-                            <button type="button" class="btn btn-secondary btn-sm cancel-btn">Hủy</button>
-                            <button type="submit" class="btn btn-success btn-sm">Lưu</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
     </td>
 </tr>

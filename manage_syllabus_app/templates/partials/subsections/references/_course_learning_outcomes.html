@@ -25,10 +25,11 @@
                 {% endif %}
                 <td class="text-center align-middle">{{ ns.cnt }}</td>
                 <td class="align-middle">
-                    {{ editable_field(clo, 'content', 'CourseLearningOutcome', syllabus, input_type='textarea', data_rest_url=url_for('api.update_course_learning_outcome', clo_id=clo.id)) }}
+                    {{ clo.content }}
                 </td>
                 <td class="text-center align-middle">
-                    <form data-method="delete" data-url="{{url_for('api.delete_course_learning_outcome', clo_id=clo.id)}}" class="rest-form">
+                    <form data-method="delete"
+                          data-url="{{url_for('api.delete_course_learning_outcome', clo_id=clo.id)}}" class="rest-form">
                         <button type="submit" class="btn btn-danger btn-sm"
                                 onclick="return confirm('Bạn có chắc chắn muốn xóa CLO này? Mọi liên kết rating cũng sẽ bị xóa vĩnh viễn.');">
                             <i class="fa-solid fa-trash"></i>
@@ -51,22 +52,6 @@
                         <button type="button" class="btn btn-outline-primary btn-sm flex-shrink-0 add-btn">
                             <i class="fas fa-plus"></i>
                         </button>
-
-                        <div class="card mt-2 add-form text-start" style="display: none;">
-                            <div class="card-body">
-                                <form data-method="post" data-url="{{url_for('api.add_course_learning_outcome', co_id=co.id)}}" class="rest-form">
-                                    <div class="mb-2">
-                                        <label class="form-label">Nội dung CLO mới:</label>
-                                        <textarea name="clo_content" class="form-control" rows="3" required></textarea>
-                                    </div>
-                                    <div>
-                                        <button type="button" class="btn btn-secondary btn-sm cancel-btn">Hủy
-                                        </button>
-                                        <button type="submit" class="btn btn-success btn-sm">Lưu</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
                     </div>
                 </td>
             </tr>
@@ -99,7 +84,7 @@
                         {# tìm rating tương ứng#}
                         {% set assoc = clo.plo_association | selectattr('plo_id', 'equalto', plo.id)|first%}
                         <div id="editable-container-rating-{{clo.id}}-{{plo.id}}" class="editable-container">
-                            <div class="display-view">
+                            <div class="">
                                 <div class="d-flex justify-content-center align-items-center">
                                     {% if assoc %}
                                     <span>{{ assoc.rating }}</span>
@@ -110,25 +95,6 @@
                                     </button>
                                     {% endif %}
                                 </div>
-                            </div>
-                            <div class="edit-view" style="display: none;">
-                                <form class="rest-form"
-                                  data-method="PUT"
-                                  data-url="{{ url_for('api.update_rating_api', clo_id=clo.id, plo_id=plo.id) }}"
-                                  action="#">
-                                    {% if assoc %}
-                                    <div class="input-group rating-input-group">
-                                        <input type="number" class="form-control w-auto" name="rating"
-                                               min='0' max='5' step='1' value="{{ assoc.rating }}">
-                                        <button type="submit" class="btn btn-success">Lưu
-                                        </button>
-                                        <button type="button" class="btn btn-secondary"
-                                                onclick="toggleFieldEdit('rating-{{ clo.id }}-{{ plo.id }}', false)">
-                                            Hủy
-                                        </button>
-                                    </div>
-                                    {% endif%}
-                                </form>
                             </div>
                         </div>
                     </td>
