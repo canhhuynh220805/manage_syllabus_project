@@ -1,9 +1,9 @@
-import math
-import os
+from datetime import datetime
+import math,json
 
-from manage_syllabus_app import app, dao, login
+from manage_syllabus_app import app, dao, login, services
 import functools
-from flask import render_template, request, url_for, flash, jsonify, abort, Blueprint
+from flask import render_template, request, url_for, flash, jsonify, abort, Blueprint, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import redirect
 from manage_syllabus_app import db
@@ -11,37 +11,7 @@ from manage_syllabus_app import db
 from manage_syllabus_app.models import Faculty, Lecturer, Credit, Subject, Syllabus, RequirementSubject, \
     TypeRequirement, MainSection, LearningMaterial, TypeLearningMaterial, TextSubSection, \
     CourseLearningOutcome, CourseObjective, SelectionSubSection, AttributeValue, ProgrammeLearningOutcome, \
-    CloPloAssociation, User, UserRole
-from manage_syllabus_app.services import build_mock_syllabus_from_json
-
-api = Blueprint('api', __name__, url_prefix='/api')
-
-
-def to_roman(n):
-    """Chuyển một số nguyên sang số La Mã."""
-    if not isinstance(n, int) or not 1 <= n < 4000:
-        return n  # Trả về giá trị gốc nếu không phải là số hợp lệ
-    val = [
-        1000, 900, 500, 400,
-        100, 90, 50, 40,
-        10, 9, 5, 4,
-        1
-    ]
-    syb = [
-        "M", "CM", "D", "CD",
-        "C", "XC", "L", "XL",
-        "X", "IX", "V", "IV",
-        "I"
-    ]
-    roman_num = ''
-    i = 0
-    while n > 0:
-        for _ in range(n // val[i]):
-            roman_num += syb[i]
-            n -= val[i]
-        i += 1
-    return roman_num
-
+    CloPloAssociation, User, UserRole, AttributeGroup, TemplateSyllabus
 
 
 # CÁC ROUTE GỐC
@@ -53,26 +23,22 @@ def index():
     syllabus = []
     if current_user.is_authenticated:
         if current_user.user_role == UserRole.ADMIN:
-            # Đếm tất cả
             total = dao.count_syllabuses()
-            # Lấy dữ liệu trang hiện tại
             syllabus = dao.get_all_syllabuses(page=page, page_size=page_size)
 
         elif current_user.user_role == UserRole.USER and current_user.lecturer_id:
-            # Đếm theo giảng viên
             total = dao.count_syllabuses(lecturer_id=current_user.lecturer_id)
-            # Lấy dữ liệu trang hiện tại
             syllabus = dao.get_syllabuses_by_lecturer_id(lecturer_id=current_user.lecturer_id,
                                                          page=page, page_size=page_size)
     all_faculties = dao.get_all_faculties()
     return render_template('index.html', syllabuses=syllabus, all_faculties=all_faculties,
-                           pages=math.ceil(total / page_size))
+                           pages=math.ceil(total / page_size), current_page=page)
 
 
-@app.route('/editor')
+@app.route('/specialist/editor')
 @login_required
 def editor():
-    return render_template('editor.html')
+    return render_template('specialist/editor.html')
 
 
 @app.route('/specialist')
@@ -80,21 +46,28 @@ def editor():
 def specialist_view():
     if current_user.user_role != UserRole.SPECIALIST:
         abort(403)
-    template_files = []
+    template_files = dao.get_all_template()
+    # draft_key = f"draft_syllabus_{template_id}"
+    draft_template_ids = []
+    for key in session.keys():
+        if key.startswith('draft_syllabus_'):
+            try:
+                t_id = int(key.split('_')[-1])
+                draft_template_ids.append(t_id)
+            except ValueError:
+                continue
 
-    return render_template('specialist/index.html', template_files=template_files)
+    return render_template('specialist/index.html', template_files=template_files
+                           , draft_template_ids=draft_template_ids)
 
-@app.route('/specialist/template/<filename>')
+
+@app.route('/specialist/template/<template_id>')
 @login_required
-def specialist_template_detail(filename):
-    # 1. Kiểm tra quyền
+def specialist_template_detail(template_id):
     if current_user.user_role != UserRole.SPECIALIST:
         abort(403)
-
-
-    # 3. Gọi hàm xử lý logic
     try:
-        mock_syllabus = []
+        mock_syllabus = services.create_fake_syllabus_from_template(template_id)
     except ValueError as e:
         flash(str(e), "danger")
         return redirect(url_for('specialist_view'))
@@ -103,9 +76,10 @@ def specialist_template_detail(filename):
         'specialist/sample_syllabus_view.html',
         syllabus=mock_syllabus,
         is_sample=True,
-        all_faculties=[], all_lecturers=[], learning_materials=[],
-        all_subjects=[], all_type_subjects=[], plos=[]
+        all_faculties=[], all_lecturers=[], all_type_learning_materials=[],
+        all_subjects=[], all_type_subjects=[], plos=[],
     )
+
 
 @app.route('/syllabus/<int:syllabus_id>/')
 @login_required
@@ -120,26 +94,9 @@ def syllabus_detail(syllabus_id):
     sorted_plos = dao.get_sorted_plos_for_syllabus(syllabus_id)
     return render_template('syllabus_detail.html', syllabus=syllabus,
                            all_faculties=all_faculties, all_lecturers=all_lecturers,
-                           learning_materials=learning_materials,
+                           all_type_learning_materials=learning_materials,
                            all_type_subjects=all_type_subjects, all_subjects=available_subjects, plos=plos,
                            unique_plos=sorted_plos)
-
-
-@app.context_processor
-def util():
-    def set_param(**kwargs):
-        args = request.args.to_dict()
-        args.update(kwargs)
-        return url_for('.index', **args)
-
-    return dict(set_param=set_param)
-
-
-@api.route('/faculties/<int:faculty_id>/lecturers', methods=['GET'])
-def get_lecturers_by_faculty(faculty_id):
-    lecturers = Lecturer.query.filter_by(faculty_id=faculty_id).all()
-    # Trả về list object đơn giản
-    return jsonify([{'id': l.id, 'name': l.name} for l in lecturers])
 
 
 # CÁC ROUTE XÁC THỰC
@@ -148,15 +105,17 @@ def user_login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        user = dao.get_user_by_username(username)
-
-        if user and dao.check_password(user, password):
+        if not username or not password:
+            return render_template('login.html', err_msg="Vui lòng nhập đúng tên tài khoản và mật khẩu")
+        user = dao.auth_user(username, password)
+        if user:
             login_user(user=user)
         else:
             flash('Tên đăng nhập hoặc mật khẩu không chính xác!', 'danger')
-
         if user.user_role == UserRole.SPECIALIST:
             return redirect('/specialist')
+        elif user.user_role == UserRole.ADMIN:
+            return redirect('/admin')
         return redirect('/')
     return render_template('login.html')
 
@@ -169,7 +128,6 @@ def user_register():
         username = request.form.get('username')
         password = request.form.get('password')
         confirm = request.form.get('confirm')
-
         if password != confirm:
             err_msg = "Mật khẩu xác nhận không khớp!"
         else:
@@ -178,7 +136,6 @@ def user_register():
                 return redirect(url_for('user_login'))
             except Exception as e:
                 err_msg = "Đã có lỗi xảy ra: " + str(e)
-
     return render_template('register.html', err_msg=err_msg)
 
 
@@ -187,591 +144,742 @@ def user_logout():
     logout_user()
     return redirect(url_for('user_login'))
 
-
-@app.route('/admin-login', methods=['POST'])
-def admin_login():
-    username = request.form['username']
-    password = request.form['password']
-    user = dao.get_user_by_username(username)
-    if user and dao.check_password(user, password):
-        login_user(user=user)
-    else:
-        flash('Tên đăng nhập hoặc mật khẩu không chính xác!', 'danger')
-    return redirect('/admin')
-
-
-@api.route('/syllabuses/<int:syllabus_id>/director', methods=['PATCH'])
-@login_required
-def update_syllabus_director(syllabus_id):
-    syllabus = db.session.get(Syllabus, syllabus_id)
-    if not syllabus:
-        flash('Không tìm thấy đề cương', 'danger')
-        return redirect(url_for('index'))
-
-    data = request.get_json()
-    if not data:
-        abort(400, description="Không có dữ liệu đầu vào (Yêu cầu phải là JSON).")
-
+@app.route('/syllabus/sync-batch-upgrade', methods=['POST'])
+def syllabus_sync_batch_upgrade():
     try:
-        # 1. Cập nhật Syllabus
-        if 'faculty_id' in data:
-            syllabus.faculty_id = int(data['faculty_id'])
-        if 'lecturer_id' in data:
-            syllabus.lecturer_id = int(data['lecturer_id'])
+        data = request.json
+        old_template_id = data['old_template_id']
+        new_template_id = data['new_template_id']
+        new_template = dao.get_template_by_id(new_template_id)
+        if not new_template:
+            return jsonify({
+                'status': 400,
+                'err_msg': "Không tìm thấy mẫu đề cương này"
+            })
+        new_structure = new_template.structure
 
-        # 2. Cập nhật Lecturer (nếu có thông tin)
-        lecturer_to_update = db.session.get(Lecturer, syllabus.lecturer_id)
-        if lecturer_to_update:
-            if 'lecturer_email' in data:
-                lecturer_to_update.email = data['lecturer_email']
-            if 'lecturer_room' in data:
-                lecturer_to_update.room = data['lecturer_room']
+        syllabuses = Syllabus.query.filter_by(template_id=old_template_id).all()
+        if not syllabuses:
+            return jsonify({
+                'status': 400,
+                'err_msg': "không có đề cương nào để đồng bộ"
+            })
 
+        count = 0
+        for syllabus in syllabuses:
+            print(f"DEBUG SYLLABUS ID: {syllabus.id}")
+            print(f"DEBUG Count Learning Materials: {len(syllabus.learning_materials)}")
+            exist = Syllabus.query.filter_by(
+                id=syllabus.id,
+                template_id=new_template_id,
+                lecturer_id=syllabus.lecturer_id
+            ).first()
+            if exist: continue
+            old_obj = syllabus.to_structure_json()
+
+            new_syllabus_structure = services.merge_syllabus_data(new_structure, old_obj)
+            now = datetime.now().strftime("%d/%m/%Y")
+            s = Syllabus(
+                name=f"{syllabus.name} {new_template.name}",
+                subject=syllabus.subject,
+                lecturer=syllabus.lecturer,
+                faculty=syllabus.faculty,
+                template=new_template,
+                status=f"{current_user.name} đã tạo đề cương ngày {now}"
+            )
+            services.build_syllabus_structure(new_syllabus=s, json_structure_syllabus=new_syllabus_structure)
+            count = count + 1
+            db.session.add(s)
+
+        print(f"Đã khởi tạo {count} đề cương mới")
         db.session.commit()
+        return jsonify({
+            'status': 200,
+            'msg': f'Đã đồng bộ và tạo mới {count} đề cương.',
+        })
 
-        # Trả về thông tin giảng viên đã được cập nhật
-        return jsonify(lecturer_to_update.to_dict())
 
     except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi khi cập nhật CSDL: {str(e)}"), 500
+        return jsonify({
+            'status': 500,
+            'err_msg': str(e)
+        })
 
-
-@api.route('/text-subsections/<int:subsection_id>', methods=['PATCH'])
-def update_text_subsection(subsection_id):
-    subsection = db.session.get(TextSubSection, subsection_id)
-    if not subsection:
-        abort(404, description="Không tìm thấy tiểu mục văn bản này.")
-    data = request.get_json()
-    if not data or 'content' not in data:
-        abort(400, description="Yêu cầu phải là JSON và chứa trường 'content'.")
-    subsection.content = data.get('content')
+@app.route('/syllabus/create_from_template/<template_id>', methods=['GET'])
+def create_from_template(template_id):
+    template_id = template_id
     try:
-        db.session.commit()
-        return jsonify(subsection.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi khi cập nhật CSDL: {str(e)}"), 500
+        new_syllabus = services.create_fake_syllabus_from_template(template_id)
 
-
-@api.route('/subjects/<string:subject_id>', methods=['PATCH'])
-@login_required
-def update_subject(subject_id):
-    subject = dao.get_subject_by_id(subject_id)
-    if not subject:
-        abort(404, description="Không tìm thấy môn học.")
-
-    data = request.get_json()
-    if not data:
-        abort(400, description="Không có dữ liệu đầu vào (Yêu cầu phải là JSON).")
-
-    # Cập nhật các trường được phép
-    if 'name' in data:
-        subject.name = data['name']
-
-    try:
-        db.session.commit()
-        # Trả về tài nguyên đã được cập nhật (dùng hàm .to_dict() mới)
-        return jsonify(subject.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi khi cập nhật CSDL: {str(e)}"), 500
-
-
-@api.route('/credits/<int:credit_id>', methods=['PATCH'])
-def update_credit(credit_id):
-    credit = dao.get_credit_by_id(credit_id)
-
-    if not credit:
-        abort(404, description="Không tìm thấy tín chỉ")
-
-    data = request.get_json()
-
-    if 'numberTheory' in data:
-        credit.numberTheory = data.get('numberTheory')
-    if 'numberPractice' in data:
-        credit.numberPractice = data.get('numberPractice')
-    if 'hourSelfStudy' in data:
-        credit.hourSelfStudy = data.get('hourSelfStudy')
-
-    try:
-        db.session.commit()
-        # Trả về tài nguyên đã được cập nhật
-        return jsonify(credit.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi khi cập nhật CSDL: {str(e)}"), 500
-
-
-@api.route('/selection-subsections/<int:subsection_id>', methods=['PATCH'])
-@login_required
-def update_selection_subsection(subsection_id):
-    subsection = db.session.get(SelectionSubSection, subsection_id)
-    if not subsection:
-        abort(404, description="Không tìm thấy tiểu mục lựa chọn này.")
-
-    data = request.get_json()
-    if not data or 'selected_ids' not in data:
-        abort(400, description="Yêu cầu phải là JSON và chứa 'selected_ids' (có thể là mảng rỗng).")
-    print(data)
-    try:
-        selected_ids = data.get('selected_ids')
-        print(selected_ids)
-        if selected_ids is None:
-            selected_ids = []
-        elif not isinstance(selected_ids, list):
-            selected_ids = [selected_ids]
-        subsection.selected_values.clear()
-        if selected_ids:
-            int_ids = [int(id) for id in selected_ids]
-            print(int_ids)
-            new_selection = AttributeValue.query.filter(AttributeValue.id.in_(int_ids)).all()
-            print(new_selection)
-            subsection.selected_values.extend(new_selection)
-
-        db.session.commit()
-        return jsonify(subsection.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi khi cập nhật CSDL: {str(e)}"), 500
-
-
-@api.route('/learning-materials/<int:material_id>', methods=['PATCH'])
-@login_required
-def update_learning_material(material_id):
-    material = db.session.get(LearningMaterial, material_id)
-    if not material:
-        abort(404, description="Không tìm thấy tài liệu")
-    data = request.get_json()
-    if not data:
-        abort(400, description="Yêu cầu phải là JSON")
-    if 'name' in data:
-        material.name = data.get('name')
-    try:
-        db.session.commit()
-        return jsonify(material.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
-
-
-@api.route('/learning-materials/<int:material_id>/type', methods=['PATCH'])
-@login_required
-def update_learning_material_type(material_id):
-    material = db.session.get(LearningMaterial, material_id)
-    if not material:
-        abort(404, description="Không tìm thấy tài liệu")
-
-    data = request.get_json()
-    if not data or 'type_material_id' not in data:
-        abort(400, description="Yêu cầu phải là JSON và chứa 'type_material_id'.")
-
-    try:
-        new_type_id = data.get('type_material_id')
-        material.type_material_id = new_type_id
-        db.session.commit()
-        return jsonify(material.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
-
-
-@api.route('/clos/<int:clo_id>/plos/<int:plo_id>/rating', methods=['PUT'])
-# @login_required
-def update_rating_api(clo_id, plo_id):
-    data = request.get_json()
-    if not data or 'rating' not in data:
-        abort(400, description="Thiếu thông tin rating.")
-
-    try:
-        new_rating = int(data['rating'])
-
-        # Tìm rating cũ (lưu ý: plo_id trong DB có thể là int hoặc str tùy cấu hình trước đó)
-        # Nếu DB đã chuẩn hóa int thì dùng plo_id, nếu chưa thì dùng str(plo_id)
-        assoc = CloPloAssociation.query.filter_by(clo_id=clo_id, plo_id=plo_id).first()
-
-        if not assoc:
-            # Thử tìm lại với dạng string nếu int không thấy (phòng hờ)
-            assoc = CloPloAssociation.query.filter_by(clo_id=clo_id, plo_id=str(plo_id)).first()
-
-        if assoc:
-            assoc.rating = new_rating
-            db.session.commit()
-            return jsonify({"success": True, "rating": new_rating})
-        else:
-            abort(404, description="Không tìm thấy liên kết rating này.")
-
-    except ValueError:
-        abort(400, description="Rating phải là số nguyên.")
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=str(e)), 500
-
-
-@api.route('/requirement-subjects/<req_id>', methods=['PATCH'])
-@login_required
-def update_requirement_subject(req_id):
-    req_subject = db.session.get(RequirementSubject, req_id)
-    if not req_subject:
-        abort(404, description="Không tìm thấy môn học điều kiện.")
-
-    data = request.get_json()
-    if not data:
-        abort(400, description="Yêu cầu phải là JSON.")
-
-    try:
-        if 'requirement_subject_id' in data:
-            req_subject.require_subject_id = data['requirement_subject_id']
-
-        if 'type_subject_id' in data:
-            req_subject.type_requirement_id = int(data['type_subject_id'])
-
-        db.session.commit()
-        return jsonify(req_subject.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
-
-
-@api.route('/subjects/<subject_id>/requirements', methods=['POST'])
-@login_required
-def add_requirement_subject(subject_id):
-    data = request.get_json()
-    print(data)
-    if not data:
-        abort(404, description="Yêu cầu phải là JSON.")
-
-    require_subject_id = data.get('requirement_subject_id')
-    type_requirement_id = data.get('type_subject_id')
-
-    if str(require_subject_id) == str(subject_id):
-        return jsonify({"success": False, "message": "Không thể chọn chính môn"}), 400
-
-    print(require_subject_id)
-    print(type_requirement_id)
-    if not all([require_subject_id, type_requirement_id]):
-        abort(400, description="Thiếu thông tin môn học hoặc loại điều kiện.")
-
-    from dao import get_available_require_subjects
-    available = get_available_require_subjects(subject_id)
-    available_ids = {s.id for s in available}
-    if require_subject_id not in available_ids:
-        return jsonify({"success": False, "message": "Môn đã được chọn hoặc không hợp lệ"}), 400
-
-    try:
-        new_req = RequirementSubject(
-            subject_id=subject_id,
-            require_subject_id=require_subject_id,
-            type_requirement_id=type_requirement_id,
+        draft_key = f"draft_syllabus_{template_id}"
+        draft_data = session.get(draft_key)
+        attribute_groups = dao.get_all_attribute_groups()
+        auto_restore = request.args.get('restore') == 'true'
+        return render_template(
+            'specialist/editor.html',
+            is_editing=True, draft_json=draft_data, auto_restore=auto_restore,
+            syllabus=new_syllabus,
+            all_faculties=[], all_lecturers=[], all_type_learning_materials=[],
+            all_subjects=[], all_type_subjects=[], plos=[],
+            attribute_groups=attribute_groups,
+            template_id=template_id,
         )
-        db.session.add(new_req)
-        db.session.commit()
-        return jsonify(new_req.to_dict())
     except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
+        raise e
 
-
-@api.route('/requirement-subjects/<req_id>', methods=['DELETE'])
-@login_required
-def delete_requirement_subject(req_id):
-    requirement_subject = db.session.get(RequirementSubject, req_id)
-    if not requirement_subject:
-        abort(404, description="Không tìm thấy để xóa.")
+@app.route('/syllabus/template', methods=['POST'])
+def create_template():
     try:
-        db.session.delete(requirement_subject)
-        db.session.commit()
-        return jsonify({"success": True, "message": "Đã xóa thành công"})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
-
-
-@api.route('/subjects/<subject_id>/course-objectives', methods=['POST'])
-@login_required
-def add_course_objective(subject_id):
-    subject = dao.get_subject_by_id(subject_id)
-    if not subject:
-        abort(404, description="Không tìm thấy môn học.")
-
-    data = request.get_json()
-    if not data:
-        abort(400, description="Yêu cầu phải là JSON.")
-    description = data.get('co_description')
-    # Xử lý plo_ids giống như selected_ids (chấp nhận cả string đơn và list)
-    raw_plo_ids = data.get('plo_ids')
-
-    plo_ids = []
-    if raw_plo_ids:
-        if isinstance(raw_plo_ids, list):
-            plo_ids = raw_plo_ids
+        data = request.json
+        name = data.get('name_syllabus')
+        structure = data.get('data')
+        if isinstance(structure, str):
+            print("Structure là String -> Cần parse")
+            structure = json.loads(structure)
         else:
-            plo_ids = [raw_plo_ids]
-
-    if not description or not plo_ids:
-        abort(400, description="Thiếu mô tả hoặc PLO.")
-    plos = dao.get_all_plos(plo_ids)
-    print(plos)
-    try:
-        current_count = len(subject.course_objectives)
-        co_name = f"CO{current_count + 1}"
-        new_co = CourseObjective(
-            name=co_name,
-            content=description,
-            subject_id=subject_id,
-            programme_learning_outcomes=plos
-        )
-        db.session.add(new_co)
-        db.session.commit()
-        return jsonify(new_co.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
-
-
-@api.route('/course-objectives/<int:co_id>', methods=['DELETE'])
-@login_required
-def delete_course_objective(co_id):
-    course_objective = db.session.get(CourseObjective, co_id)
-    if not course_objective:
-        abort(404, description="Không tìm thấy CO để xóa.")
-    try:
-        db.session.delete(course_objective)
-        db.session.commit()
-        return jsonify({"success": True, "message": "Đã xóa CO thành công"})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
-
-
-@api.route('/course-objectives/<int:co_id>', methods=['PATCH'])
-@login_required
-def update_course_objective(co_id):
-    course_objective = db.session.get(CourseObjective, co_id)
-    if not course_objective:
-        abort(404, description="Không tìm thấy CO để xóa.")
-
-    data = request.get_json()
-    if not data or 'content' not in data:
-        abort(400, description="Thiếu trường 'content'.")
-
-    course_objective.content = data.get('content')
-    try:
-        db.session.commit()
-        return jsonify(course_objective.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
-
-
-@api.route('/course-objectives/<int:co_id>/plos', methods=['PUT'])
-@login_required
-def update_course_objective_plos(co_id):
-    co = db.session.get(CourseObjective, co_id)
-    if not co:
-        abort(404, description="Không tìm thấy CO.")
-
-    data = request.get_json()
-
-    # --- 1. Xử lý input: ÉP KIỂU VỀ INT ---
-    raw_ids = data.get('plo_ids')
-    target_plo_ids = []
-
-    if raw_ids:
-        if not isinstance(raw_ids, list):
-            raw_ids = [raw_ids]  # Bọc string/int đơn vào list
-
-        # Ép tất cả về số nguyên (int) ngay từ đầu
+            print("Structure đã là List/Dict -> Dùng luôn")
+        print(name)
+        print(structure)
         try:
-            target_plo_ids = [int(x) for x in raw_ids]
-        except (ValueError, TypeError):
-            # Nếu có giá trị bậy bạ không convert được, bỏ qua hoặc báo lỗi
-            print(f"Cảnh báo: Danh sách PLO ID chứa giá trị không hợp lệ: {raw_ids}")
-            abort(400, description="Danh sách PLO ID phải là số.")
+            t = TemplateSyllabus(name=f"{name} MỚI", structure=structure)
+            db.session.add(t)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+        return jsonify({
+            'status': 200,
+            'msg': 'Tạo thành công',
+            'new_template_id': t.id,
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 500,
+            "err_msg": str(e)
+        })
 
+
+
+
+@app.route('/syllabus/draft/save', methods=['POST'])
+def draft_save():
     try:
-        # 2. Cập nhật bảng quan hệ chính (CO - PLO)
-        if target_plo_ids:
-            # Dùng .in_ với danh sách số nguyên
-            new_plos = ProgrammeLearningOutcome.query.filter(
-                ProgrammeLearningOutcome.id.in_(target_plo_ids)
-            ).all()
-            co.programme_learning_outcomes = new_plos
+        data = request.json
+        obj_id = data.get("id")
+
+        draft_key = f"draft_syllabus_{obj_id}"
+        session[draft_key] = data.get('structure')
+        session.modified = True
+        return jsonify({
+            "status": 200,
+            "msg": "Lưu thành công"
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": f"Lỗi {str(e)}"
+        })
+
+
+@app.route('/syllabus/draft/delete', methods=['DELETE'])
+def draft_delete():
+    try:
+        data = request.json
+        obj_id = data.get("id")
+        draft_key = f"draft_syllabus_{obj_id}"
+        session.pop(draft_key)
+        session.modified = True
+        return jsonify({
+            "status": 200,
+            "msg": "Đã xóa bản nháp"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": f"Lỗi {str(e)}"
+        })
+
+
+# API ĐỀ CƯƠNG USER
+@app.route('/text-subsection/<int:section_id>', methods=['PATCH'])
+def update_text_subsection(section_id):
+    try:
+        s = TextSubSection.query.get(section_id)
+        if not s:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy tiểu mục"
+            })
+
+        data = request.json
+        if dao.update_text_sub_section(data.get('content'), s):
+            return jsonify({
+                "status": 200,
+                "msg": "Cập nhật thành công"
+            })
         else:
-            co.programme_learning_outcomes = []  # Xóa hết nếu input rỗng
-
-        # 3. Cập nhật bảng rating (CloPloAssociation)
-        for clo in co.course_learning_outcomes:
-            # Xóa các rating không còn được chọn
-            if not target_plo_ids:
-                CloPloAssociation.query.filter_by(clo_id=clo.id).delete()
-            else:
-                CloPloAssociation.query.filter(
-                    CloPloAssociation.clo_id == clo.id,
-                    CloPloAssociation.plo_id.notin_(target_plo_ids)
-                ).delete(synchronize_session=False)
-
-            # Thêm rating mới nếu chưa có
-            if target_plo_ids:
-                existing_assocs = db.session.query(CloPloAssociation.plo_id).filter_by(clo_id=clo.id).all()
-
-                # Tạo Set chứa ID (Int) đã tồn tại
-                existing_plo_ids_set = set()
-                for r in existing_assocs:
-                    try:
-                        existing_plo_ids_set.add(int(r[0]))
-                    except (ValueError, TypeError):
-                        pass
-
-                print(f"Debug - CLO {clo.id} Existing: {existing_plo_ids_set} | Target: {target_plo_ids}")
-
-                for plo_id in target_plo_ids:
-                    # Bây giờ cả plo_id và existing_plo_ids_set đều là INT
-                    if plo_id not in existing_plo_ids_set:
-                        new_assoc = CloPloAssociation(clo_id=clo.id, plo_id=plo_id, rating=0)
-                        db.session.add(new_assoc)
-
-        db.session.commit()
-        return jsonify(co.to_dict())
-
+            return jsonify({
+                "status": 400,
+                "err_msg": "Lỗi cập nhật"
+            })
     except Exception as e:
-        db.session.rollback()
-        print(f"Lỗi update_co_plos: {e}")
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
 
 
-@api.route('/course-objectives/<int:co_id>/course-learning-outcomes', methods=['POST'])
-@login_required
-def add_course_learning_outcome(co_id):
-    course_objective = db.session.get(CourseObjective, co_id)
-    if not course_objective:
-        abort(404, description="Không tìm thấy mục tiêu môn học (CO) cha.")
-
-    data = request.get_json()
-    if not data or 'clo_content' not in data:
-        abort(400, description="Yêu cầu phải là JSON và chứa 'clo_content'.")
-
-    clo_description = data.get('clo_content')
-    if not clo_description:
-        abort(400, description="Nội dung CLO không được rỗng.")
-
+@app.route('/course-objective/<int:co_id>', methods=['PATCH'])
+def update_course_objective(co_id):
     try:
-        new_clo = CourseLearningOutcome(
-            content=clo_description,
-            course_objective_id=course_objective.id
-        )
-        db.session.add(new_clo)
-
-        parent_plos = course_objective.programme_learning_outcomes
-        for plo in parent_plos:
-            new_association = CloPloAssociation(
-                clo=new_clo,
-                plo_id=plo.id,
-                rating=0
-            )
-            db.session.add(new_association)
-        db.session.commit()
-        return jsonify(new_clo.to_dict()), 201
-
+        co = dao.get_co_by_id(co_id)
+        if not co:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy mục tiêu môn học"
+            })
+        data = request.json
+        if dao.update_co(data.get('content'), co):
+            return jsonify({
+                "status": 200,
+                "msg": "Cập nhật thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Lỗi cập nhật"
+            })
     except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
 
 
-@api.route('/course-learning-outcomes/<int:clo_id>', methods=['PATCH'])
-@login_required
+@app.route('/course-learning-outcome/<int:clo_id>', methods=['PATCH'])
 def update_course_learning_outcome(clo_id):
-    clo = db.session.get(CourseLearningOutcome, clo_id)
-    if not clo:
-        abort(404, description="Không tìm thấy CLO.")
-
-    data = request.get_json()
-    if not data or 'content' not in data:
-        abort(400, description="Yêu cầu phải là JSON và chứa trường 'content'.")
-
-    clo.content = data.get('content')
     try:
-        db.session.commit()
-        # Trả về đối tượng CLO đã được cập nhật
-        return jsonify(clo.to_dict())
+        clo = dao.get_clo_by_id(clo_id)
+        if not clo:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy mô tả chuẩn đầu ra"
+            })
+        data = request.json
+        if dao.update_clo(data.get('content'), clo):
+            return jsonify({
+                "status": 200,
+                "msg": "Cập nhật thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Lỗi cập nhật"
+            })
     except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=str(e)), 500
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
 
-
-@api.route('/course-learning-outcomes/<int:clo_id>', methods=['DELETE'])
-@login_required
-def delete_course_learning_outcome(clo_id):
-    course_learning_outcome = db.session.get(CourseLearningOutcome, clo_id)
-    if not course_learning_outcome:
-        abort(404, description="Không tìm thấy CLO để xóa.")
-
-    try:
-        db.session.delete(course_learning_outcome)
-        db.session.commit()
-        return jsonify({"success": True, "message": "Đã xóa CLO thành công."})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
-
-
-@api.route('/syllabuses/<int:syllabus_id>/learning-materials', methods=['POST'])
-@login_required
+@app.route('/syllabus/<int:syllabus_id>/learning-material', methods=['POST'])
 def add_learning_material(syllabus_id):
-    syllabus = db.session.get(Syllabus, syllabus_id)
-    if not syllabus:
-        flash('Không tìm thấy đề cương!', 'danger')
-        return redirect(url_for('syllabus_detail', syllabus_id=syllabus_id))
-
-    data = request.get_json()
-    if not data or 'name_material' not in data or 'type_material_id' not in data:
-        abort(400, description="Thiếu tên tài liệu hoặc loại tài liệu.")
-
-    name_material = data.get('name_material')
-    type_material_id = data.get('type_material_id')
-
     try:
-        lm_obj = dao.find_learning_material(name=name_material)
+        syllabus = dao.get_syllabus_by_id(syllabus_id)
+        if not syllabus:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy đề cương"
+            })
+        data = request.json
 
-        if not lm_obj:
-            lm_obj = LearningMaterial(
-                name=name_material,
-                type_material_id=int(type_material_id),
+        name = data.get('name')
+        type_id = data.get('type_id')
+        if dao.add_learning_material(name=name, type_id=type_id, syllabus=syllabus):
+            return jsonify({
+                "status": 200,
+                "msg": "Thêm thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Thêm thất bại"
+            })
+
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+@app.route('/syllabus/<int:syllabus_id>/learning-material/<int:material_id>', methods=['DELETE'])
+def del_learning_material(syllabus_id, material_id):
+    try:
+        syllabus = dao.get_syllabus_by_id(syllabus_id)
+        material = dao.get_learning_material(id=material_id)
+        if not syllabus or not material:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không đủ dữ liệu"
+            })
+        if dao.remove_learning_material(material=material, syllabus=syllabus):
+            return jsonify({
+                "status": 200,
+                "msg": "Xóa thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Xóa thất bại"
+            })
+
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route('/learning-material/<int:material_id>', methods=['PATCH'])
+def update_learning_material(material_id):
+    try:
+        m = dao.get_learning_material(id=material_id)
+        if not m:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy tài liệu tham khảo"
+            })
+
+        data = request.json
+        if dao.update_learning_material(data.get('name'), m):
+            return jsonify({
+                "status": 200,
+                "msg": "Cập nhật thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Lỗi cập nhật"
+            })
+
+    except  Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route('/attribute-group/<int:group_id>', methods=['GET'])
+def get_attribute_group(group_id):
+    try:
+        subsection_id = request.args.get('subsection_id', type=int)
+        ag = AttributeGroup.query.get(group_id)
+        ag_values = dao.get_attribute_group_values(group_id, subsection_id)
+        if not ag_values:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy nhóm thuộc tính"
+            })
+        return jsonify({
+            "status": 200,
+            "results": [item.to_dict() for item in ag_values],
+            "attribute_group": {
+                'id': ag.id,
+                'name': ag.name,
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+@app.route('/attribute-group', methods=['POST'])
+def add_attribute_group():
+    try:
+        data = request.json
+        name = data.get('name')
+        attribute_values = data.get('attribute_values')
+        if not name or not attribute_values:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Lỗi dữ liệu"
+            })
+        av = []
+        for value in attribute_values:
+            new_av = AttributeValue(
+                name_value=value
             )
-            db.session.add(lm_obj)
+            db.session.add(new_av)
+            av.append(new_av)
 
-        if lm_obj not in syllabus.learning_materials:
-            syllabus.learning_materials.append(lm_obj)
-            db.session.commit()
-            return jsonify(lm_obj.to_dict()), 201
-        else:
-            db.session.rollback()
-            return jsonify(success=False, message="Tài liệu này đã có trong đề cương."), 409
-
+        ag = AttributeGroup(
+            name=name,
+            attribute_values = av
+        )
+        db.session.add(ag)
+        db.session.commit()
+        return jsonify({
+            "status": 200,
+            "msg": "Tạo nhóm thuộc tính thành công",
+            'data': {
+                "name": name,
+                "id": ag.id,
+            }
+        })
     except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
 
-
-@api.route('/syllabuses/<int:syllabus_id>/learning-materials/<int:material_id>', methods=['DELETE'])
-@login_required
-def delete_learning_material(syllabus_id, material_id):
-    syllabus = dao.get_syllabus_by_id(syllabus_id)
-    if not syllabus:
-        abort(404, description="Không tìm thấy đề cương.")
-
-    material_to_remove = dao.find_learning_material(id=material_id)
-    if not material_to_remove:
-        abort(404, description="Không tìm thấy tài liệu.")
-
+@app.route('/subsection/attribute', methods=['POST'])
+def add_subsection_attribute():
     try:
-        if material_to_remove in syllabus.learning_materials:
-            # Xóa mối quan hệ, không xóa tài liệu gốc
-            syllabus.learning_materials.remove(material_to_remove)
-            db.session.commit()
-            return jsonify({"success": True, "message": "Đã xóa tài liệu khỏi đề cương."})
+        data = request.json
+        subsection_id = data.get('subsection_id')
+        attribute_id = data.get('attribute_id')
+        if not subsection_id or not attribute_id:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Lỗi id"
+            })
+
+        if dao.add_attribute(subsection_id, attribute_id):
+            return jsonify({
+                "status": 200,
+                "msg": "Thêm thành công"
+            })
         else:
-            abort(404, description="Tài liệu không có trong đề cương này.")
+            return jsonify({
+                "status": 400,
+                "err_msg": "Thêm thất bại"
+            })
     except Exception as e:
-        db.session.rollback()
-        return jsonify(success=False, message=f"Lỗi server: {str(e)}"), 500
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route('/subsection/attribute', methods=['DELETE'])
+def delete_subsection_attribute():
+    try:
+        data = request.json
+        subsection_id = data.get('subsection_id')
+        attribute_id = data.get('attribute_id')
+        if not subsection_id or not attribute_id:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Lỗi id"
+            })
+
+        if dao.del_attribute(subsection_id, attribute_id):
+            return jsonify({
+                "status": 200,
+                "msg": "Xóa thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Xóa thất bại"
+            })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route('/syllabus/update-credits', methods=['PUT'])
+def update_credits():
+    try:
+        data = request.json
+        credit_id = data.get('credit_id')
+        if not credit_id:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy credit_id"
+            })
+        theory = data.get('theory')
+        practice = data.get('practice')
+        self_study = data.get('self_study')
+        if not theory or not practice or not self_study:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Lỗi dữ liệu"
+            })
+
+        if dao.update_credit(credit_id, theory, practice, self_study):
+            return jsonify({
+                "status": 200,
+                "msg": "Cập nhật thành công",
+                "total": theory + practice
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Cập nhật thất bại"
+            })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route('/syllabus/<int:syllabus_id>/requirement-subject', methods=['POST'])
+def add_requirement_subject(syllabus_id):
+    try:
+        s = dao.get_syllabus_by_id(syllabus_id)
+        if not s:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy đề cương"
+            })
+        data = request.json
+        subject_id = data.get('subject_id')
+        type_id = data.get('type_id')
+        if not subject_id or not type_id:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Thiếu thông tin môn học hoặc loại điều kiện"
+            })
+
+        if dao.add_requirement_subject(syllabus=s, subject_id=subject_id, type_id=type_id):
+            subject = dao.get_subject_by_id(subject_id)
+            type = dao.get_type_subject(type_id)
+            return jsonify({
+                "status": 200,
+                "msg": "Thêm thành công",
+                "subject": subject.to_dict(),
+                "type": type.to_dict()
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Thêm thất bại"
+            })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route('/syllabus/<int:syllabus_id>/requirement-subject/<string:req_subject_id>', methods=['DELETE'])
+def delete_requirement_subject(syllabus_id, req_subject_id):
+    try:
+        s = dao.get_syllabus_by_id(syllabus_id)
+        if not s:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy đề cương"
+            })
+
+        if dao.delete_requirement_subject(syllabus=s, subject_id=req_subject_id):
+            return jsonify({
+                "status": 200,
+                "msg": "Xóa thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Xóa thất bại"
+            })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+@app.route('/course-objective/<int:co_id>/plo', methods=['POST'])
+def add_plo_objective(co_id):
+    try:
+        co = dao.get_co_by_id(co_id)
+        plo_id = request.json.get('plo_id')
+        plo = dao.get_plo_by_id(plo_id)
+        if not co or not plo:
+            return jsonify({
+                "status": 400,
+                "msg": "Lỗi dữ liệu"
+            })
+        if dao.add_plo_for_co(co=co, plo=plo):
+            return jsonify({
+                "status": 200,
+                "msg": "Thêm thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg":"Thêm thất bại"
+            })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route('/course-objective/<int:co_id>/delete-plo/<int:plo_id>', methods=['DELETE'])
+def del_plo_objective(co_id, plo_id):
+    try:
+        co = dao.get_co_by_id(co_id)
+        plo = dao.get_plo_by_id(plo_id)
+        if not co or not plo:
+            return jsonify({
+                "status": 400,
+                "msg": "Lỗi dữ liệu"
+            })
+        if dao.delete_plo_for_co(co=co, plo=plo):
+            return jsonify({
+                "status": 200,
+                "msg": "Xóa thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg":"Xóa thất bại"
+            })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+@app.route('/subject/<subject_id>/course-objective', methods=['POST'])
+def add_course_objective(subject_id):
+    try:
+        subject = dao.get_subject_by_id(subject_id)
+        if not subject:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy môn học"
+            })
+        data = request.json
+        co_content = data.get('content')
+        plo_ids = data.get('plo_ids')
+        plos = dao.get_plos(plo_ids=plo_ids)
+        co = CourseObjective(subject=subject, content=co_content, programme_learning_outcomes=plos)
+        db.session.add(co)
+        db.session.commit()
+        return jsonify({
+            "status": 200,
+            "msg": "Thêm thành công"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route('/subject/<subject_id>/course-objective/<int:co_id>', methods=['DELETE'])
+def del_course_objective(subject_id, co_id):
+    try:
+        subject = dao.get_subject_by_id(subject_id)
+        co = dao.get_co_by_id(co_id)
+        if not subject:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy môn học"
+            })
+
+        if not co:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy mục tiêu môn học"
+            })
+
+        subject.course_objectives.remove(co)
+        db.session.commit()
+        return jsonify({
+            "status": 200,
+            "msg": "Xóa thành công"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+@app.route('/course-objective/<int:co_id>/clo', methods=['POST'])
+def add_course_clo(co_id):
+    try:
+        co = dao.get_co_by_id(co_id)
+        if not co:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy mục tiêu môn học"
+            })
+        data = request.json
+        clo_content = data.get('content')
+        clo = CourseLearningOutcome(content=clo_content)
+        if dao.add_clo_for_co(co=co, clo=clo):
+            return jsonify({
+                "status": 200,
+                "msg": "Thêm thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Thêm thất bại"
+            })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+@app.route('/course-objective/<int:co_id>/clo/<int:clo_id>', methods=['DELETE'])
+def del_course_clo(co_id, clo_id):
+    try:
+        co = dao.get_co_by_id(co_id)
+        clo = dao.get_clo_by_id(clo_id)
+        if not co or not clo:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Lỗi data"
+            })
+
+        if dao.delete_clo_for_co(co=co, clo=clo):
+            return jsonify({
+                "status": 200,
+                "msg": "Xoa thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Xóa thất bại"
+            })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+@app.route('/clo/<int:clo_id>/plo/<int:plo_id>', methods=['PUT'])
+def update_rating(clo_id, plo_id):
+    try:
+        data = request.json
+        rating = data.get('rating')
+        if not rating:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không lấy được rating"
+            })
+        if dao.update_rating(clo_id=clo_id, plo_id=plo_id, rating=rating):
+            return jsonify({
+                "status": 200,
+                "msg": "Cập nhật thành công"
+            })
+        else:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Cập nhật thất bại"
+            })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })

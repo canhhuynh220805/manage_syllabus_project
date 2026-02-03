@@ -1,23 +1,36 @@
 {% extends 'base.html' %}
 
 {% block content%}
-<div class="container my-5 p-4 p-md-5 content-wrapper shadow-sm rounded bg-light syllabus-detail-card">
-
-    <div class="text-center mb-5 syllabus-header">
-        <h6>BỘ GIÁO DỤC VÀ ĐÀO TẠO</h6>
-        <h6>TRƯỜNG ĐẠI HỌC MỞ THÀNH PHỐ HỒ CHÍ MINH</h6>
-        <h2 class="mt-4">ĐỀ CƯƠNG MÔN HỌC</h2>
-        <h5 class="text-uppercase">Course Specification</h5>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-10">
+                <div class="card shadow-sm syllabus-detail-card">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-5 syllabus-header">
+                            <h6 class="text-uppercase font-weight-bold">Bộ Giáo Dục và Đào Tạo</h6>
+                            <h6 class="text-uppercase font-weight-bold">Trường Đại Học Mở Thành Phố Hồ Chí Minh</h6>
+                            <hr style="width: 100px; border-top: 2px solid #333;" class="mx-auto my-3">
+                            <h2 class="mt-4 font-weight-bold">ĐỀ CƯƠNG MÔN HỌC</h2>
+                            <h5 class="text-uppercase text-muted">Course Specification</h5>
+                        </div>
+                        {% for part in syllabus.main_sections %}
+                        {# Include động file linh kiện #}
+                        {% include 'partials/_' + part.code + '.html' %}
+                        {% endfor %}
+                        <div class="text-center mt-5 no-print">
+                            <a href="{{ url_for('index') }}" class="btn btn-default">
+                                <i class="fas fa-arrow-left mr-1"></i> Quay lại danh sách
+                            </a>
+                            <button onclick="window.print()" class="btn btn-primary ml-2">
+                                <i class="fas fa-print mr-1"></i> In đề cương
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</section>
 
-    {% for part in syllabus.main_sections %}
-
-        {# Include động file linh kiện dựa trên 'part.code' #}
-        {% include 'partials/_' + part.code + '.html' %}
-
-    {% endfor %}
-    <div class="text-center mt-5">
-        <a href="{{ url_for('index') }}" class="btn btn-custom px-4 py-2">&laquo; Quay lại danh sách</a>
-    </div>
-</div>
 {% endblock%}

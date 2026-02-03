@@ -1,29 +1,13 @@
-import os
-
-from flask import json
-from types import SimpleNamespace
-from manage_syllabus_app import app, db
+import copy, json
+from manage_syllabus_app import app, db, dao
 from manage_syllabus_app.models import MainSection, TextSubSection, AttributeGroup, SelectionSubSection, \
-    ReferenceSubSection
+    ReferenceSubSection, Syllabus, Subject, Lecturer, SubSection, TableSubSection, AttributeValue
 
 
 def init_structure_syllabus(syllabus):
-    structure_name = syllabus.structure_file or 'syllabus_2025.json'
-    structures_dir = os.path.join(app.root_path, 'data', 'structures')
-    json_path = os.path.join(structures_dir, structure_name)
+    templates = syllabus.template
 
-    if not os.path.exists(json_path):
-        print(f"Cảnh báo: Không tìm thấy file cấu trúc {json_path}")
-        return
-
-    try:
-        with open(json_path, 'r', encoding='utf-8') as f:
-            structure_data = json.load(f)
-    except Exception as e:
-        print(f"Lỗi đọc JSON: {e}")
-        return
-
-    for part_def in structure_data:
+    for part_def in templates.structure:
         new_part = MainSection(
             name=part_def['name'],
             code=part_def['code'],
@@ -37,7 +21,7 @@ def init_structure_syllabus(syllabus):
                 new_sub = TextSubSection(
                     name=sub_part['name'],
                     position=sub_part['position'],
-                    content=''  # Nội dung trống ban đầu
+                    content=''
                 )
             elif sub_part['type'] == 'selection':
                 # Tìm AttributeGroup tương ứng
@@ -66,55 +50,192 @@ def init_structure_syllabus(syllabus):
         print(f"Lỗi khi khởi tạo cấu trúc: {e}")
 
 
+def create_fake_syllabus_from_template(template_id):
+    template = dao.get_template_by_id(template_id)
+    fake_syllabus = Syllabus(
+        id=template_id,
+        name=template.name,
+        subject=Subject(name="(Môn học mẫu)", credit=dao.get_credit_by_id(1)),
+        lecturer=Lecturer(name="(Tên giảng viên)"),
+    )
+    fake_syllabus.main_sections = []
+    raw_structure = template.structure
+    fake_id_counter = [-1]
+    if raw_structure:
+        for part_def in raw_structure:
+            new_part = MainSection(
+                name=part_def['name'],
+                code=part_def['code'],
+                position=part_def['position']
+            )
+            new_part.sub_sections = []
+            for sub_part in part_def.get('sub_sections', []):
+                clone_sub_section(sub_part, new_part, fake_id_counter)
+            fake_syllabus.main_sections.append(new_part)
 
+    return fake_syllabus
 
+def clone_sub_section(sub_section, main_section, id):
+    current_fake_id = id[0]
+    id[0] -= 1
 
-def build_mock_syllabus_from_json(structure_data, filename_display="Mẫu"):
-    mock_main_sections = []
-    for part_def in structure_data:
-        mock_sub_sections = []
-        for i, sub_def in enumerate(part_def['sub_sections']):
-            mock_sub_def = sub_def.copy()
-            mock_sub_def['id'] = (part_def['position'] * 100) + i
+    common_data = {
+        'id': current_fake_id,
+        'name': sub_section['name'],
+        'code': sub_section['code'],
+        'position': sub_section['position'],
+        'type': sub_section['type'],
+    }
+    new_sub_section = None
 
-            # Mock attribute group cho selection
-            if mock_sub_def.get('type') == 'selection':
-                mock_sub_def['attribute_group'] = SimpleNamespace(
-                    attribute_values=[
-                        SimpleNamespace(id=1, name_value='[Lựa chọn mẫu A]'),
-                        SimpleNamespace(id=2, name_value='[Lựa chọn mẫu B]')
-                    ]
-                )
-            mock_sub_sections.append(SimpleNamespace(**mock_sub_def))
-
-        mock_part = SimpleNamespace(
-            id=part_def['position'],
-            name=part_def['name'],
-            code=part_def['code'],
-            position=part_def['position'],
-            sub_sections=mock_sub_sections
+    if sub_section['type'] == 'text':
+        new_sub_section = TextSubSection(
+            **common_data,
+            place_holder=sub_section.get('placeholder', 'place_holder'),
+            display_mode=sub_section['display_mode'],
+            content=""
         )
-        mock_main_sections.append(mock_part)
+    elif sub_section['type'] == 'selection':
+        new_sub_section = SelectionSubSection(
+            **common_data,
+            attribute_group_id=sub_section['attribute_group_id']
+        )
+    elif sub_section['type'] == 'reference':
+        new_sub_section = ReferenceSubSection(
+            **common_data,
+            reference_code=sub_section['reference_code']
+        )
+    elif sub_section['type'] == 'table':
+        data = copy.deepcopy(sub_section['data'])
+        # data['rows'] = []
+        new_sub_section = TableSubSection(
+            **common_data,
+            data=data
+        )
+    main_section.sub_sections.append(new_sub_section)
 
-    # Mock Data phụ trợ
-    mock_plos = [SimpleNamespace(id=f'PLO.{i}') for i in range(1, 4)]
+def merge_syllabus_data(template, syllabus):
+    subject_info = syllabus.get('subject', {}) or {}
+    reference_store = {
+        "credit": subject_info.get('credit'),
+        "requirement_subject": subject_info.get('required_subjects', []),
+        "director": syllabus.get('lecturer'),
+        "lecturer_info": syllabus.get('lecturer'),
+        "objectives_and_outcomes": syllabus.get('course_objectives', []),
+        "course_learning_outcomes": syllabus.get('course_objectives', []),
+        "learning_material": syllabus.get('learning_materials', []),
+        "subject_assessment": syllabus.get('assessments', [])
+    }
+    data_map = {}
+    data_syllabus = syllabus.get('main_sections', [])
+    for main in data_syllabus:
+        m_code = main.get('code')
+        if not m_code: continue
 
-    mock_subject = SimpleNamespace(
-        id='MOCK_001',
-        name=f'[Môn học Mẫu theo {filename_display}]',
-        credit=SimpleNamespace(id=0, getTotalCredit=lambda: 3, numberTheory=2, numberPractice=1, hourSelfStudy=90),
-        required_by_relation=[],
-        course_objectives=[]
-    )
+        sub_map = {}
+        for sub in main.get('sub_sections', []):
+            s_code = sub.get('code')
+            if s_code:
+                sub_map[s_code] = sub
 
-    mock_syllabus = SimpleNamespace(
-        id=0,
-        main_sections=mock_main_sections,
-        subject=mock_subject,
-        lecturer=SimpleNamespace(id=0, name='[Giảng viên mẫu]', email='sample@university.edu.vn', room='A.101'),
-        faculty=SimpleNamespace(id=0, name='[Khoa Mẫu]'),
-        subject_id=0, lecturer_id=0, faculty_id=0,
-        learning_materials=[]
-    )
+        data_map[m_code] = sub_map
 
-    return mock_syllabus
+    merger_result = []
+    for main in template:
+        new_main = copy.deepcopy(main)
+        old_subs = data_map.get(main.get('code'))
+        new_subs = []
+        for sub in main.get('sub_sections', []):
+            new_sub = copy.deepcopy(sub)
+            sub_type = sub.get('type')
+            sub_code = sub.get('code')
+            if sub_type == "reference":
+                ref_code = sub.get('reference_code')
+                if ref_code == 'learning_material' or ref_code == 'learning_materials':
+                    print(f"DEBUG: Tìm thấy ref_code='{ref_code}'")
+                    print(f"DEBUG: Có trong store không? {ref_code in reference_store}")
+                    print(f"DEBUG: Dữ liệu là: {reference_store.get(ref_code)}")
+                if ref_code and ref_code in reference_store:
+                    ref_data = reference_store[ref_code]
+
+                    if ref_data:
+                        new_sub['ref_data'] = ref_data
+
+                # if old_subs_storage:
+                #     old_item = old_subs_storage.get(sub_code)
+                #     if old_item and 'content' in old_item:
+                #         new_sub['content'] = old_item['content']
+
+            elif old_subs:
+                item = old_subs.get(sub_code)
+                if item:
+                    if sub_type == 'text':
+                        new_sub['content'] = item['content']
+                        new_sub['display_mode'] = item['display_mode']
+                        new_sub['placeholder'] = item['placeholder']
+                    elif sub_type == 'selection':
+                        new_sub['selected_value_ids'] = item['selected_value_ids']
+                    elif sub_type == 'table':
+                        if 'data' in item and 'rows' in item['data']:
+                            if 'data' not in new_sub: new_sub['data'] = {}
+                            new_sub['data']['rows'] = item['data']['rows']
+
+
+            new_subs.append(new_sub)
+        new_main['sub_sections'] = new_subs
+        merger_result.append(new_main)
+    return merger_result
+
+def build_syllabus_structure(new_syllabus, json_structure_syllabus):
+
+    for inx_main, main in enumerate(json_structure_syllabus):
+        new_main = MainSection(
+            name=main.get('name'),
+            code=main.get('code'),
+            position=main.get('position', inx_main + 1),
+        )
+        new_syllabus.main_sections.append(new_main)
+
+        for idx_sub, sub in enumerate(main.get('sub_sections', [])):
+            sub_type = sub.get('type')
+            base_data = {
+                'name': sub.get('name'),
+                'code': sub.get('code'),
+                'position': sub.get('position', idx_sub + 1),
+            }
+            new_sub = None
+            if sub_type == 'text':
+                new_sub = TextSubSection(
+                    **base_data,
+                    content=sub.get('content'),
+                    place_holder=sub.get('placeholder'),
+                    display_mode=sub.get('display_mode')
+                )
+            elif sub_type == 'selection':
+                new_sub = SelectionSubSection(
+                    **base_data,
+                    attribute_group_id=sub.get('attribute_group_id')
+                )
+
+                selected_value_ids = sub.get('selected_value_ids')
+                if selected_value_ids:
+                    values = AttributeValue.query.filter(AttributeValue.id.in_(selected_value_ids)).all()
+                    new_sub.selected_values.extend(values)
+
+            elif sub_type == 'table':
+                new_sub = TableSubSection(
+                    **base_data,
+                    data=sub.get('data', {})
+                )
+            elif sub_type == 'reference':
+                new_sub = ReferenceSubSection(
+                    **base_data,
+                    reference_code=sub.get('reference_code')
+                )
+
+            if new_sub:
+                new_main.sub_sections.append(new_sub)
+                print(new_sub)
+
+
+    return new_syllabus

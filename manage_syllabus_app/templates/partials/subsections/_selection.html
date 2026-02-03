@@ -1,21 +1,166 @@
-<tr>
-    {# Sửa lại: Dùng 'item_index' thay vì 'loop.index' #}
-    <th scope="row" style="width: 300px;" class="fs-6">{{ item_index }}. {{ sub_item.name }}</th>
+<tr class="sub-section"
+    data-position="{{ sub_item.position }}"
+    data-name="{{ sub_item.name }}"
+    data-code="{{ sub_item.code }}"
+    data-type="{{ sub_item.type }}"
+    data-group-id="{{ sub_item.attribute_group_id}}">
+    <th scope="row" style="width: 40%;" class="fs-6">
+        {% if is_editing %}
+        <div class="input-group input-group-sm mb-2 ps-4"> <span
+                class="input-group-text bg-transparent border-0 text-muted p-0 me-2 small">
+                <small>Mã định danh tiểu mục:</small>
+            </span>
+            <input type="text"
+                   class="form-control form-control-sm border-0 bg-light text-secondary font-monospace py-0 h-auto label-code"
+                   style="font-size: 0.85rem;"
+                   value="{{ sub_item.code }}"
+                   id="code-{{sub_item.code}}"
+            >
+        </div>
+        <div class="d-flex align-items-center mb-2">
+            <label class="fw-bold text-dark me-2 mb-0 text-nowrap">
+                {{ sub_item.position }}.
+            </label>
+            <input
+                    type="text"
+                    class="form-control label-input"
+                    value="{{ sub_item.name }}"
+                    id="content-{{ sub_item.id }}"
+                    placeholder="Nhập tên tiểu mục..."
+            >
+        </div>
+        <div class="mb-2 p-2 bg-light border rounded">
+            <label class="form-label small text-muted fw-bold mb-1">
+                <i class="fas fa-database me-1"></i>Nhóm thuộc tính
+            </label>
+            <div class="input-group input-group-sm">
+                <select class="form-select fw-bold"
+                        id="selection-group-{{ sub_item.id }}"
+                        onchange="updateAttributeGroupForSubSection(this, {{ sub_item.id }})">
+                    <option value="" class="text-muted">-- Chọn nhóm --</option>
+                    {% for group in attribute_groups %}
+                    <option value="{{ group.id }}" {% if sub_item.attribute_group_id== group.id %}selected {% endif %}>
+                        {{ group.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-outline-primary" type="button"
+                        onclick="openCreateGroupModal({{ sub_item.id }})"
+                        title="Tạo nhóm mới">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="form-text small fst-italic mt-1 text-truncate" id="preview-box-{{ sub_item.id }}"></div>
+        </div>
+        <div class="mt-2">
+            <div class="d-flex ">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-success border-0 dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-plus-circle"></i> Thêm mục dưới
+                    </button>
+                    <ul class="dropdown-menu shadow">
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)"
+                               onclick="addCustomRow(this, 'text', 'input')"> <i
+                                    class="fas fa-minus text-muted me-2"></i> Văn bản (1 dòng)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)"
+                               onclick="addCustomRow(this, 'text', 'textarea')"> <i
+                                    class="fas fa-align-justify text-muted me-2"></i> Văn bản (Nhiều dòng)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)"
+                               onclick="addCustomRow(this, 'selection')">
+                                <i class="far fa-check-square text-muted me-2"></i> Lựa chọn (Selection)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="addCustomRow(this, 'table')">
+                                <i class="fas fa-table text-muted me-2"></i> Bảng (Table)
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger border-0 ms-1"
+                        onclick="removeRow(this)" title="Xóa mục này">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <label class="fw-bold text-dark d-block mb-1">
+            {{ sub_item.position }}. {{ sub_item.name }}
+        </label>
+        {% endif %}
+    </th>
     <td>
         <div class="editable-container">
-            <div class="mt-5">
-                <div class="d-flex flex-wrap gap-2 mb-2 align">
-                    {% for value in sub_item.selected_values %}
-                    <span class="badge bg-success d-flex align-items-center fs-6">{{value.name_value}}</span>
+            <div class="mt-2">
+                <div class="mb-2" id="display-list-{{ sub_item.id }}">
+                    {% for selected in sub_item.selected_values %}
+                    <span class="badge bg-success text-white border me-1 mb-1 fs-6 p-2">
+                        {{ selected.name_value }}
+                        <a href="#" class="text-white ms-1 text-decoration-none">&times;</a>
+                    </span>
                     {% else %}
-                    <span class="text-muted">Chưa có lựa chọn</span>
+                    <span class="text-muted small fst-italic">Chưa có lựa chọn</span>
                     {% endfor %}
-                    <button type="button" class="btn btn-outline-primary btn-sm edit-trigger-button"
-                            onclick="toggleSelectionEdit({{ sub_item.id }},true)">
-                        <i class="fas fa-pencil-alt"></i> Chỉnh sửa
+                </div>
+                <div>
+                    <button type="button"
+                            class="btn btn-link btn-sm p-0 text-decoration-none dropdown-toggle"
+                            data-bs-toggle="dropdown"
+                            onclick="loadOptions(this, {{sub_item.id}}, {{sub_item.attribute_group_id}})">
+                        <i class="fas fa-plus-circle me-1"></i> Thêm
                     </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-{{ sub_item.id }}">
+                    </ul>
                 </div>
             </div>
         </div>
     </td>
 </tr>
+
+<div class="modal fade" id="createGroupModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tạo Nhóm Thuộc Tính Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tên nhóm (Ví dụ: Phương pháp dạy)</label>
+                    <input type="text" id="new-group-name" class="form-control" placeholder="Nhập tên nhóm...">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Các giá trị lựa chọn</label>
+                    <div id="new-attributes-container">
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control attr-value"
+                                   placeholder="Giá trị 1 (VD: Thuyết giảng)">
+                            <button class="btn btn-primary" onclick="removeAttrInput(this)">Xóa giá trị</button>
+                        </div>
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control attr-value"
+                                   placeholder="Giá trị 2 (VD: Thảo luận nhóm)">
+                            <button class="btn btn-primary" onclick="removeAttrInput(this)">Xóa giá trị</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-link p-0" onclick="addMoreAttrInput()">+ Thêm dòng</button>
+                </div>
+
+                <input type="hidden" id="target-sub-section-id">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="submitNewGroup()">Lưu & Chọn ngay</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,32 +1,30 @@
-<div class="mb-5">
-    {% from 'partials/_macros.html' import editable_section_header %}
-    {% from 'partials/_macros.html' import editable_field %}
+<div class="mb-5 main-section"
+     data-position="{{ part.position }}"
+     data-name="{{ part.name }}"
+     data-code="{{ part.code }}">
     <h3 class="section-title-fresh mb-3">
-            <i class="fas fa-info-circle me-2"></i>{{part.position | roman}}. {{ part.name }}
+        {% if is_editing %}
+        <div class="d-flex align-items-center mb-2">
+            <label class="fw-bold text-dark me-2 mb-0 text-nowrap">
+                {{ part.position }}.
+            </label>
+
+            <input
+                    type="text"
+                    class="form-control part-input"
+                    value="{{ part.name }}"
+                    placeholder="Nhập tên phần....."
+            >
+        </div>
+        {% else %}
+        <i class="fas fa-info-circle me-2"></i>{{part.position}}. {{ part.name }}
+        {% endif %}
     </h3>
     <table class="table align-middle info-table-fresh">
         <tbody>
-        {# 1. Tên môn học tiếng Việt #}
-        <tr>
-            <th scope="row" class="fs-6">1. Tên môn học tiếng Việt/Course title in Vietnamese</th>
-            <td>
-                {{editable_field(syllabus.subject, 'name','Subject', syllabus, input_type='input', data_rest_url=url_for('api.update_subject', subject_id=syllabus.subject.id))}}
-            </td>
-        </tr>
-
-        {# Mã môn học #}
-        <tr>
-            <th scope="row" class="fs-6">Mã môn học/Course code</th>
-            <td>
-                {{syllabus.subject.id}}
-            </td>
-        </tr>
-
-        {# Các tiểu mục còn lại #}
+        {# Loop index bắt đầu từ 2 vì mục 1 đã dùng ở trên #}
         {% for sub_item in part.sub_sections %}
-        {% with item_index = loop.index + 1 %}
-        {% include 'partials/subsections/_' + sub_item.type + '.html' %}
-        {% endwith %}
+        {% include 'partials/subsections/_' + sub_item.template_name + '.html' %}
         {% endfor %}
         </tbody>
     </table>

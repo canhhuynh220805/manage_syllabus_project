@@ -1,0 +1,21 @@
+{% extends 'partials/subsections/_text.html' %}
+
+{% block content %}
+{% if sub_item.code == "subject_name_vi"%}
+<input
+        class="form-control mb-2"
+        rows="4"
+        value="{{ sub_item.content }}"
+        placeholder="{{syllabus.subject.name}}"
+        readonly
+>
+{% else %}
+<input
+        class="form-control mb-2"
+        rows="8"
+        value="{{ sub_item.content }}"
+        placeholder="{{syllabus.subject.id}}"
+        readonly
+>
+{% endif %}
+{% endblock%}

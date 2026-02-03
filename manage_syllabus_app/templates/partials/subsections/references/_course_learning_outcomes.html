@@ -1,125 +1,140 @@
-{% from 'partials/_macros.html' import editable_field %}
-<tr>
-    <th scope="row" style="width: 300px;" class="fs-6">{{ item_index }}. {{ sub_item.name }}</th>
-    <td>
-        <table class="table table-bordered">
-            <thead class="table-light">
-            <tr>
-                <th scope="col" style="width: 20%;" class="text-center align-middle">Mục tiêu môn học/Course
-                    Objectives
-                </th>
-                <th scope="col" style="width: 20%;" class="text-center align-middle">CĐR môn học - CLO</th>
-                <th scope="col" style="width: 60%;" class="text-center align-middle">Mô tả CĐR - description</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% set ns = namespace(cnt=1) %}
-            {% for co in syllabus.subject.course_objectives %}
-            {% if co.course_learning_outcomes %}
-            {% for clo in co.course_learning_outcomes %}
-            <tr>
-                {% if loop.first %}
-                <td class="text-center align-middle" rowspan="{{ co.course_learning_outcomes|length + 1 }}">{{ co.name
-                    }}
-                </td>
-                {% endif %}
-                <td class="text-center align-middle">{{ ns.cnt }}</td>
-                <td class="align-middle">
-                    {{ clo.content }}
-                </td>
-                <td class="text-center align-middle">
-                    <form data-method="delete"
-                          data-url="{{url_for('api.delete_course_learning_outcome', clo_id=clo.id)}}" class="rest-form">
-                        <button type="submit" class="btn btn-danger btn-sm"
-                                onclick="return confirm('Bạn có chắc chắn muốn xóa CLO này? Mọi liên kết rating cũng sẽ bị xóa vĩnh viễn.');">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            {% set ns.cnt = ns.cnt + 1 %}
-            {% endfor %}
-            {% else %}
-            <tr>
-                <td class="text-center align-middle" rowspan="2">{{ co.name }}</td>
-                <td colspan="2" class="align-middle text-muted fst-italic">Chưa có chuẩn đầu ra cho mục tiêu này.</td>
-            </tr>
+{% extends 'partials/subsections/references/base_th_header.html' %}
+{% block content%}
+<td>
+    <table class="table table-bordered">
+        <thead class="table-light">
+        <tr>
+            <th scope="col" style="width: 20%;" class="text-center align-middle">Mục tiêu môn học/Course
+                Objectives
+            </th>
+            <th scope="col" style="width: 20%;" class="text-center align-middle">CĐR môn học - CLO</th>
+            <th scope="col" style="width: 60%;" class="text-center align-middle">Mô tả CĐR - description</th>
+            <th scope="col" class="text-center align-middle">Xóa</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% set ns = namespace(cnt=1) %}
+        {% for co in syllabus.subject.course_objectives %}
+        {% set co_index = loop.index %}
+        {% if co.course_learning_outcomes %}
+        {% for clo in co.course_learning_outcomes %}
+        <tr>
+            {% if loop.first %}
+            <td class="text-center align-middle" rowspan="{{ co.course_learning_outcomes|length + 1 }}">
+                CO{{ co_index }}
+            </td>
             {% endif %}
+            <td class="text-center align-middle">{{ ns.cnt }}</td>
+            <td class="align-middle">
+                <textarea
+                        class="form-control mb-2"
+                        rows="3"
+                        id="content-clo{{clo.id}}"
+                        placeholder="Nhập nội dung CLO...."
+                        onblur="updateCourseLearningOutcome({{clo.id}})"> {{ clo.content }}</textarea>
+            </td>
+            <td class="text-center align-middle">
+                <button type="submit" class="btn btn-sm btn-outline-danger border-0 ms-1"
+                        onclick="removeCLO({{co.id}}, {{clo.id}})">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        </tr>
+        {% set ns.cnt = ns.cnt + 1 %}
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td class="text-center align-middle" rowspan="2">CO{{co_index}}</td>
+            <td colspan="2" class="align-middle text-muted fst-italic">Chưa có chuẩn đầu ra cho mục tiêu này.</td>
+        </tr>
+        {% endif %}
 
-            <tr>
-                <td colspan="2">
-                    <div class="add-form-container text-center d-flex justify-content-center">
-                        <button type="button" class="btn btn-outline-primary btn-sm flex-shrink-0 add-btn">
-                            <i class="fas fa-plus"></i>
+        <tr>
+            <td colspan="3">
+                <div class="card bg-light border-0 shadow-sm">
+                    <div class="card-body p-1">
+                        <h6 class="fw-bold text-dark mb-3">Thêm mô tả CĐR mới</h6>
+                        <div class="mb-3">
+                                <textarea
+                                        class="form-control"
+                                        rows="2"
+                                        placeholder="Nhập nội dung mô tả CĐR mới tại đây..."
+                                        id="co-{{co.id}}-clo-content"
+                                ></textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end border-top pt-3 p-1">
+                        <button type="button" class="btn btn-light me-2 text-secondary" onclick="clearAddCLO({{co.id}})">Hủy bỏ</button>
+                        <button type="button" class="btn btn-primary px-4" onclick="addCLO({{co.id}})">Thêm mục Tiêu
                         </button>
                     </div>
-                </td>
-            </tr>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h6 class="mt-4 text-center">Ma trận tích hợp giữa chuẩn đầu ra của môn học và chuẩn đầu ra của chương trình đào
+        tạo</h6>
+    <table border="1" class="table table-bordered text-center align-middle">
+        <thead>
+        <tr>
+            <td class="fw-bold">CLOs</td>
+            {% for plo in unique_plos %}
+            <td class="fw-bold">PLO.{{plo.id}}</td>
             {% endfor %}
-            </tbody>
-        </table>
-        <h6 class="mt-4 text-center">Ma trận tích hợp giữa chuẩn đầu ra của môn học và chuẩn đầu ra của chương trình đào
-            tạo</h6>
-        <table border="1" class="table table-bordered text-center align-middle">
-            <thead>
+        </tr>
+        </thead>
+        <tbody>
+        <div>
+            {% set ns = namespace(cnt=1) %}
+            {% for co in syllabus.subject.course_objectives %}
+            {% for clo in co.course_learning_outcomes %}
             <tr>
-                <td>CLOs</td>
-                {% for plo in unique_plos %}
-                <td class="fw-bold">PLO.{{plo.id}}</td>
-                {% endfor %}
-            </tr>
-            </thead>
-            <tbody>
-            <div>
-                {% set ns = namespace(cnt=1) %}
-                {% for co in syllabus.subject.course_objectives %}
-                {% for clo in co.course_learning_outcomes %}
-                <tr>
-                    <td>{{ ns.cnt }}</td>
-                    {% set ns.cnt = ns.cnt + 1 %}
+                <td>{{ ns.cnt }}</td>
+                {% set ns.cnt = ns.cnt + 1 %}
 
-                    {# Lặp qua từng cột PLO để điền rating #}
-                    {% for plo in unique_plos %}
-                    <td>
-                        {# tìm rating tương ứng#}
-                        {% set assoc = clo.plo_association | selectattr('plo_id', 'equalto', plo.id)|first%}
-                        <div id="editable-container-rating-{{clo.id}}-{{plo.id}}" class="editable-container">
-                            <div class="">
-                                <div class="d-flex justify-content-center align-items-center">
-                                    {% if assoc %}
-                                    <span>{{ assoc.rating }}</span>
-                                    <button type="button"
-                                            class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0 edit-trigger-button"
-                                            onclick="toggleFieldEdit('rating-{{ clo.id }}-{{ plo.id }}', true)">
-                                        <i class="fas fa-pencil-alt"></i>Chỉnh sửa
-                                    </button>
-                                    {% endif %}
-                                </div>
+                {# Lặp qua từng cột PLO để điền rating #}
+                {% for plo in unique_plos %}
+                <td>
+                    {# tìm rating tương ứng#}
+                    {% set assoc = clo.plo_association | selectattr('plo_id', 'equalto', plo.id)|first%}
+                    <div id="editable-container-rating-{{clo.id}}-{{plo.id}}" class="editable-container">
+                        <div class="">
+                            <div class="d-flex justify-content-center align-items-center">
+                                {% if assoc %}
+                                <input type="number" class="form-control mb-2 text-center" rows="2"
+                                       id="rating-{{clo.id}}-{{plo.id}}"
+                                       value="{{ assoc.rating }}" onblur="updateRating({{clo.id}}, {{plo.id}})">
+                                {% else %}
+                                <input class="form-control mb-2 text-center" readonly rows="2" value="0">
+                                {% endif %}
                             </div>
                         </div>
-                    </td>
-                    {% endfor %}
-                </tr>
+                    </div>
+                </td>
                 {% endfor %}
-                {% endfor %}
-            </div>
-            </tbody>
-        </table>
-        <div class="rating-legend border rounded p-3 bg-light small mx-auto" style="width: 400px;">
-            <div class="d-flex justify-content-between align-items-center">
-
-                <div class="text-start">
-                    <p class="mb-1">1: Không đáp ứng</p>
-                    <p class="mb-1">2: Ít đáp ứng</p>
-                    <p class="mb-0">3: Đáp ứng trung bình</p>
-                </div>
-
-                <div class="text-start">
-                    <p class="mb-1">4: Đáp ứng nhiều</p>
-                    <p class="mb-0">5: Đáp ứng rất nhiều</p>
-                </div>
-
-            </div>
+            </tr>
+            {% endfor %}
+            {% endfor %}
         </div>
-    </td>
-</tr>
+        </tbody>
+    </table>
+    <div class="rating-legend border rounded p-3 bg-light small mx-auto" style="width: 400px;">
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div class="text-start">
+                <p class="mb-1">1: Không đáp ứng</p>
+                <p class="mb-1">2: Ít đáp ứng</p>
+                <p class="mb-0">3: Đáp ứng trung bình</p>
+            </div>
+
+            <div class="text-start">
+                <p class="mb-1">4: Đáp ứng nhiều</p>
+                <p class="mb-0">5: Đáp ứng rất nhiều</p>
+            </div>
+
+        </div>
+    </div>
+</td>
+{% endblock%}

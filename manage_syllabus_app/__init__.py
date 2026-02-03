@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, Blueprint
+from flask import Flask
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -27,12 +27,6 @@ db = SQLAlchemy(app=app)
 migrate = Migrate(app, db)
 login.login_view = 'user_login'
 
-try:
-    from .controllers import api as api_blueprint
-    #Đăng ký Blueprint với ứng dụng Flask
-    app.register_blueprint(api_blueprint)
-except ImportError as e:
-    print(f"Cảnh báo: Không thể import hoặc đăng ký api_blueprint. Lỗi: {e}")
 from manage_syllabus_app import controllers, commands, admin
 
 

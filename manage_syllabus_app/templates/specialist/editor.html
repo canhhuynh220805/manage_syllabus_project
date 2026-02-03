@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block header %}
+{% include 'specialist/header.html' %}
+{% endblock %}
+{% block content %}
+<div class="container my-3 p-4 p-md-5 content-wrapper shadow-sm rounded bg-light syllabus-detail-card"
+     id="editor-context"
+     data-draft='{{ draft_json | tojson | safe }}'
+     data-auto-restore='{{ "true" if auto_restore else "false" }}'>
+    <input type="hidden" value="{{template_id}}" id="template_id">
+    <div class="text-center mb-5 syllabus-header">
+    <input
+        type="text"
+        class="form-control mx-auto text-center fw-semibold"
+        value="{{ syllabus.name }}"
+        placeholder="Nhập tên đề cương"
+        id="name-syllabus"
+        style="
+            max-width: 700px;
+            font-size: 1.4rem;
+            padding: 12px 16px;
+        "
+    >
+</div>
+
+    {% for part in syllabus.main_sections %}
+    {% include 'partials/_' + part.code + '.html' %}
+    {% endfor %}
+    <div class="text-center mt-5 no-print">
+        <a href="/specialist" class="btn btn-default" onclick="clearDraft({{syllabus.id}})">
+            <i class="fas fa-arrow-left mr-1"></i> Hủy tạo
+        </a>
+        <button class="btn btn-warning me-2 text-dark" id="btnDraft" onclick="saveDraft({{syllabus.id}})">
+            Lưu nháp
+        </button>
+        <button class="btn btn-primary" onclick="save()">
+            Tạo mẫu
+        </button>
+    </div>
+</div>
+<div id="row-templates" style="display: none;">
+    <template id="tpl-text">
+        {% with sub_item={'id': 'TEMP_ID', 'name': '', 'content': '', 'type': 'text', 'display_mode': 'input',
+        'place_holder': 'Nhập nội dung...'}, is_editing=True, item_index='#' %}
+        {% include 'partials/subsections/_input.html' %}
+        {% endwith %}
+    </template>
+    <template id="tpl-textarea">
+        {% with sub_item={'id': 'TEMP_ID', 'name': '', 'content': '', 'type': 'text', 'display_mode': 'textarea',
+        'place_holder': 'Nhập nội dung...'}, is_editing=True, item_index='#' %}
+        {% include 'partials/subsections/_textarea.html' %}
+        {% endwith %}
+    </template>
+    <template id="tpl-selection">
+        {% with sub_item={'id': 'TEMP_ID', 'name': '', 'type': 'selection', 'attribute_group_id': ''},
+        is_editing=True, item_index='#' %}
+        {% include 'partials/subsections/_selection.html' %}
+        {% endwith %}
+    </template>
+    <template id="tpl-table">
+        {% with sub_item={'id': 'TEMP_ID', 'name': '', 'data': {'headers':['Cột 1', 'Cột 2'], 'rows':[['','']]}, 'type':
+        'table'}, is_editing=True, item_index='#' %}
+        {% include 'partials/subsections/_table.html' %}
+        {% endwith %}
+    </template>
+</div>
+{% endblock %}

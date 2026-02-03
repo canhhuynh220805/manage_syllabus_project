@@ -1,28 +1,118 @@
 [
-    {
-        "name": "Thông tin tổng quát - General Information",
-        "code": "general_info",
+  {
+    "name": "Thông tin tổng quát - General Information",
+    "code": "general_info",
+    "position": 1,
+    "sub_sections": [
+      {
+        "name": "Tên môn học tiếng Việt/Course title in Vietnamese",
+        "code": "subject_name_vi",
+        "type": "text",
         "position": 1,
-        "sub_sections": [
-            {"name": "Tên môn học tiếng Anh/Course title in English", "type": "text", "position": 1},
-            {"name": "Phương thức giảng dạy", "type": "selection", "position": 2, "attribute_group_id": 1},
-            {"name": "Ngôn ngữ giảng dạy", "type": "selection", "position": 3, "attribute_group_id": 3},
-            {"name": "Thành phần kiến thức", "type": "selection", "position": 4, "attribute_group_id": 2},
-            {"name": "Số tín chỉ / Credits", "type": "reference", "position": 5, "reference_code": "credit"},
-            {"name": "Phụ trách môn học/ Administration of the course", "type": "reference", "position": 6, "reference_code": "director"}
-        ]
-    },
-    {
-        "name": "Mô tả môn học - Course Overview",
-        "code": "course_overview",
+        "placeholder": "",
+        "display_mode": "readonly"
+      },
+      {
+        "name": "Mã môn học/Course code",
+        "code": "subject_code",
+        "type": "text",
+        "position": 1,
+        "placeholder": "",
+        "display_mode": "readonly"
+      },
+      {
+        "name": "Tên môn học tiếng Anh/Course title in English",
+        "type": "text",
         "position": 2,
-        "sub_sections": [
-            {"name": "Mô tả chi tiết", "type": "text", "position": 1},
-            {"name": "Môn học điều kiện/Requirements", "type": "reference", "position": 2, "reference_code": "requirement_subject"},
-            {"name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs", "type": "reference", "position": 3, "reference_code": "objectives_and_outcomes"},
-            {"name": "Chuẩn đầu ra môn học - Course Learning Outcomes", "type": "reference", "position": 4, "reference_code": "course_learning_outcomes"},
-            {"name": "Học liệu - Textbook and materials", "type": "reference", "position": 5, "reference_code": "learning_material"},
-            {"name": "Đánh giá môn học/Subject assessment", "type": "reference", "position": 6, "reference_code": "subject_assessment"}
-        ]
-    }
+        "code": "english_title",
+        "placeholder": "Nhập tên tiếng anh",
+        "display_mode": "input"
+      },
+      {
+        "name": "Phương thức giảng dạy",
+        "type": "selection",
+        "position": 3,
+        "attribute_group_id": 1,
+        "code": "teaching_methods"
+      },
+      {
+        "name": "Ngôn ngữ giảng dạy",
+        "type": "selection",
+        "position": 4,
+        "attribute_group_id": 3,
+        "code": "language"
+      },
+      {
+        "name": "Thành phần kiến thức",
+        "type": "selection",
+        "position": 5,
+        "attribute_group_id": 2,
+        "code": "knowledge_components"
+      },
+      {
+        "name": "Số tín chỉ / Credits",
+        "type": "reference",
+        "position": 6,
+        "reference_code": "credit",
+        "code": "credit"
+      },
+      {
+        "name": "Phụ trách môn học/ Administration of the course",
+        "type": "reference",
+        "position": 7,
+        "reference_code": "director",
+        "code": "lecturer_info"
+      }
+    ]
+  },
+  {
+    "name": "Mô tả môn học - Course Overview",
+    "code": "course_overview",
+    "position": 2,
+    "sub_sections": [
+      {
+        "name": "Mô tả chi tiết",
+        "type": "text",
+        "position": 1,
+        "code": "course_detail",
+        "placeholder": "Nhập mô tả chi tiết",
+        "display_mode": "textarea"
+      },
+      {
+        "name": "Môn học điều kiện/Requirements",
+        "type": "reference",
+        "position": 2,
+        "reference_code": "requirement_subject",
+        "code": "requirement_subject"
+      },
+      {
+        "name": "Mục tiêu môn học, Chuẩn đầu ra và PLOs",
+        "type": "reference",
+        "position": 3,
+        "reference_code": "objectives_and_outcomes",
+        "code": "objective_outcomes"
+      },
+      {
+        "name": "Chuẩn đầu ra môn học - Course Learning Outcomes",
+        "type": "reference",
+        "position": 4,
+        "reference_code": "course_learning_outcomes",
+        "code": "course_learning_outcomes"
+      },
+      {
+        "name": "Học liệu - Textbook and materials",
+        "type": "reference",
+        "position": 5,
+        "reference_code": "learning_material",
+        "code": "learning_material"
+      },
+      {
+        "name": "Đánh giá môn học/Subject assessment",
+        "type": "reference",
+        "position": 6,
+        "reference_code": "subject_assessment",
+        "code": "subject_assessment"
+      }
+    ]
+  }
 ]

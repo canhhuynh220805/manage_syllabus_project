@@ -2,7 +2,7 @@
   "attribute_groups": [
     {
       "id": 1,
-      "name_group": "Phương thức giảng dạy",
+      "name": "Phương thức giảng dạy",
       "values": [
         { "id": 101, "name_value": "Trực tiếp/FTF" },
         { "id": 102, "name_value": "Trực tuyến/Online" },
@@ -11,7 +11,7 @@
     },
     {
       "id": 2,
-      "name_group": "Thành phần kiến thức",
+      "name": "Thành phần kiến thức",
       "values": [
         { "id": 201, "name_value": "Giáo dục đại cương/General" },
         { "id": 202, "name_value": "Kiến thức cơ sở/Foundation" },
@@ -23,7 +23,7 @@
     },
     {
       "id": 3,
-      "name_group": "Ngôn ngữ giảng dạy",
+      "name": "Ngôn ngữ giảng dạy",
       "values": [
         { "id": 301, "name_value": "Tiếng Việt/Vietnamese" },
         { "id": 302, "name_value": "Tiếng Anh/English" },

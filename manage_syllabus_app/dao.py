@@ -1,9 +1,11 @@
 from sqlalchemy import cast, Integer
-
+import hashlib
 from manage_syllabus_app import db
 from manage_syllabus_app.models import User, Syllabus, Faculty, Lecturer, Subject, TypeRequirement, \
     LearningMaterial, TypeLearningMaterial, CourseObjective, CourseLearningOutcome, CloPloAssociation, \
-    RequirementSubject, Credit, SubSection, ProgrammeLearningOutcome, TrainingProgram
+    RequirementSubject, Credit, SubSection, ProgrammeLearningOutcome, TrainingProgram, TemplateSyllabus, TextSubSection, \
+    AttributeGroup, AttributeValue, SubSectionAttributeValue, SelectionSubSection, \
+    CourseObjectiveProgrammeLearningOutcome
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -12,15 +14,13 @@ def get_user_by_id(user_id):
     return User.query.get(int(user_id))
 
 def get_user_by_username(username):
-    """Lấy người dùng theo username."""
-    return User.query.filter_by(username=username.strip()).first()
+    return User.query.filter_by(username=username).first()
 
+def auth_user(username, password):
+    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    return User.query.filter(User.username == username.strip(),
+                             User.password == password).first()
 
-def check_password(user, password):
-    """Kiểm tra mật khẩu người dùng."""
-    if user:
-        return check_password_hash(user.password, password)
-    return False
 
 
 def add_user(name, username, password, avatar=None, role='2'):
@@ -89,12 +89,10 @@ def get_credit_by_id(credit_id):
 #     return type.query.filter_by(id=id).first()
 
 def get_all_type_subjects():
-    """Lấy tất cả các loại môn học điều kiện."""
     return TypeRequirement.query.all()
 
 
 def get_all_learning_material_types():
-    """Lấy tất cả các loại tài liệu học tập."""
     return TypeLearningMaterial.query.all()
 
 
@@ -104,7 +102,6 @@ def get_available_require_subjects(current_subject_id):
             RequirementSubject.subject_id == current_subject_id
         )
     )
-    #lấy tất cả các môn ko nằm trong môn đã chọn và ko phải chính môn đó
     available_subjects = db.session.query(Subject).filter(Subject.id != current_subject_id).filter(Subject.id.notin_(subquery)).all()
     return available_subjects
 
@@ -119,7 +116,16 @@ def get_all_cos():
     cos = CourseObjective.query
     return cos.all()
 
-def find_learning_material(name=None, id=None):
+def get_co_by_id(co_id):
+    return CourseObjective.query.filter_by(id=co_id).first()
+
+def get_clo_by_id(clo_id):
+    return CourseLearningOutcome.query.filter_by(id=clo_id).first()
+
+def get_plo_by_id(plo_id):
+    return ProgrammeLearningOutcome.query.filter_by(id=plo_id).first()
+
+def get_learning_material(name=None, id=None):
     lm = LearningMaterial.query
     if name:
         lm = lm.filter_by(name=name)
@@ -150,6 +156,30 @@ def count_syllabuses(lecturer_id=None):
     if lecturer_id:
         query = query.filter_by(lecturer_id=lecturer_id)
     return query.count()
+
+def get_all_template():
+    return TemplateSyllabus.query.all()
+
+def get_template_by_id(template_id):
+    return TemplateSyllabus.query.get(template_id)
+
+def get_latest_template():
+    return TemplateSyllabus.query.order_by(TemplateSyllabus.id.desc()).first()
+
+def get_all_attribute_groups():
+    return AttributeGroup.query.all()
+
+def get_attribute_group_values(group_id, subsection_id):
+    subquery = db.session.query(SubSectionAttributeValue.attribute_value_id).filter(
+        SubSectionAttributeValue.subsection_id == subsection_id,
+    )
+
+    available_values = AttributeValue.query.filter(AttributeValue.attribute_group_id == group_id,
+                                                   AttributeValue.id.notin_(subquery)).all()
+    return available_values
+
+def get_type_subject(type_id):
+    return TypeRequirement.query.get(type_id)
 # =================================================================
 # CÁC HÀM CẬP NHẬT VÀ XÓA (UPDATE/DELETE)
 # =================================================================
@@ -161,3 +191,215 @@ def delete_course_objective_by_id(co_id):
         db.session.commit()
         return True
     return False
+
+def update_text_sub_section(content, subsection = None):
+    if content:
+        subsection.content = content
+        db.session.commit()
+        return True
+    return False
+
+def update_co(content, co):
+    if content:
+        co.content = content
+        db.session.commit()
+        return True
+    return False
+
+def update_clo(content, clo):
+    if content:
+        clo.content = content
+        db.session.commit()
+        return True
+    return False
+
+def update_learning_material(name, material):
+    if name:
+        material.name = name
+        db.session.commit()
+        return True
+    return False
+
+def add_learning_material(name, type_id ,syllabus):
+    try:
+        type = TypeLearningMaterial.query.get(type_id)
+        lm = LearningMaterial.query.filter_by(name=name).first()
+        if lm:
+            syllabus.learning_materials.append(lm)
+        else:
+            l = LearningMaterial(name=name, type_material=type)
+            db.session.add(l)
+            syllabus.learning_materials.append(l)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        return False
+
+def remove_learning_material(material, syllabus):
+    try:
+        syllabus.learning_materials.remove(material)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        return False
+
+def add_attribute(subsection_id, attribute_id):
+    try:
+        new_relation = SubSectionAttributeValue(
+            subsection_id=subsection_id,
+            attribute_value_id=attribute_id
+        )
+        db.session.add(new_relation)
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        return False
+
+def del_attribute(subsection_id, attribute_id):
+    try:
+        relation = SubSectionAttributeValue.query.filter_by(subsection_id=subsection_id,attribute_value_id=attribute_id).first()
+        if relation:
+            db.session.delete(relation)
+            db.session.commit()
+            return True
+        return False
+    except Exception as e:
+        db.session.rollback()
+        return False
+
+def update_credit(credit_id, theory, practice, self_study):
+    try:
+        credit = Credit.query.get(credit_id)
+        if not credit:
+            return False
+        credit.numberTheory = theory
+        credit.numberPractice = practice
+        credit.hourSelfStudy = self_study
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        return False
+
+def add_requirement_subject(syllabus, subject_id, type_id):
+    try:
+        subject_require = Subject.query.get(subject_id)
+        type = TypeRequirement.query.get(type_id)
+        if not subject_require or not type:
+            return False
+
+        res = RequirementSubject(
+            subject=syllabus.subject,
+            require_subject = subject_require,
+            type_requirement=type
+        )
+        db.session.add(res)
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return False
+
+def delete_requirement_subject(syllabus, subject_id):
+    try:
+        require = RequirementSubject.query.filter_by(subject_id=syllabus.subject.id, require_subject_id=subject_id).first()
+        if require:
+            db.session.delete(require)
+            db.session.commit()
+            return True
+        return False
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return False
+
+def add_plo_for_co(co, plo):
+    try:
+        co.programme_learning_outcomes.append(plo)
+        clos = co.course_learning_outcomes
+        for clo in clos:
+            existing_rating = CloPloAssociation.query.filter_by(
+                clo_id=clo.id,
+                plo_id=plo.id
+            ).first()
+            if existing_rating:
+                return False
+            relation = CloPloAssociation(
+                clo_id=clo.id,
+                plo_id=plo.id,
+                rating=0
+            )
+            db.session.add(relation)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def delete_plo_for_co(co, plo):
+    try:
+        co.programme_learning_outcomes.remove(plo)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def get_plos(plo_ids):
+    return ProgrammeLearningOutcome.query.filter(
+        ProgrammeLearningOutcome.id.in_(plo_ids)
+    ).all()
+
+def add_clo_for_co(co, clo):
+    try:
+        co.course_learning_outcomes.append(clo)
+        plos = co.programme_learning_outcomes
+        for plo in plos:
+            existing_rating = CloPloAssociation.query.filter_by(
+                clo_id=clo.id,
+                plo_id=plo.id
+            ).first()
+            if existing_rating:
+                continue
+            relation = CloPloAssociation(
+                clo_id=clo.id,
+                plo_id=plo.id,
+                rating=0
+            )
+            db.session.add(relation)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def delete_clo_for_co(co, clo):
+    try:
+        co.course_learning_outcomes.remove(clo)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def update_rating(clo_id, plo_id, rating):
+    try:
+        relation = CloPloAssociation.query.filter_by(
+            clo_id=clo_id,
+            plo_id=plo_id,
+        ).first()
+        if relation:
+            relation.rating = rating
+            db.session.commit()
+            return True
+        return False
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return False

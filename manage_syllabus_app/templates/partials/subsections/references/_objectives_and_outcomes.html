@@ -1,59 +1,152 @@
-{% from 'partials/_macros.html' import editable_field %}
-
-<tr>
-    <th scope="row" style="width: 300px;" class="fs-6">{{ item_index }}. {{ sub_item.name }}</th>
-    <td>
-        <table class="table table-bordered">
-            <thead class="table-light">
-            <tr>
-                <th scope="col" style="width: 30%;" class="text-center align-middle">Mục tiêu môn học/Course
-                    Objectives
-                </th>
-                <th scope="col" style="width: 50%;" class="text-center align-middle">Mô tả - Description</th>
-                <th scope="col" style="width: 20%;" class="text-center align-middle">CĐR CTĐT phân bổ cho môn học -
-                    PLOs
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for co in syllabus.subject.course_objectives %}
-            <tr>
-                <td class="align-middle">
-                    <div class="co-name-container ms-4">
-                        <span class="me-2">{{ co.name }}</span>
+{% extends 'partials/subsections/references/base_th_header.html' %}
+{% block content %}
+<td>
+    <table class="table table-bordered">
+        <thead class="table-light">
+        <tr>
+            <th scope="col" style="width: 30%;" class="text-center align-middle">Mục tiêu môn học/Course
+                Objectives
+            </th>
+            <th scope="col" style="width: 50%;" class="text-center align-middle">Mô tả - Description</th>
+            <th scope="col" style="width: 20%;" class="text-center align-middle">CĐR CTĐT phân bổ cho môn học -
+                PLOs
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for co in syllabus.subject.course_objectives %}
+        <tr class="align-middle">
+            <td class="px-3 py-3 fw-bold text-dark border-end text-center align-middle" style="width: 15%;">
+                CO{{loop.index}}
+                <button type="button" class="btn btn-sm btn-outline-danger border-0 ms-1"
+                        onclick="deleteCourseObjective('{{syllabus.subject.id}}', {{co.id}})">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+            <td class="px-3 py-3 text-dark border-end" style="width: 45%;">
+                    <textarea
+                            class="form-control mb-2"
+                            rows="4"
+                            id="content-co{{co.id}}"
+                            placeholder="Nhập nội dung CO...."
+                            onblur="updateCourseObjective({{co.id}})"> {{ co.content }}</textarea>
+            </td>
+            <td class="px-3 py-3">
+                <div class="d-flex flex-wrap gap-2 mb-2" id="list-plo-co{{co.id}}">
+                    {% for plo in co.programme_learning_outcomes %}
+                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-3 py-2 d-flex align-items-center"
+                          id="co-{{co.id}}-plo-{{plo.id}}">
+                            PLO.{{ plo.id }}
+                            <a href="javascript:void(0)"
+                               class="ms-2 text-success text-decoration-none fw-bold"
+                               onclick="deletePLO({{co.id}}, {{plo.id}})">
+                                &times;
+                            </a>
+                    </span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <button type="button"
+                            class="btn btn-link text-primary text-decoration-none p-0 small dropdown-toggle"
+                            data-bs-toggle="dropdown">
+                        <i class="fas fa-plus me-1"></i>PLO
+                        <ul class="dropdown-menu" id="dropdown-co-{{co.id}}">
+                            {% for plo in plos %}
+                            {% if plo not in co.programme_learning_outcomes %}
+                            <li id="li-co-{{co.id}}-plo-{{plo.id}}"><a class="dropdown-item" href="#"
+                                                                       onclick="selectPLO({{plo.id}}, {{co.id}})">PLO.{{plo.id}}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </button>
+                </div>
+                <div class="d-none mt-2">
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm bg-white">
+                            <option value="">-- Add PLO --</option>
+                            {% for option in plos %}
+                            {% if option not in co.programme_learning_outcomes %}
+                            <option value="{{ option.id }}">{{ option.name }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button type="button"
+                                class="btn btn-primary btn-sm">
+                            Add
+                        </button>
+                        <button type="button"
+                                class="btn btn-light btn-sm border">
+                            Done
+                        </button>
                     </div>
-                </td>
-
-                <td class=" align-middle col-sm-6">
-                    {{co.content}}
-                </td>
-                <td class="text-center align-middle col-sm-4">
-                    <div id="selection-container-co-{{ co.id }}">
-                        <div class="display-view editable-container">
-                            <div class="d-flex flex-column align-items-center gap-1">
-                                {% for plo in co.programme_learning_outcomes %}
-                                <span class="badge bg-success fs-6">PLO.{{ plo.id }}</span>
-                                {% else %}
-                                <span class="text-muted">Chưa có</span>
-                                {% endfor %}
-                            </div>
-                            <button type="button"
-                                    class="btn btn-outline-primary btn-sm  ms-3 flex-shrink-0  edit-trigger-button"
-                                    onclick="toggleSelectionEdit('co-{{ co.id }}',true)">
-                                <i class="fas fa-pencil-alt"></i> Chỉnh sửa
-                            </button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <div class="d-flex justify-content-center add-form-container">
-            <button type="button"
-                    class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0 add-btn">
-                <i class="fa-solid fa-plus"></i>
-            </button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="card bg-light border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h6 class="fw-bold text-dark mb-3">Thêm mục tiêu môn học mới</h6>
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary">Nội dung mục tiêu (Description)</label>
+                <textarea
+                        class="form-control"
+                        rows="3"
+                        placeholder="Nhập mô tả mục tiêu môn học tại đây..."
+                        id="description-co"
+                ></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary">Gán chuẩn đầu ra (PLOs)</label>
+                <div class="dropdown">
+                    <button class="btn btn-white border shadow-sm dropdown-toggle d-flex align-items-center justify-content-between w-100 rounded-pill px-3 py-2"
+                            type="button"
+                            id="dropdownPloButton"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            style="min-width: 250px;">
+                        <span id="selected-plo-text" class="fw-medium text-secondary">-- Chọn PLO --</span>
+                    </button>
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-4 mt-2 p-2 w-100"
+                        aria-labelledby="dropdownPloButton" style="max-height: 300px; overflow-y: auto;">
+                        <li>
+                            <a class="dropdown-item rounded-3 p-2 mb-1 text-muted" href="javascript:void(0)">
+                                <i class="fas fa-times-circle me-2"></i>Bỏ chọn
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        {% for plo in plos %}
+                        <li>
+                            <a class="dropdown-item rounded-3 p-2 mb-1 d-flex flex-column"
+                               href="javascript:void(0)"
+                               onclick="selectPloItem('{{plo.id}}')"
+                                title="{{ plo.description }}">
+                                <span class="fw-bold text-primary">PLO.{{plo.id}}</span>
+                                <span class="small text-muted text-wrap" style="line-height: 1.2;">
+                                    {{ plo.description | truncate(60) }}
+                                </span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-4 p-2 bg-white border rounded" id="list-plos"
+                 style="min-height: 45px;">
+                <span class="text-muted small fst-italic align-self-center ms-2" id="plo-placeholder">
+                    Chưa có PLO nào được chọn.
+                </span>
+            </div>
+            <div class="d-flex justify-content-end border-top pt-3">
+                <button type="button" class="btn btn-light me-2 text-secondary" onclick="clearInputCourseObjective()">Hủy bỏ</button>
+                <button type="button" class="btn btn-primary px-4" onclick="addCourseObjective('{{syllabus.subject.id}}')">Thêm mục Tiêu
+                </button>
+            </div>
         </div>
-    </td>
-</tr>
+    </div>
+</td>
+{% endblock%}

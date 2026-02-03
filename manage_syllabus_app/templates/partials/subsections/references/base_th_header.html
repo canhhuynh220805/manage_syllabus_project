@@ -3,8 +3,8 @@
     data-name="{{ sub_item.name }}"
     data-code="{{ sub_item.code }}"
     data-type="{{ sub_item.type }}"
-    data-display-mode="{{ sub_item.display_mode}}">
-    <td class="bg-white" colspan="100%">
+    data-ref-code="{{ sub_item.reference_code}}">
+    <th scope="row" style="width: 40%;" class="fs-6">
         {% if is_editing %}
         <div class="input-group input-group-sm mb-2 ps-4"> <span class="input-group-text bg-transparent border-0 text-muted p-0 me-2 small">
                 <small>Mã định danh tiểu mục:</small>
@@ -20,12 +20,13 @@
             <label class="fw-bold text-dark me-2 mb-0 text-nowrap">
                 {{ sub_item.position }}.
             </label>
+
             <input
                     type="text"
                     class="form-control label-input"
                     value="{{ sub_item.name }}"
                     id="content-{{ sub_item.id }}"
-                    placeholder="Nhập {{sub_item.name}}"
+                    placeholder="Nhập tên tiểu mục..."
             >
         </div>
         <div class="mt-2">
@@ -68,11 +69,12 @@
             </div>
         </div>
         {% else %}
-        <label class="fw-bold text-dark d-block mb-1 label-input">
+        <label class="fw-bold text-dark d-block mb-1">
             {{ sub_item.position }}. {{ sub_item.name }}
         </label>
         {% endif %}
-        {% block content %}
-        {% endblock %}
-    </td>
+
+    </th>
+    {% block content %}
+    {% endblock %}
 </tr>

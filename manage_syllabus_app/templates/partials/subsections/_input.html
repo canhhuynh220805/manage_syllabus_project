@@ -1,0 +1,23 @@
+{% extends 'partials/subsections/_text.html' %}
+
+{% block content %}
+{% if is_editing %}
+<input
+        class="form-control mb-2"
+        rows="4"
+        value="{{ sub_item.content }}"
+        id="content"
+        placeholder="{{sub_item.place_holder}}"
+        readonly
+>
+{% else %}
+<input
+        class="form-control mb-2"
+        rows="4"
+        value="{{ sub_item.content }}"
+        id="content-{{ sub_item.id }}"
+        placeholder="{{sub_item.place_holder}}"
+        onblur="updateSection('{{ sub_item.id }}')"
+>
+{% endif %}
+{% endblock%}

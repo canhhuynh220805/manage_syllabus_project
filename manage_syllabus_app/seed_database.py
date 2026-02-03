@@ -7,7 +7,7 @@ from manage_syllabus_app import app, db
 from manage_syllabus_app.models import AttributeGroup, AttributeValue, Syllabus, Faculty, Lecturer, Subject, Credit, \
     TypeRequirement, RequirementSubject, TypeLearningMaterial, LearningMaterial, MainSection, SubSection, \
     TextSubSection, SelectionSubSection, ReferenceSubSection, ProgrammeLearningOutcome, CourseLearningOutcome, \
-    CourseObjective, CloPloAssociation, TrainingProgram, Major
+    CourseObjective, CloPloAssociation, TrainingProgram, Major, TemplateSyllabus
 
 
 def seed_data():
@@ -19,16 +19,16 @@ def seed_data():
 
     print("Bắt đầu gieo dữ liệu...")
     for item in data['attribute_groups']:
-        name_group_from_json = item['name_group']
+        name_group_from_json = item['name']
 
-        exists = db.session.query(AttributeGroup).filter_by(name_group=name_group_from_json).first()
+        exists = db.session.query(AttributeGroup).filter_by(name=name_group_from_json).first()
         if not exists:
             values_from_json = item['values']
             list_of_value_objects = [AttributeValue(id=val['id'], name_value=val['name_value']) for val in values_from_json]
 
             # SỬA Ở ĐÂY: Thay `name` bằng `name_group` để khớp với model
             new_group = AttributeGroup(
-                name_group=name_group_from_json,
+                name=name_group_from_json,
                 attribute_values=list_of_value_objects
             )
 
@@ -71,6 +71,18 @@ def seed_data_3():
     json_path = Path(__file__).parent / 'data' / 'data.json'
     with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
+
+    json_path2 = Path(__file__).parent / 'data/structures' / 'syllabus_2025.json'
+    with open(json_path2, 'r', encoding='utf-8') as f2:
+        data2 = json.load(f2)
+    t = TemplateSyllabus(
+        name="Đề cương mẫu 2025",
+        structure=data2,
+    )
+    db.session.add(t)
+    db.session.commit()
+
+    default_template = db.session.query(TemplateSyllabus).first()
 
     for item in data['syllabuses']:
         # --- Faculty ---
@@ -147,7 +159,8 @@ def seed_data_3():
                 name=syllabus_name,
                 subject=subject,
                 lecturer=lecturer,
-                faculty=faculty
+                faculty=faculty,
+                template=default_template
             )
             db.session.add(syllabus)
 
@@ -167,7 +180,9 @@ def seed_data_3():
                     new_sub_section = TextSubSection(
                         name=sub_section_data['name'],
                         content=sub_section_data['content'],
-                        position=sub_section_data['position']
+                        position=sub_section_data['position'],
+                        place_holder=sub_section_data['place_holder'],
+                        display_mode=sub_section_data['display_mode'],
                     )
 
                 elif sub_section_data['type'] == 'selection':
@@ -192,13 +207,13 @@ def seed_data_3():
 
                 if new_sub_section:
                     # Gán SubSection vào MainSection cha
+                    new_sub_section.code = sub_section_data['code']
                     new_section.sub_sections.append(new_sub_section)
                     db.session.add(new_sub_section)
         # --- Course Objective
         for co in item.get('course_objectives', []):
-            name_co = co['name']
             description_co = co['description']
-            new_co = CourseObjective(name=name_co, content=description_co, subject=subject)
+            new_co = CourseObjective(content=description_co, subject=subject)
             db.session.add(new_co)
             for plo_id in co["plos"]:
                 plo = db.session.query(ProgrammeLearningOutcome).filter_by(id=plo_id).first()

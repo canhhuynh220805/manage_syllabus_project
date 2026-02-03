@@ -1,53 +1,98 @@
 {% extends 'base.html' %}
+
 {% block header %}
 {% include 'specialist/header.html' %}
 {% endblock %}
-{% block content %}
-<div class="container mt-5">
-    <div class="card border-0">
-        <div class="card-header text-white d-flex justify-content-between align-items-center py-3" style="background-color: #00558F">
-            <h4 class="mb-0 text-uppercase fw-bold"> Danh sách Đề cương mẫu</h4>
-        </div>
 
-        <div class="card-body p-4">
-            {% if template_files %}
-            <p class="text-muted fst-italic mb-3">
-                Chọn một cấu trúc bên dưới để xem trước nội dung chi tiết.
-            </p>
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered align-middle">
-                    <thead class="table-light">
-                    <tr>
-                        <th class="text-center" style="width: 60px;">STT</th>
-                        <th>Tên tệp cấu trúc (JSON)</th>
-                        <th class="text-center" style="width: 150px;">Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for file in template_files %}
-                    <tr>
-                        <td class="text-center fw-bold">{{ loop.index }}</td>
-                        <td>
-                            <i class="fa fa-file-code text-warning me-2"></i>
-                            <span class="fw-bold text-dark">{{ file }}</span>
-                        </td>
-                        <td class="text-center">
-                            <a href="{{ url_for('specialist_template_detail', filename=file) }}"
-                               class="btn btn-outline-primary btn-sm px-3 shadow-sm">
-                                <i class="fa fa-eye me-1"></i> Xem chi tiết
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+{% block content %}
+<div class="content pt-4">
+    <div class="container">
+
+        <div class="card shadow-lg border-0 rounded-lg">
+
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+                <h3 class="card-title font-weight-bold text-dark mb-0">
+                    <i class="fas fa-layer-group text-primary mr-2"></i>
+                    Danh sách Cấu trúc mẫu
+                </h3>
+
+                <button class="btn btn-primary btn-sm rounded px-3 font-weight-bold shadow-sm">
+                    <i class="fas fa-plus mr-1"></i> THÊM MỚI
+                </button>
             </div>
-            {% else %}
-            <div class="alert alert-warning text-center py-4">
-                <i class="fa fa-exclamation-triangle fa-2x mb-2"></i><br>
-                Chưa có tệp cấu trúc nào trong thư mục <code>data/structures/</code>.
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-valign-middle mb-0">
+                        <thead class="bg-light">
+                        <tr>
+                            <th class="border-top-0 text-muted text-uppercase small font-weight-bold pl-4"
+                                style="width: 50px;">STT
+                            </th>
+                            <th class="border-top-0 text-muted text-uppercase small font-weight-bold">Tên đề cương mẫu
+                            </th>
+                            <th class="border-top-0 text-muted text-uppercase small font-weight-bold">Ngày tạo</th>
+                            <th class="border-top-0 text-muted text-uppercase small font-weight-bold text-right pr-4">
+                                Hành động
+                            </th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% if template_files %}
+                        {% for template in template_files %}
+                        <tr>
+                            <td class="pl-4 text-muted font-weight-bold">
+                                {{ loop.index }}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <span class="d-block font-weight-bold text-dark">{{ template }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="text-success font-weight-bold text-sm">
+                                    <i class="fas fa-check-circle mr-1"></i> Ready
+                                </span>
+                            </td>
+                            <td class="text-right pr-4">
+                                <a href="{{ url_for('specialist_template_detail', template_id=template.id) }}"
+                                   class="btn btn-outline-primary btn-sm rounded-pill px-3 font-weight-bold text-xs">
+                                    Xem chi tiết
+                                </a>
+                                {% if template.id in draft_template_ids %}
+                                <a href="{{ url_for('create_from_template', template_id=template.id) }}?restore=true"
+                                   class="btn btn-warning btn-sm flex-grow-1 fw-bold text-dark">
+                                    <i class="fas fa-history"></i> Tiếp tục sửa
+                                </a>
+                                {% else %}
+                                <a
+                                        class="btn btn-outline-primary btn-sm rounded-pill px-3 font-weight-bold text-xs"
+                                        href="{{ url_for('create_from_template', template_id=template.id) }}">
+                                    Tạo mới từ phiên bản này
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="fas fa-inbox fa-3x mb-3 text-light-gray"></i>
+                                    <p>Chưa có mẫu nào được tải lên.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            {% endif %}
+            <div class="card-footer bg-white border-0 py-3">
+            </div>
         </div>
     </div>
 </div>

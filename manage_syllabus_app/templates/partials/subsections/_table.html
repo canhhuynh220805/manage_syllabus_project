@@ -1,0 +1,133 @@
+<tr class="sub-section"
+    data-position="{{ sub_item.position }}"
+    data-name="{{ sub_item.name }}"
+    data-code="{{ sub_item.code }}"
+    data-type="{{ sub_item.type }}">
+    <th scope="row" style="width: 40%;" class="fs-6">
+        {% if is_editing %}
+        <div class="input-group input-group-sm mb-2 ps-4"> <span class="input-group-text bg-transparent border-0 text-muted p-0 me-2 small">
+                <small>Mã định danh tiểu mục:</small>
+            </span>
+            <input type="text"
+                   class="form-control form-control-sm border-0 bg-light text-secondary font-monospace py-0 h-auto label-code"
+                   style="font-size: 0.85rem;"
+                   value="{{ sub_item.code }}"
+                   id="code-{{sub_item.code}}"
+            >
+        </div>
+        <div class="d-flex align-items-center mb-2">
+            <label class="fw-bold text-dark me-2 mb-0 text-nowrap">
+                {{ sub_item.position }}.
+            </label>
+            <input
+                    type="text"
+                    class="form-control label-input"
+                    value="{{ sub_item.name }}"
+                    id="content-{{ sub_item.id }}"
+                    placeholder="Nhập tên tiểu mục..."
+            >
+        </div>
+        <div class="mt-2">
+            <div class="d-flex ">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-success border-0 dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-plus-circle"></i> Thêm mục dưới
+                    </button>
+                    <ul class="dropdown-menu shadow">
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)"
+                               onclick="addCustomRow(this, 'text', 'input')"> <i
+                                    class="fas fa-minus text-muted me-2"></i> Văn bản (1 dòng)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)"
+                               onclick="addCustomRow(this, 'text', 'textarea')"> <i
+                                    class="fas fa-align-justify text-muted me-2"></i> Văn bản (Nhiều dòng)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)"
+                               onclick="addCustomRow(this, 'selection')">
+                                <i class="far fa-check-square text-muted me-2"></i> Lựa chọn (Selection)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="addCustomRow(this, 'table')">
+                                <i class="fas fa-table text-muted me-2"></i> Bảng (Table)
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger border-0 ms-1"
+                        onclick="removeRow(this)" title="Xóa mục này">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <label class="fw-bold text-dark d-block mb-1">
+            {{ sub_item.position }}. {{ sub_item.name }}
+        </label>
+        {% endif %}
+    </th>
+    <td>
+        <div class="card border-0 shadow-sm bg-light">
+            <div class="card-body p-3">
+                <div class="table-responsive bg-white border rounded mb-3">
+                    <table class="table table-bordered mb-0 js-auto-table" id="dynamic-table-{{ sub_item.id }}">
+                        <thead>
+                        <tr class="bg-primary bg-opacity-10">
+                            {% for header in sub_item.data['headers'] %}
+                            <th class="text-center p-0" style="width: 1%">
+                                <div class="d-inline-flex justify-content-center w-100">
+                                    <textarea rows="1"
+                                       class="form-control border-0 bg-transparent fw-bold shadow-none hybrid-textarea"
+                                       oninput="resizeHybrid(this)">{{ header }}</textarea>
+                                    <button type="button" class="btn btn-sm btn-outline-danger border-0 ms-1"
+                                            onclick="delTableCol(this)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </th>
+                            {% endfor %}
+                            <th style="width: 1%" class="p-0 text-center align-middle">Xóa</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in sub_item.data['rows'] %}
+                        <tr class="bg-primary bg-opacity-10">
+                            {% for cell in row %}
+                            <td class="p-0">
+                                <textarea rows="1"
+                                   class="form-control border-0 bg-transparent fw-bold shadow-none hybrid-textarea"
+                                   oninput="resizeHybrid(this)">{{ cell }}</textarea>
+                            </td>
+                            {% endfor %}
+                            <td class="text-center p-0 action-cell">
+                                <button type="button" class="btn btn-sm btn-outline-danger border-0 ms-1"
+                                        onclick="delTableRow(this)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="addTableRow(this)">
+                        <i class="fas fa-plus me-1"></i> Thêm hàng
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" onclick="addTableCol(this)">
+                        <i class="fas fa-columns me-1"></i> Thêm cột
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm ms-auto" onclick="saveTable(this)">
+                        <i class="fas fa-save me-1"></i> Lưu bảng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </td>
+</tr>

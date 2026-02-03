@@ -1,31 +1,60 @@
-{% extends 'base_bare.html' %}
-
+{% extends 'base.html' %}
 {% block content %}
-<div class="container" style="max-width: 500px; margin-top: 100px;">
-    <h1 class="text-center mb-4">Đăng nhập</h1>
-
-    {# Hiển thị thông báo lỗi nếu có #}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-
-    <form method="post" action="{{ url_for('user_login') }}">
-        <div class="mb-3">
-            <label for="username" class="form-label">Tên đăng nhập</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+<div class="d-flex flex-grow-1 align-items-center justify-content-center py-5 px-3">
+    <div class="w-100 rounded-3 shadow-sm p-4 bg-white border" style="max-width: 480px;">
+        <div class="mb-4 text-center">
+            <div class="d-inline-flex align-items-center justify-content-center rounded mb-3 bg-primary bg-opacity-10 border border-primary border-opacity-25"
+                 style="width: 56px; height: 56px;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 14l9-5-9-5-9 5 9 5z" fill="currentColor" class="text-primary"/>
+                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+                          fill="currentColor" class="text-primary opacity-50"/>
+                </svg>
+            </div>
+            <h2 class="m-0 mb-2 fw-semibold text-dark" style="font-size: 24px; line-height: 1.3;">
+                Đăng nhập tài khoản
+            </h2>
         </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Mật khẩu</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <button type="submit" class="btn btn-custom-primary w-100">Đăng nhập</button>
-    </form>
-    <div class="text-center mt-3">
-        <p>Chưa có tài khoản? <a href="{{ url_for('user_register') }}">Đăng ký ngay</a></p>
+        <form method="post" >
+            <div class="mb-3">
+                <label for="username" class="form-label fw-medium text-dark" style="font-size: 14px;">
+                    Tên đăng nhập
+                </label>
+                <input
+                        type="text"
+                        id="username"
+                        class="form-control py-3 px-4"
+                        placeholder="abcxyz123"
+                        style="font-size: 15px;"
+                        name="username"
+                >
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="form-label fw-medium text-dark" style="font-size: 14px;">
+                    Mật khẩu
+                </label>
+                <input
+                        type="password"
+                        id="password"
+                        class="form-control py-3 px-4"
+                        placeholder="Nhập mật khẩu"
+                        style="font-size: 15px;"
+                        name="password"
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-3 mb-2 fw-semibold shadow-sm"
+                    style="font-size: 15px;">
+                Đăng nhập
+            </button>
+
+            <div class="text-end">
+                <a href="{{url_for('user_register')}}" class="btn btn-outline-primary btn-sm px-3 py-2 fw-medium h-2">
+                    Đăng ký
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

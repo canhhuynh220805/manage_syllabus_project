@@ -1,13 +1,13 @@
-{% from 'partials/_macros.html' import editable_field %}
-<tr>
-    <th scope="row" style="width: 300px;" class="fs-6">{{ item_index }}. {{ sub_item.name }}</th>
-    <td>
+{% extends 'partials/subsections/references/base_th_header.html' %}
+{%block content%}
+<td>
         <table class="table table-bordered">
             <thead class="table-light">
             <tr>
                 <th class="text-center align-middle" scope="col" style="width: 10%;">STT</th>
                 <th class="text-center align-middle" scope="col" style="width: 60%;">Tên tài liệu</th>
                 <th class="text-center align-middle" scope="col" style="width: 30%;">Loại tài liệu</th>
+                <th class="text-center align-middle" scope="col" style="width: 30%;">Xóa</th>
             </tr>
             </thead>
             <tbody>
@@ -15,24 +15,25 @@
             <tr>
                 <td class="text-center align-middle">{{ loop.index }}</td>
                 <td>
-                    {{material.name}}
+                    <input
+                            type="text"
+                            class="form-control bg-white mb-3"
+                            id="name-learning-material{{material.id}}"
+                            value="{{material.name}}"
+                            placeholder="Nhập tên tài liệu tham khảo...."
+                            onblur="updateLearningMaterial({{material.id}})"
+                    >
                 </td>
                 <td>
-                    <div id="editable-container-LearningMaterial-{{ material.id }}-type" class="editable-container">
-                        <div class="display-view mt-5">
-                            <div class="d-flex align-items-center">
-                                <p class="mb-0 me-auto">{{ material.type_material.name }}</p>
-                                <button type="button"
-                                        class="btn btn-outline-primary btn-sm ms-3 flex-shrink-0 edit-trigger-button"
-                                        onclick="toggleFieldEdit('LearningMaterial-{{ material.id }}-type', true)">
-                                    <i class="fas fa-pencil-alt"></i> Chỉnh sửa
-                                </button>
-                            </div>
-                        </div>
+                    <div class="d-flex align-items-center">
+                        <p class="mb-0 me-auto">{{ material.type_material.name }}</p>
                     </div>
                 </td>
                 <td class="text-center align-middle">
-                    chỉnh sửa sau
+                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 ms-1"
+                        onclick="removeLearningMaterial({{syllabus.id}}, {{material.id}})">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
                 </td>
             </tr>
             {% endfor %}
@@ -43,11 +44,28 @@
             {% endif %}
             </tbody>
         </table>
-        <div class="d-flex justify-content-center add-form-container">
-            <button type="button"
-                    class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0 add-btn">
-                <i class="fa-solid fa-plus"></i>
-            </button>
+        <div class="card bg-light border-0 shadow-sm">
+            <div class="card-body p-1">
+                <h6 class="fw-bold text-dark mb-3">Thêm tài liệu</h6>
+                <div class="d-flex gap-2">
+                    <input
+                            type="text"
+                            class="form-control bg-white mb-3"
+                            placeholder="Nhập tên tài liệu tham khảo...."
+                            id="learning-material-name"
+                    >
+                    <select id="new-type-learning-material" class="form-select" style="width: 45%;">
+                        {% for t in all_type_learning_materials%}
+                        <option value="{{t.id}}">{{t.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end border-top pt-3 p-1">
+                <button type="button" class="btn btn-light me-2 text-secondary" onclick="clearInputLearningMaterial()">Hủy bỏ</button>
+                <button type="button" class="btn btn-primary px-4" onclick="addLearningMaterial({{syllabus.id}})">Thêm tài liệu
+                </button>
+            </div>
         </div>
     </td>
-</tr>
+{% endblock%}

@@ -25,6 +25,7 @@ class BaseModel(db.Model):
 # =============================================================================
 
 class SyllabusLearningMaterial(db.Model):
+    __tablename__ = 'syllabus_learning_material'
     syllabus_id = Column(Integer, ForeignKey('syllabus.id'), primary_key=True)
     learning_material_id = Column(Integer, ForeignKey('learning_material.id'), primary_key=True)
 
@@ -35,8 +36,8 @@ class SubSectionAttributeValue(db.Model):
 
 
 class CourseObjectiveProgrammeLearningOutcome(db.Model):
-    course_objective_id = Column(Integer, ForeignKey('course_objective.id'), primary_key=True)
-    programme_learning_outcome_id = Column(Integer, ForeignKey('programme_learning_outcome.id'),
+    course_objective_id = Column(Integer, ForeignKey('course_objective.id', ondelete='CASCADE'), primary_key=True)
+    programme_learning_outcome_id = Column(Integer, ForeignKey('programme_learning_outcome.id', ondelete='CASCADE'),
                                            primary_key=True)
 
 
@@ -73,6 +74,18 @@ class Syllabus(BaseModel):
     learning_materials = relationship('LearningMaterial', secondary='syllabus_learning_material',
                                       backref='syllabuses', lazy=True)
 
+    def to_structure_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'subject': self.subject.to_dict(),
+            'faculty': self.faculty.to_dict(),
+            'lecturer': self.lecturer.to_dict(),
+            'main_sections': [ms.to_dict() for ms in self.main_sections],
+            'course_objectives': [co.to_dict() for co in self.subject.course_objectives],
+            'learning_materials': [lm.to_dict() for lm in self.learning_materials]
+        }
+
 
 class MainSection(BaseModel):
     code = Column(String(50), nullable=False)
@@ -82,24 +95,61 @@ class MainSection(BaseModel):
                                 order_by="SubSection.position")
     __table_args__ = (UniqueConstraint('code', 'syllabus_id', name='uq_code_per_syllabus'),)
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'code': self.code,
+            'position': self.position,
+            'sub_sections': [sub.to_dict() for sub in self.sub_sections],
+        }
+
 
 # Kế thừa đa hình (Polymorphism)
 class SubSection(BaseModel):
     position = Column(Integer, default=1, nullable=False)
-    type = Column(String(50))  # Cột phân loại
+    type = Column(String(50))
+    code = Column(String(50), nullable=False)
     main_section_id = Column(Integer, ForeignKey('main_section.id'), nullable=False)
     __mapper_args__ = {
         'polymorphic_identity': 'sub_section',
         'polymorphic_on': type
     }
 
+    def to_dict(self):
+        data = {
+            'name': self.name,
+            'code': self.code,
+            'position': self.position,
+            'type': self.type,
+        }
+        return data
+
+    @property
+    def template_name(self):
+        return self.type
+
 
 class TextSubSection(SubSection):
     id = Column(Integer, ForeignKey('sub_section.id'), primary_key=True)
     content = Column(Text, nullable=True)
+    display_mode = Column(String(50), default="input")
+    place_holder = Column(String(100), nullable=True)
     __mapper_args__ = {
         'polymorphic_identity': 'text'
     }
+
+    @property
+    def template_name(self):
+        return self.display_mode if self.display_mode else "input"
+
+    def to_dict(self):
+        data = super().to_dict()
+        data.update({
+            'content': self.content,
+            'display_mode': self.display_mode,
+            'placeholder': self.place_holder,
+        })
+        return data
 
 
 class SelectionSubSection(SubSection):
@@ -113,6 +163,14 @@ class SelectionSubSection(SubSection):
         'polymorphic_identity': 'selection'
     }
 
+    def to_dict(self):
+        data = super().to_dict()
+        data.update({
+            'attribute_group_id': self.attribute_group_id,
+            'selected_value_ids': [value.id for value in self.selected_values],
+        })
+        return data
+
 
 class ReferenceSubSection(SubSection):
     id = Column(Integer, ForeignKey('sub_section.id'), primary_key=True)
@@ -120,6 +178,26 @@ class ReferenceSubSection(SubSection):
     __mapper_args__ = {
         'polymorphic_identity': 'reference'
     }
+
+    def to_dict(self):
+        data = super().to_dict()
+        data.update({
+            'reference_code': self.reference_code,
+        })
+        return data
+
+class TableSubSection(SubSection):
+    id = Column(Integer, ForeignKey('sub_section.id'), primary_key=True)
+    data = Column(JSON, nullable=False)
+    __mapper_args__ = {
+        'polymorphic_identity': 'table'
+    }
+    def to_dict(self):
+        data = super().to_dict()
+        data.update({
+            'data': self.data,
+        })
+        return data
 
 
 # =============================================================================
@@ -144,12 +222,33 @@ class Subject(db.Model):
     def __str__(self):
         return self.name
 
+    def to_dict(self):
+        required_subjects = []
+        for req in self.required_relation:
+            required_subjects.append({
+                "require_subject_id": req.require_subject.id,
+                "require_subject_name": req.require_subject.name,
+                "type_requirement": req.type_requirement.name
+            })
+        return {
+            'id': self.id,
+            'name': self.name,
+            'credit': self.credit.to_dict(),
+            'required_subjects': required_subjects,
+        }
+
 
 class Faculty(BaseModel):
     name = Column(String(100), unique=True)
     syllabuses = relationship('Syllabus', backref='faculty', lazy=True)
     lecturers = relationship('Lecturer', backref='faculty', lazy=True)
     majors = relationship('Major', backref='faculty', lazy=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
 
 
 class Lecturer(BaseModel):
@@ -159,15 +258,36 @@ class Lecturer(BaseModel):
     faculty_id = Column(Integer, ForeignKey('faculty.id'), nullable=False)
     syllabuses = relationship('Syllabus', backref='lecturer', lazy=True)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'room': self.room,
+        }
+
 
 class LearningMaterial(BaseModel):
     name = Column(String(100), unique=True)
     type_material_id = Column(Integer, ForeignKey('type_learning_material.id'), nullable=False)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "type_material": self.type_material.to_dict(),
+        }
+
 
 class TypeLearningMaterial(BaseModel):
     name = Column(String(100), unique=True)
     learning_materials = relationship('LearningMaterial', backref='type_material', lazy=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
 
 
 class Credit(db.Model):
@@ -182,6 +302,13 @@ class Credit(db.Model):
 
     def __str__(self):
         return f"TC: {self.getTotalCredit()} (LT: {self.numberTheory} - TH: {self.numberPractice})"
+
+    def to_dict(self):
+        return {
+            'number_theory': self.numberTheory,
+            'number_practice': self.numberPractice,
+            'hour_self_study': self.hourSelfStudy,
+        }
 
 
 class Major(BaseModel):
@@ -205,7 +332,6 @@ class TrainingProgram(BaseModel):
 # =============================================================================
 
 class AttributeGroup(BaseModel):
-    name_group = Column(String(100), nullable=False)
     attribute_values = relationship('AttributeValue', backref='attribute_group', lazy=True)
 
 
@@ -213,6 +339,12 @@ class AttributeValue(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name_value = Column(String(50), nullable=False)
     attribute_group_id = Column(Integer, ForeignKey('attribute_group.id'), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name_value": self.name_value,
+        }
 
 
 class RequirementSubject(db.Model):
@@ -227,8 +359,15 @@ class TypeRequirement(BaseModel):
     name = Column(String(30), unique=True)
     requirement_subjects = relationship('RequirementSubject', backref='type_requirement', lazy=True)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
 
-class CourseObjective(BaseModel):
+
+class CourseObjective(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(Text, nullable=False)
     subject_id = Column(String(10), ForeignKey('subject.id', onupdate="CASCADE"))
     course_learning_outcomes = relationship('CourseLearningOutcome', backref='course_objective', lazy=True,
@@ -236,8 +375,15 @@ class CourseObjective(BaseModel):
     # Quan hệ N-N với PLO
     programme_learning_outcomes = relationship('ProgrammeLearningOutcome',
                                                secondary='course_objective_programme_learning_outcome',
-                                               backref='course_objectives', lazy=True)
+                                               backref='course_objectives', lazy=True,passive_deletes=True)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "description": self.content,
+            'plos': [plo.id for plo in self.programme_learning_outcomes],
+            'clos': [clo.to_dict() for clo in self.course_learning_outcomes],
+        }
 
 class CourseLearningOutcome(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -245,6 +391,18 @@ class CourseLearningOutcome(db.Model):
     course_objective_id = Column(Integer, ForeignKey('course_objective.id'))
     # Quan hệ custom association (CLO - PLO - Rating)
     plo_association = relationship('CloPloAssociation', backref='clo', lazy=True, cascade="all, delete-orphan")
+
+    def to_dict(self):
+        rating = []
+        for asso in self.plo_association:
+            rating.append({
+                'plo_id': asso.plo_id,
+                'level': asso.rating
+            })
+        return {
+            'description': self.content,
+            'ratings': rating,
+        }
 
 
 class ProgrammeLearningOutcome(db.Model):
@@ -255,8 +413,8 @@ class ProgrammeLearningOutcome(db.Model):
 
 # Bảng liên kết CLO-PLO có thêm cột rating (Association Object)
 class CloPloAssociation(db.Model):
-    clo_id = Column(Integer, ForeignKey('course_learning_outcome.id'), primary_key=True)
-    plo_id = Column(Integer, ForeignKey('programme_learning_outcome.id'), primary_key=True)
+    clo_id = Column(Integer, ForeignKey('course_learning_outcome.id', ondelete='CASCADE'), primary_key=True)
+    plo_id = Column(Integer, ForeignKey('programme_learning_outcome.id', ondelete='CASCADE'), primary_key=True)
     rating = Column(Integer, nullable=False)
 
 
@@ -286,5 +444,5 @@ class User(BaseModel, UserMixin):
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()
-        print("Database initialized successfully!")
+        t = TemplateSyllabus.query.first()
+        print(t.structure)

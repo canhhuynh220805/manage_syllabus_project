@@ -1,3 +1,4 @@
+import hashlib
 import os
 
 from flask import  json
@@ -44,7 +45,7 @@ def seed_accounts():
             admin_user = User(
                 name='Quản trị viên',
                 username=admin_username,
-                password=generate_password_hash('123'),
+                password=str(hashlib.md5("123".strip().encode('utf-8')).hexdigest()),
                 user_role=UserRole.ADMIN
             )
             db.session.add(admin_user)
@@ -55,7 +56,6 @@ def seed_accounts():
         for name in lecturer_names:
             lecturer = Lecturer.query.filter_by(name=name).first()
             if lecturer:
-                # Tạo username tự động (ví dụ: "Trần Thị B" -> "tranthib")
                 temp_name = strip_accents(name).lower()
                 username = re.sub(r'\s+', '', temp_name)
 
@@ -64,9 +64,9 @@ def seed_accounts():
                     new_user = User(
                         name=lecturer.name,
                         username=username,
-                        password=generate_password_hash('123'),
+                        password=str(hashlib.md5("123".strip().encode('utf-8')).hexdigest()),
                         user_role=UserRole.USER,
-                        lecturer_id=lecturer.id  # Liên kết User với Lecturer
+                        lecturer_id=lecturer.id
                     )
                     db.session.add(new_user)
                     print(f"Đã tạo tài khoản cho GV '{name}': username='{username}', password='123'")
@@ -75,6 +75,13 @@ def seed_accounts():
             else:
                 print(f"CẢNH BÁO: Không tìm thấy giảng viên '{name}' trong CSDL. Bỏ qua việc tạo tài khoản.")
 
+        t = User(
+            name="test",
+            username="test",
+            password=str(hashlib.md5("123".strip().encode('utf-8')).hexdigest()),
+            user_role=UserRole.SPECIALIST,
+        )
+        db.session.add(t)
         db.session.commit()
         print("Thêm tài khoản thành công!")
 

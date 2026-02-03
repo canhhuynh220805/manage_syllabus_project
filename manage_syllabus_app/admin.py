@@ -45,7 +45,7 @@ class AuthenticatedAdminView(ModelView):
     def on_model_change(self, form, model, is_created):
         if hasattr(form, 'password') and form.password.data:
             raw_password = form.password.data
-            model.password = generate_password_hash(raw_password)
+            model.password = str(hashlib.md5(raw_password.strip().encode('utf-8')).hexdigest())
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
@@ -85,15 +85,13 @@ class LecturerAdminView(AuthenticatedAdminView):
 # Ló view tùy chỉnh đề cương
 class SyllabusAdminView(AuthenticatedAdminView):
     list_template = 'admin/custom_syllabus_list.html'
-
-
-    form_columns = ['name', 'subject', 'faculty','lecturer', 'structure_file', 'training_programs']
+    form_columns = ['name', 'subject', 'faculty','lecturer', 'template', 'training_programs']
     form_args = {
         'name': {'label': 'Tên đề cương'},
         'subject': {'label': 'Môn học'},
         'faculty': {'label': 'Khoa'},
         'lecturer': {'label': 'Giảng viên'},
-        'structure_file': {'label': 'Đề cương mẫu'},
+        'template': {'label': 'Đề cương mẫu'},
         'training_programs': {'label': 'Chương trình đào tạo'}
     }
 

@@ -1,452 +1,94 @@
-/* danh sách màu*/
-:root {
-  --background: #fffffe;
-  --headline: #272343;
-  --paragraph: #2d334a;
-  --button: #ffd803;
-  --button-text: #272343;
-  --stroke: #272343;
-  --main: #fffffe;
-  --highlight: #ffd803;
-  --secondary: #e3f6f5;
-  --tertiary: #bae8e8;
+.js-auto-table {
+    table-layout: auto !important;
+    width: auto !important;
+    min-width: 100%;
+}
+
+.js-auto-table td,
+.js-auto-table th {
+    width: 1px;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 
-/* Override Bootstrap Colors with Custom Scheme */
-.bg-primary {
-  background-color: var(--headline) !important;
-}
-
-.bg-secondary {
-  background-color: var(--secondary) !important;
-}
-
-.bg-warning {
-  background-color: var(--button) !important;
-}
-
-.bg-light {
-  background-color: var(--main) !important;
-}
-
-.bg-info {
-  background-color: var(--tertiary) !important;
-}
-
-.text-primary {
-  color: var(--headline) !important;
-}
-
-.text-secondary {
-  color: var(--paragraph) !important;
-}
-
-.text-warning {
-  color: var(--button-text) !important;
-}
-
-.text-dark {
-  color: var(--headline) !important;
-}
-
-.text-muted {
-  color: var(--paragraph) !important;
-  opacity: 0.7;
-}
-
-body{
-    background-color: #f2f7f5;
-    color: var(--paragraph);
-    font-family: Arial;
-}
-
-/* header */
-.custom-header{
-    background-color: var(--headline);
-    height: 72px;
-}
-
-.custom-logo{
-    width: 32px;
-    height: 32px;
-    background-color: var(--button);
-    color: var(--button-text);
-    border-radius: 8px;
-    font-weight: bold;
-}
-
-/* tool bar */
-.btn-outline-custom{
-    border-color: var(--tertiary);
-    color: var(--headline);
-}
-
-.btn-outline-custom:hover {
-  background-color: var(--secondary);
-  border-color: var(--tertiary);
-  color: var(--headline);
-}
-
-.custom-toolbar{
-    background-color: var(--main);
-    border-bottom: 1px solid var(--tertiary);
-    min-height: 64px;
-}
-
-.btn-custom-primary{
-    background-color: var(--button);
-    border-color: var(--button);
-    color: var(--button-text);
-    font-weight: 500;
-}
-
-.btn-custom-primary:hover{
-    background-color: #e6c203;
-    border-color: #e6c203;
-    color: var(--button-text);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(255, 216, 3, 0.3);
+.auto-resize-input {
+    min-width: 80px;
+    max-width: 400px;
+    width: auto;
+    display: inline-block;
+    box-sizing: border-box;
+    transition: width 0.1s ease;
 }
 
 
-/* table data */
-
-table{
-    border: 2px solid;
+.js-auto-table .action-cell {
+    width: 50px !important;
 }
 
-.table-custom{
-    background-color: var(--main);
-}
-
-.table-custom thead th{
-    background-color: var(--secondary);
-    color: var(--headline);
-    font-weight: 600;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid var(--tertiary);
-}
-
-.table-custom tbody tr:hover{
-    background-color: var(--secondary);
-}
-
-.table-custom td {
-  border-bottom: 1px solid var(--secondary);
-  color: var(--paragraph);
-}
-
-/* card custom */
-.card-custom{
-    border: 1px solid var(--tertiary);
-    background-color: var(--main);
-}
-
-.card-custom .card-header{
-    background-color: var(--secondary);
-    border-bottom: 1px solid var(--tertiary);
-    color: var(--headline);
-}
-
-.syllabus-detail-card {
-    /* Nền trắng với độ trong mờ là 85% */
-    background-color: rgba(255, 255, 255, 0.85);
-
-    /* (Tùy chọn) Thêm hiệu ứng làm mờ nền phía sau, rất đẹp mắt */
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
-}
-
-/* sidebar custom*/
-
-.custom-sidebar{
-    background-color: var(--main);
-    border-right: 1px solid var(--tertiary);
-    min-height: calc(100vh - 72px);
-}
-
-
-/* editor content */
-.editor-content{
-    background-color: var(--secondary);
-    min-height: calc(100vh - 72px);
-}
-
-.editor-main{
-    background-color: var(--main);
-    border-radius: 8px;
-    box-shadow: 0 0.125rem 0.25rem rgba(39, 35, 67, 0.075);
-}
-
-/* dropdown custom */
-.dropdown-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 50px;
-    border: 2px solid #007BFF;
-    font-weight: 600;
-}
-
-.dropdown-toggle:focus {
-    box-shadow: none !important;
-}
-
-.dropdown-toggle::after {
-    display: none;
-}
-
-.dropdown-menu {
-    border: 2px solid #F44336;
-    padding: 0; /* Gộp padding: 0rem 0; thành 0 */
-}
-
-.dropdown-item {
-    display: block;
+.hybrid-textarea {
     width: 100%;
-    padding: 12px;
-}
+    /* height: 100%; -> BỎ dòng này nếu muốn auto-height hoạt động tốt nhất với rows="1" */
 
-.dropdown-item:focus, .dropdown-item:hover {
-    color: #ffffff;
-    background-color: #dc3545;
-}
+    padding: 8px 6px;
+    line-height: 24px;
 
-.dropdown-menu.dropdown-menu-scrollable {
-    max-height: 250px;
-    overflow-y: auto;
-}
+    /* Logic hiển thị */
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word; /* Hoặc normal tùy bạn */
 
-/* === FRESH GREEN THEME FOR GENERAL INFO === */
+    /* Tắt transition để co giãn mượt mà tức thì */
+    transition: none !important;
 
-/* Bảng màu xanh tươi */
-:root {
-  --fresh-green-dark: #1E6043;   /* Xanh lá đậm cho chữ và viền */
-  --fresh-green-light: #F0FAF6;  /* Xanh lá rất nhạt cho nền */
-  --fresh-green-accent: #28a745; /* Xanh lá tươi làm điểm nhấn */
-}
-
-/* Tùy chỉnh cho tiêu đề phần (h3) */
-.section-title-fresh {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--fresh-green-dark); /* Màu chữ xanh lá đậm */
-    padding: 0.75rem 1.25rem;
-    background-color: var(--fresh-green-light); /* Nền xanh lá rất nhạt */
-    border-left: 5px solid var(--fresh-green-accent); /* Viền nhấn màu xanh tươi */
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-}
-
-/* Màu của icon trong tiêu đề */
-.section-title-fresh .fas {
-    color: var(--fresh-green-accent); /* Icon có màu xanh tươi */
-}
-
-/* Tùy chỉnh cho bảng thông tin */
-.info-table-fresh {
-    border: 1px solid #d4edda; /* Viền bảng màu xanh lá nhạt */
-    border-radius: 5px;
+    resize: none;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Thêm bóng mờ nhẹ nhàng */
-}
-
-/* Tùy chỉnh cho các ô tiêu đề của hàng (th) */
-.info-table-fresh th {
-    color: var(--fresh-green-dark);
-    font-weight: 600;
-    width: 30%;
-}
-
-
-
-/* === NAVBAR TỪ GIAO DIỆN AGENCY === */
-
-#mainNav {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  background-color: #00558F;
-  transition: padding-top 0.3s ease-in-out, padding-bottom 0.3s ease-in-out;
-}
-#mainNav .navbar-toggler {
-  padding: 0.75rem;
-  font-size: 0.75rem;
-  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  text-transform: uppercase;
-  font-weight: 700;
-}
-#mainNav .navbar-brand {
-  color: white; /* Dùng lại màu vàng của bạn */
-  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  font-weight: 700;
-  letter-spacing: 0.0625em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-}
-
-#mainNav .navbar-nav .nav-item .nav-link {
-  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  font-size: 0.95rem;
-  color: #fff;
-  letter-spacing: 0.0625em;
-}
-#mainNav .navbar-nav .nav-item .nav-link.active, #mainNav .navbar-nav .nav-item .nav-link:hover {
-  color: var(--highlight); /* Dùng lại màu vàng của bạn */
-}
-
-/* Thêm lại logo OU vào navbar brand */
-#mainNav .navbar-brand .custom-logo {
-    width: 28px;
-    height: 28px;
-    background-color: white;
-    color: var(--button-text);
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Hiệu ứng khi cuộn chuột */
-@media (min-width: 992px) {
-  #mainNav {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+    box-sizing: border-box;
     border: none;
-  }
-  #mainNav .navbar-brand {
-    font-size: 1.5em;
-    transition: font-size 0.3s ease-in-out;
-  }
-  #mainNav.navbar-shrink {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    background-color: #00558;
-  }
-  #mainNav.navbar-shrink .navbar-brand {
-    font-size: 1.25em;
-  }
-  #mainNav .navbar-nav .nav-item {
-    margin-right: 1rem;
-  }
-  #mainNav .navbar-nav .nav-item:last-child {
-    margin-right: 0;
-  }
-}
-
-/* Chỉnh lại khoảng cách cho nội dung chính để không bị navbar che mất */
-main {
-    padding-top: 100px;
-}
-
-/* CSS cho tính năng "Click to Edit" */
-.editable-cell {
-    cursor: pointer;
-}
-
-/* Mặc định, ẩn form sửa và hiện nội dung tĩnh */
-.editable-cell .edit-view { display: none; }
-.editable-cell .display-view { display: block; }
-
-/* Khi ô được JS thêm class 'is-editing' */
-.editable-cell.is-editing { cursor: default; }
-.editable-cell.is-editing .display-view { display: none; }
-.editable-cell.is-editing .edit-view { display: block; }
-
-/* --- CSS cho thanh tín chỉ hàng ngang --- */
-.credit-horizontal-bar {
-    display: flex;
-    justify-content: space-around; /* Căn đều các mục */
-    align-items: center;
-    background-color: var(--fresh-green-light); /* Dùng lại nền xanh nhạt */
-    border-radius: 8px;
-    padding: 1rem;
-    border: 1px solid #d4edda;
-}
-
-.credit-item {
-    text-align: center;
-}
-
-.credit-label {
+    background: transparent;
     display: block;
-    font-size: 0.85rem;
-    color: var(--paragraph);
-    margin-bottom: 0.25rem;
-    text-transform: uppercase;
-    font-weight: 500;
 }
 
-.credit-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--fresh-green-dark); /* Dùng lại màu chữ xanh đậm */
+/* Select box */
+.select2-container--default .select2-selection--single {
+    height: 38px;
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+    padding: 4px 10px;
+    background-color: #fff;   /* 👈 nền trắng */
 }
 
-/* Làm nổi bật phần "Tổng tín chỉ" */
-.credit-value.total {
-    color: var(--fresh-green-accent); /* Dùng màu xanh nhấn */
-    font-size: 1.8rem; /* Cho to hơn một chút */
+/* Text trong select */
+.select2-selection__rendered {
+    line-height: 40px !important;
+    background-color: #fff;   /* 👈 đảm bảo trắng */
 }
 
-/* 1. Tạo một container có thể định vị được */
-.editable-container {
-    position: relative;
-    padding-bottom: 40px; /* Thêm khoảng đệm ở dưới để nút không che mất nội dung */
+/* Dropdown */
+.select2-dropdown {
+    border: 1px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: #fff;   /* 👈 nền trắng dropdown */
 }
 
-/* 2. Định vị nút "Chỉnh sửa" ở góc dưới bên phải */
-.edit-trigger-button {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
+/* Option mặc định */
+.select2-results__option {
+    padding: 8px 12px;
+    border-radius: 0.375rem;
+    margin: 2px 6px;
+    background-color: #fff;   /* 👈 option nền trắng */
 }
 
-.editable-container:hover .edit-trigger-button {
-    opacity: 1;
+/* Hover */
+.select2-results__option--highlighted {
+    background-color: #0d6efd !important;
+    color: #fff;
 }
 
-.dropdown-menu-scrollable {
-    max-height: 250px;  /* Bạn có thể thay đổi chiều cao này */
-    overflow-y: auto;   /* Tự động thêm thanh cuộn khi cần */
+/* Selected */
+.select2-results__option--selected {
+    background-color: #fff;   /* 👈 KHÔNG xám nữa */
+    font-weight: 500;         /* tuỳ chọn, nhìn giống Bootstrap */
 }
-
-/* 1. Mặc định ẩn hàng chứa nút "Thêm" đi */
-.add-clo-row {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-}
-
-/* 2. Khi rê chuột vào vùng chứa (tbody), làm hiện hàng đó lên */
-.clo-group-container:hover .add-clo-row {
-    opacity: 1;
-}
-/* 1. Vùng chứa tên CO và nút xóa */
-.co-name-container {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Mặc định: căn giữa tên CO */
-    min-height: 40px; /* Đảm bảo có đủ không gian để hover */
-}
-
-/* 2. Mặc định ẩn nút xóa đi */
-.co-name-container .delete-co-form {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-}
-
-/* 4. Hiện nút xóa lên khi hover */
-.co-name-container:hover .delete-co-form {
-    opacity: 1;
-}
-
-
 

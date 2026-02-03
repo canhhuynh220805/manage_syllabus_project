@@ -6,13 +6,15 @@
 <div class="container my-3 p-4 p-md-5 content-wrapper shadow-sm rounded bg-light syllabus-detail-card">
 
     <div class="text-center mb-5 syllabus-header">
-        <h2 class="mt-4">ĐỀ CƯƠNG MÔN HỌC MẪU</h2>
+        <h2 class="mt-4">{{syllabus.name}}</h2>
     </div>
-
     {% for part in syllabus.main_sections %}
-    {# Include động file linh kiện dựa trên 'part.code' #}
     {% include 'partials/_' + part.code + '.html' %}
     {% endfor %}
-
+    <div class="text-center mt-5 no-print">
+        <a href="/specialist" class="btn btn-default">
+            <i class="fas fa-arrow-left mr-1"></i> Quay lại danh sách
+        </a>
+    </div>
 </div>
 {% endblock %}

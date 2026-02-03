@@ -1,55 +1,56 @@
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-        <a class="navbar-brand" href="{{ url_for('specialist_view') }}">
-            <div class="custom-logo text-center d-inline-block me-2 d-flex justify-content-center align-items-center">
-                <span>OU</span>
-            </div>
-            Quản lí đề cương
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
-                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            Menu
-            <i class="fas fa-bars ms-1"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('specialist_view') }}">Trang chủ</a></li>
-                {% if current_user.is_authenticated %}
-                <li class="nav-item d-flex align-items-center">
-                    <a class="nav-link text-warning" href="#">Chào, {{ current_user.name }}!</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('editor')}}">Tạo đề cương mẫu</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('user_logout') }}">Đăng xuất</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('user_login') }}">Đăng nhập</a>
-                </li>
-                {% endif %}
-                <li class="nav-item d-flex align-items-center">
-                    <button class="btn btn-link text-white me-2" data-bs-toggle="modal" data-bs-toggle="tooltip"
-                            data-bs-placement="bottom" title="Thông báo">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                    <div class="bg-info rounded-circle d-flex align-items-center justify-content-center"
-                         style="width: 32px; height: 32px;">
-                        <span class="text-dark fw-bold small">AD</span>
+<div class="main-header navbar navbar-expand p-0 fixed-top">
+    <header class="w-100 border-bottom border-white border-opacity-10 bg-primary shadow-sm">
+        <div class="container-fluid px-4 py-3 mx-auto" style="max-width: 1440px;">
+            <div class="d-flex align-items-center justify-content-between">
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center justify-content-center rounded bg-white text-primary shadow-sm"
+                         style="width: 48px; height: 48px;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 14l9-5-9-5-9 5 9 5z" fill="currentColor"/>
+                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+                                  fill="currentColor" style="opacity: 0.6"/>
+                        </svg>
                     </div>
-                </li>
-            </ul>
+                    <div>
+                        <a href="/specialist">
+                            <h1 class="h5 m-0 fw-bold text-white" style="line-height: 1.2;">
+                                <span>OU</span>
+                                Quản lí đề cương
+                            </h1>
+                        </a>
+                    </div>
+                </div>
+                {% if current_user.is_authenticated %}
+                <div class="d-flex align-items-center gap-3">
+                    <a class="btn btn-outline-light btn-sm px-3 py-2 fw-medium" href="{{url_for('editor')}}">Tạo đề cương mẫu</a>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-end d-none d-sm-block">
+                            <p class="m-0 fw-bold text-white" style="font-size: 14px; line-height: 1.2;">
+                                {{ current_user.name if current_user.name else "John Doe" }}
+                            </p>
+                            <p class="m-0 text-white-50" style="font-size: 12px; line-height: 1.2;">
+                                Professor
+                            </p>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center bg-white text-primary fw-bold shadow-sm"
+                             style="width: 40px; height: 40px;">
+                            JD
+                        </div>
+                    </div>
+                    <a href="{{url_for('user_logout')}}" class="btn btn-outline-light btn-sm px-3 py-2 fw-medium">
+                        Đăng xuất
+                    </a>
+                </div>
+                {% else %}
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{{url_for('user_login')}}" class="btn btn-outline-light btn-sm px-3 py-2 fw-medium">
+                        Đăng nhập
+                    </a>
+                </div>
+                {% endif %}
+            </div>
         </div>
-    </div>
-</nav>
+    </header>
+</div>
+<script src="{{ url_for('static', filename='js/specialist_script.js') }}"></script>

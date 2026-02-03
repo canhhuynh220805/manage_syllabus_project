@@ -1,0 +1,22 @@
+{% extends 'partials/subsections/_text.html' %}
+
+{% block content %}
+{% if is_editing %}
+<textarea
+        class="form-control mb-2"
+        rows="4"
+        id="content"
+        placeholder="{{sub_item.place_holder}}"
+        readonly
+>{{ sub_item.content }}</textarea>
+{% else %}
+<textarea
+        class="form-control mb-2"
+        rows="4"
+        id="content-{{ sub_item.id }}"
+        placeholder="{{sub_item.place_holder}}"
+        onblur="updateSection('{{ sub_item.id }}')"
+>{{ sub_item.content }}</textarea>
+{% endif %}
+
+{% endblock%}
