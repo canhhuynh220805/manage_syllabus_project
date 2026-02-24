@@ -117,7 +117,7 @@
             <ul class="pagination mt-2 justify-content-center mb-5 gap-1">
                 <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
                     <a class="page-link rounded border-0 shadow-sm text-dark bg-white"
-                       href="{{ ('/?page=' ~ (current_page + 1)) if current_page > 1 else '#' }}" tabindex="-1">
+                       href="{{ ('/?page=' ~ (current_page - 1)) if current_page > 1 else '#' }}" tabindex="-1">
                         &larr; Trước
                     </a>
                 </li>

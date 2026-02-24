@@ -1,0 +1,67 @@
+<div class="main-header navbar navbar-expand p-0 fixed-top">
+    <header class="w-100 border-bottom border-white border-opacity-10 bg-primary shadow-sm">
+        <div class="container-fluid px-4 py-3 mx-auto" style="max-width: 1440px;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center justify-content-center rounded bg-white text-primary shadow-sm"
+                         style="width: 48px; height: 48px;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 14l9-5-9-5-9 5 9 5z" fill="currentColor"/>
+                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+                                  fill="currentColor" style="opacity: 0.6"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <a href="/admin">
+                            <h1 class="h5 m-0 fw-bold text-white" style="line-height: 1.2;">
+                                Course Syllabus<br>Management System
+                            </h1>
+                        </a>
+                    </div>
+                </div>
+                {% if current_user.is_authenticated %}
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{{url_for('admin_users_view')}}" class="btn btn-outline-light btn-sm px-3 py-2 fw-medium">
+                        Quản lí người dùng
+                    </a>
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+                            Danh sách danh mục
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{url_for('admin_training_programs_view')}}">Chương trình đào tạo</a></li>
+                            <li><a class="dropdown-item" href="{{url_for('admin_majors_view')}}">Chuyên ngành</a></li>
+                            <li><a class="dropdown-item" href="{{url_for('admin_subjects_view')}}">Môn học</a></li>
+                        </ul>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-end d-none d-sm-block">
+                            <p class="m-0 fw-bold text-white" style="font-size: 14px; line-height: 1.2;">
+                                {{ current_user.name if current_user.name else "John Doe" }}
+                            </p>
+                            <p class="m-0 text-white-50" style="font-size: 12px; line-height: 1.2;">
+                                Professor
+                            </p>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center bg-white text-primary fw-bold shadow-sm"
+                             style="width: 40px; height: 40px;">
+                            JD
+                        </div>
+                    </div>
+                    <a href="{{url_for('user_logout')}}" class="btn btn-outline-light btn-sm px-3 py-2 fw-medium">
+                        Đăng xuất
+                    </a>
+                </div>
+                {% else %}
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{{url_for('user_login')}}" class="btn btn-outline-light btn-sm px-3 py-2 fw-medium">
+                        Đăng nhập
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+</div>
+
+

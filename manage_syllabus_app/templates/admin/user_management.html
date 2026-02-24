@@ -1,0 +1,182 @@
+{% extends 'admin/index.html' %}
+{% block content %}
+<div class="container-fluid p-0">
+
+    <div class="d-flex align-items-center my-2">
+        <a href="{{url_for('admin_add_user')}}" class="btn btn-primary ms-auto">
+            <i class="fas fa-plus me-1"></i> Thêm tài khoản
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center mb-4">
+            <div class="col-md-10">
+                <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                    <input type="text"
+                           name="keyword"
+                           value="{{ request.args.get('keyword', '') }}"
+                           class="form-control border-start-0 ps-0"
+                           placeholder="Tìm kiếm tên hoặc email....">
+                </div>
+            </div>
+            <div class="col-md-2 d-grid mx-2">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="px-4 py-3 text-secondary text-uppercase small fw-bold">Họ và tên</th>
+                        <th class="px-4 py-3 text-secondary text-uppercase small fw-bold">Email</th>
+                        <th class="px-4 py-3 text-secondary text-uppercase small fw-bold">Khoa</th>
+                        <th class="px-4 py-3 text-secondary text-uppercase small fw-bold">Vai trò</th>
+                        <th class="px-4 py-3 text-end text-secondary text-uppercase small fw-bold">Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td class="px-4">
+                            <div class="fw-bold text-dark">{{ user.name }}</div>
+                        </td>
+                        <td class="px-4">
+                            <div class="text-muted">{{ user.lecturer.email or 'N/A' }}</div>
+                        </td>
+                        <td class="px-4">
+                            <div class="text-muted">{% if user.lecturer %} {{user.lecturer.faculty.name}} {% else %} N/A
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-4">
+                            {% if user.user_role.name == 'ADMIN' %}
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Admin</span>
+                            {% elif user.user_role.name == 'LECTURER' %}
+                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill">Lecturer</span>
+                            {% elif user.user_role.name == 'SPECIALIST' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Specialist</span>
+                            {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">User</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button
+                                        class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#AssignModal{{ user.id }}">
+                                    <i class="fas fa-user-plus me-1"></i> Chỉnh vai trò
+                                </button>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger d-inline-flex align-items-center"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal{{ user.id }}">
+                                    <i class="fas fa-trash-alt me-1"></i> Xóa
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <div class="modal fade" id="AssignModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-primary">Thay đổi vai trò</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {% if roles %}
+                                    {% for role in roles %}
+                                    <div class="form-check mb-2">
+                                        <input
+                                                class="form-check-input"
+                                                type="radio"
+                                                name="role_{{user.id}}"
+                                                id="role_{{ user.id }}"
+                                                value="{{ role }}"
+                                                {% if user.user_role.name== role %}checked{% endif %}
+                                        >
+                                        <label class="form-check-label" for="role_{{ user.id }}">
+                                            {{ role }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                    {% else %}
+                                    <small class="text-muted">Không có vai trò nào</small>
+                                    {% endif %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary" onclick="changeUserRole({{user.id}})">Xác nhận đổi</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-danger">Xác nhận xóa</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Bạn có chắc sẽ xóa người dùng tên <strong>{{ user.name }}</strong>?
+                                    <br><small class="text-muted">Hành động không thể hoàn tác!!!</small>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                                    <form action="#" method="POST">
+                                        <button type="submit" class="btn btn-danger" onclick="deleteUser({{user.id}})">Xóa người dùng</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-2">
+            {% if pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination mt-2 justify-content-center mb-5 gap-1">
+                    <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                        <a class="page-link rounded border-0 shadow-sm text-dark bg-white"
+                           href="{{ url_for(request.endpoint, **dict(request.args, page=current_page-1)) if current_page > 1 else '#' }}"
+                           tabindex="-1">
+                            &larr; Trước
+                        </a>
+                    </li>
+                    {% for i in range(1, pages + 1) %}
+                    <li class="page-item {% if i == current_page %}active{% endif %}">
+                        <a class="page-link rounded border-0 shadow-sm
+                      {% if i == current_page %}bg-primary text-white{% else %}bg-white text-dark{% endif %}"
+                           href="{{ url_for(request.endpoint, **dict(request.args, page=i)) }}">
+                            {{ i }}
+                        </a>
+                    </li>
+                    {% endfor %}
+
+                    <li class="page-item {% if current_page == pages %}disabled{% endif %}">
+                        <a class="page-link rounded border-0 shadow-sm text-dark bg-white"
+                           href="{{ url_for(request.endpoint, **dict(request.args, page=current_page+1)) if current_page < pages else '#' }}">
+                            Sau &rarr;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

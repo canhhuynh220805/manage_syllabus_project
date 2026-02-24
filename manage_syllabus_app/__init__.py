@@ -20,7 +20,7 @@ app.config["SECRET_KEY"] = "d4e2a8c1b9f0e1d3c5a7b6f8e9d0c1b2"
 app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.jinja_env.add_extension('jinja2.ext.do')
-app.config["PAGE_SIZE"] = 7
+app.config["PAGE_SIZE"] = 4
 
 login = LoginManager(app=app)
 db = SQLAlchemy(app=app)

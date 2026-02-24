@@ -1,0 +1,141 @@
+{% extends 'admin/index.html' %}
+{% block content %}
+<div class="container-fluid p-0 mt-2 mb-5">
+
+    <div class="d-flex mb-4 mt-4">
+        <a class="btn btn-primary shadow-sm text-end ms-auto"
+        href="{{ url_for('admin_add_major') }}">
+            <i class="fas fa-plus me-2"></i> Thêm chuyên ngành
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="GET" action="" class="row g-3 align-items-end">
+                <div class="col-md-10">
+                    <label for="faculty" class="form-label fw-bold text-secondary small mb-2">Tìm kiếm theo khoa</label>
+                    <select id="faculty" name="faculty_id" class="form-select">
+                        <option value="">Tất cả khoa</option>
+                        {% for faculty in faculties %}
+                        <option value="{{ faculty.id }}">
+                        {{ faculty.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-filter me-2"></i>Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="px-4 py-3 text-secondary text-uppercase small fw-bold">Tên chuyên ngành</th>
+                        <th class="px-4 py-3 text-secondary text-uppercase small fw-bold">Mã ngành</th>
+                        <th class="px-4 py-3 text-secondary text-uppercase small fw-bold">Khoa phụ trách</th>
+                        <th class="px-4 py-3 text-end text-secondary text-uppercase small fw-bold">Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                    {% for major in majors %}
+                    <tr>
+                        <td class="px-4">
+                            <div class="fw-bold text-dark">{{ major.name }}</div>
+                        </td>
+                        <td class="px-4">
+                                <span class="badge bg-light text-dark border font-monospace fs-6 px-3 py-1">
+                                    {{ major.code }}
+                                </span>
+                        </td>
+                        <td class="px-4">
+                            <div class="text-secondary">{{ major.faculty.name if major.faculty else 'N/A' }}</div>
+                        </td>
+                        <td class="px-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a  href="{{ url_for('admin_update_major', major_id=major.id) }})}}"
+                                        class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center">
+                                    <i class="fas fa-edit me-1"></i> Chỉnh sửa
+                                </a>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger d-inline-flex align-items-center"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteMajorModal{{ major.id }}">
+                                    <i class="fas fa-trash-alt me-1"></i> Xóa
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="deleteMajorModal{{ major.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title text-danger fw-bold">
+                                        <i class="fas fa-exclamation-triangle me-2"></i> Xác nhận xóa
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body py-0">
+                                    Bạn có chắc chắn muốn xóa chuyên ngành <strong class="text-dark">{{ major.name
+                                    }}</strong>?
+                                    <p class="text-muted small mt-2 mb-0">Hành động không thể hoàn tác và
+                                        đề cương liên kết với chuyên ngành này sẽ bị xóa</p>
+                                </div>
+                                <div class="modal-footer border-top-0 pt-4">
+                                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal"> Hủy
+                                    </button>
+                                    <button type="submit" class="btn btn-danger px-4">Xóa chuyên ngành</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <i class="fas fa-folder-open fa-3x mb-3 text-light"></i>
+                            <p class="mb-0">Không có chuyên ngành cần tìm</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-2">
+            {% if pages and pages > 1 %}
+            <nav aria-label="Major pagination">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                        <a class="page-link text-secondary"
+                           href="{{ url_for(request.endpoint, **dict(request.args, page=current_page-1)) }}">Previous</a>
+                    </li>
+
+                    {% for i in range(1, pages + 1) %}
+                    <li class="page-item {% if i == current_page %}active{% endif %}">
+                        <a class="page-link {% if i == current_page %}bg-primary text-white border-primary{% else %}text-secondary{% endif %}"
+                           href="{{ url_for(request.endpoint, **dict(request.args, page=i)) }}">{{ i }}</a>
+                    </li>
+                    {% endfor %}
+
+                    <li class="page-item {% if current_page == pages %}disabled{% endif %}">
+                        <a class="page-link text-secondary"
+                           href="{{ url_for(request.endpoint, **dict(request.args, page=current_page+1)) }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

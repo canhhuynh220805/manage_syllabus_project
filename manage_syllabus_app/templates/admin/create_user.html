@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block header %}
+{% include 'admin/header.html' %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid p-0 mt-4">
+    <div class="mx-0">
+        <div class="d-flex align-items-center mt-10">
+            <a href="{{ url_for('admin_users_view') }}"
+               class="btn btn-primary text-decoration-none d-flex align-items-center mt-10">
+                <i class="fas fa-arrow-left me-2"></i> Trở về
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 700px;">
+        <div class="mx-auto mb-4 card-header">
+            <h2 class="h3 fw-bold ">Tạo người dùng mới</h2>
+            <p class="text-muted mb-0">Thêm người dùng mới vào hệ thống</p>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" action="/admin/user" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="fullName" class="form-label fw-bold">Họ và tên <span
+                            class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="fullName" name="name" required
+                           placeholder="Nhập đầy đủ họ và tên (vd: Nguyễn Văn A)">
+                </div>
+                <div class="mb-3">
+                    <label for="fullName" class="form-label fw-bold">Nhập tên tài khoản<span
+                            class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="userName" name="username" required
+                           placeholder="Nhập tên tài khoản">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-bold">Địa chỉ email<span
+                            class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="email" name="email" required
+                           placeholder="abc@ou.edu.vn">
+                </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label fw-bold">Role <span class="text-danger">*</span></label>
+                    <select class="form-select" id="role" name="role" required>
+                        <option value="" selected disabled>Select a role...</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="SPECIALIST">Syllabus Specialist</option>
+                        <option value="LECTURER">Lecturer</option>
+                        <option value="USER">User (Student/Viewer)</option>
+                    </select>
+                    <div class="form-text text-muted">Determines user permissions and access level</div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="password" class="form-label fw-bold">Mật khẩu<span
+                                class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="password" name="password" required
+                               placeholder="••••••••">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="confirmPassword" class="form-label fw-bold">Xác nhận mật khẩu <span
+                                class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required
+                               placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="avatar" class="form-label fw-bold">Avatar<span
+                            class="text-danger">*</span></label>
+                    <input type="file" class="form-control" id="avatar" name="avatar" required>
+                </div>
+
+                <div class="d-flex gap-2 pt-3 border-top">
+                    <button type="submit" class="btn btn-primary px-4 d-flex align-items-center">
+                        Tạo người dùng
+                    </button>
+                    <a href=""
+                       class="btn btn-outline-secondary px-4 d-flex align-items-center">
+                        Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4 d-flex align-items-start mx-auto" role="alert" style="max-width: 700px;">
+        <i class="fas fa-info-circle mt-1 me-2"></i>
+        <div>
+            <strong>Note:</strong>
+            <ul class="mb-0 ps-3 small">
+                <li>Creating a "Lecturer" role user might require linking to a Lecturer profile later.</li>
+                <li>Password must be at least 6 characters long.</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

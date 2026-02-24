@@ -212,7 +212,6 @@ def sync_structure():
 
 '''
 (.venv) PS D:\PythonProject> set FLASK_APP=manage_syllabus_app.index
-
 (.venv) PS D:\PythonProject> flask create-db                          
 Đã tạo cơ sở dữ liệu thành công!
 (.venv) PS D:\PythonProject> flask seed-db

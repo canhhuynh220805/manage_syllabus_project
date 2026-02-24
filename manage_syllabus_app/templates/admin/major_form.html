@@ -1,0 +1,101 @@
+{% extends 'admin/index.html' %}
+{% block content %}
+<div class="container-fluid p-0 mt-2 mb-5">
+
+    <div class="mx-0 mt-4 mb-3">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('admin_majors_view') }}"
+               class="btn btn-primary text-decoration-none ms-auto">
+                <i class="fas fa-arrow-left me-2"></i> Trở về
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mx-auto mb-5" style="max-width: 700px;">
+        <div class="card-header bg-white pt-4 pb-2 border-0">
+            <h2 class="h3 fw-bold text-gray-800 text-center">
+                {{ 'Chỉnh sửa chuyên ngành' if major else 'Tạo chuyên ngành mới' }}
+            </h2>
+            <p class="text-muted mb-0 text-center">
+                {{ 'Cập nhật thông tin chuyên ngành' if major else 'Thêm chuyên ngành mới vào hệ thống' }}
+            </p>
+        </div>
+
+        <div class="card-body p-4 pb-4">
+
+
+            {% if major %}
+            <div class="alert alert-light border d-flex align-items-center mb-4 py-2" role="alert">
+                <i class="fas fa-info-circle text-muted me-2"></i>
+                <div>
+                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Mã Chuyên
+                        ngành (Read-only)</small>
+                    <span class="fw-bold font-monospace text-dark">#{{ major.code }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mb-3">
+                <label for="majorName" class="form-label fw-bold">Tên chuyên ngành <span
+                        class="text-danger">*</span></label>
+                <input type="text"
+                       class="form-control"
+                       id="majorName"
+                       name="name"
+                       required
+                       placeholder="e.g., Computer Science"
+                       value="{{ major.name if major else '' }}">
+                <div class="form-text text-muted">Tên đầy đủ của chuyên ngành</div>
+            </div>
+            {% if not major %}
+            <div class="mb-3">
+                <label for="majorCode" class="form-label fw-bold">Mã chuyên ngành <span
+                        class="text-danger">*</span></label>
+                <input type="text"
+                       class="form-control font-monospace"
+                       id="majorCode"
+                       name="code"
+                       required
+                       placeholder="e.g., 123456"
+                       maxlength="10"
+                       value="{{ major.code if major else '' }}"
+                       {% if major %}readonly{% endif %}>
+                <div class="form-text text-muted">Mã số chuyên ngành, sẽ không thể chỉnh sửa khi đã tạo</div>
+            </div>
+            {% endif %}
+            <div class="mb-4">
+                <label for="faculty" class="form-label fw-bold">Khoa quản lý <span
+                        class="text-danger">*</span></label>
+                <select class="form-select" id="faculty" name="faculty_id" required>
+                    <option value="" disabled {% if not major %}selected{% endif %}>-- Chọn Khoa --</option>
+
+                    {% for faculty in faculties %}
+                    <option value="{{ faculty.id }}"
+                            {% if major and major.faculty_id== faculty.id %}selected{% endif %}>
+                        {{ faculty.name }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+                <div class="form-text text-muted">Khoa trực thuộc của chuyên ngành này</div>
+            </div>
+
+            <div class="d-flex gap-2 pt-3 border-top mt-4 mb-2">
+                <button type="submit" class="btn btn-primary px-4 d-flex align-items-center"
+                        {% if major %}
+                        onclick="updateMajor({{major.id}})"
+                        {% else %}
+                        onclick="createMajor()"
+                        {% endif %}>
+
+                    <i class="fas fa-save me-2"></i> {{ 'Lưu thay đổi' if major else 'Tạo chuyên ngành' }}
+                </button>
+                <a href="{{ url_for('admin_majors_view') }}"
+                   class="btn btn-outline-secondary px-4 d-flex align-items-center">
+                    <i class="fas fa-times me-2"></i> Hủy
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

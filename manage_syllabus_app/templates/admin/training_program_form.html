@@ -1,0 +1,105 @@
+{% extends 'admin/index.html' %}
+{% block content %}
+<div class="container-fluid p-0 mt-2 mb-5">
+
+    <div class="mx-0 mt-4 mb-3">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('admin_training_programs_view') }}"
+               class="btn btn-primary text-decoration-none ms-auto">
+                <i class="fas fa-arrow-left me-2"></i> Trở về
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mx-auto mb-5" style="max-width: 700px;">
+        <div class="card-header bg-white pt-4 pb-2 border-0">
+            <h2 class="h3 fw-bold text-gray-800 text-center">
+                {{ 'Chỉnh sửa chương trình đào tạo' if program else 'Tạo chương trình đào tạo mới' }}
+            </h2>
+            <p class="text-muted mb-0 text-center">
+                {{ 'Cập nhật thông tin chương trình đào tạo' if program else 'Thêm chương trình đào tạo mới vào hệ
+                thống' }}
+            </p>
+        </div>
+
+        <div class="card-body p-4 pb-4">
+                <div class="mb-3">
+                    <label for="programName" class="form-label fw-bold">Tên chương trình đào tạo <span
+                            class="text-danger">*</span></label>
+                    <input type="text"
+                           class="form-control"
+                           id="programName"
+                           name="name"
+                           required
+                           placeholder="VD: Cử nhân Khoa học Máy tính - Khóa 2024"
+                           value="{{ program.name if program else '' }}">
+                    <div class="form-text text-muted">Tên đầy đủ của chương trình (Thường bao gồm cả năm)</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="academicYear" class="form-label fw-bold">Khóa <span
+                            class="text-danger">*</span></label>
+                    <input type="number"
+                           class="form-control"
+                           id="academicYear"
+                           name="academic_year"
+                           required
+                           placeholder="VD: 2024"
+                           value="{{ program.academic_year if program else '' }}">
+                    <div class="form-text text-muted">Khóa mà chương trình này bắt đầu áp dụng</div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="major" class="form-label fw-bold">Chuyên ngành <span
+                            class="text-danger">*</span></label>
+                    <select class="form-select" id="major" name="major_id" required>
+                        <option value="" disabled {% if not program %}selected{% endif %}>-- Chọn Chuyên ngành --
+                        </option>
+
+                        {% for major in majors %}
+                        <option value="{{ major.id }}"
+                                {% if program and program.major_id== major.id %}selected{% endif %}>
+                            {{ major.name }} ({{ major.code }})
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <div class="form-text text-muted">Chuyên ngành trực thuộc của chương trình đào tạo này</div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="program" class="form-label fw-bold">Chương trình đào tạo cũ <span
+                            class="text-danger">*</span></label>
+                    <select class="form-select" id="program" name="program_id" required>
+                        <option value="" disabled {% if not program %}selected{% endif %}>-- Chọn chương trình đào tạo cần kế thừa--
+                        </option>
+
+                        {% for op in other_programs %}
+                        <option value="{{ op.id }}">
+                            Khóa {{op.academic_year}}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <div class="form-text text-muted">Kế thừa đề cương từ chương trình đào tạo này</div>
+                </div>
+
+                <div class="d-flex gap-2 pt-3 border-top mt-4 mb-2">
+                    <button type="submit" class="btn btn-primary px-4 d-flex align-items-center"
+                        {% if program %}
+                        onclick="updateProgram({{program.id}})"
+                        {% else %}
+                        onclick="createProgram()"
+                        {% endif %}>
+                        <i class="fas fa-save me-2"></i> {{ 'Lưu thay đổi' if program else 'Tạo chương trình' }}
+                    </button>
+                    <a href="{{ url_for('admin_training_programs_view') }}"
+                       class="btn btn-outline-secondary px-4 d-flex align-items-center">
+                        <i class="fas fa-times me-2"></i> Hủy
+                    </a>
+                </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

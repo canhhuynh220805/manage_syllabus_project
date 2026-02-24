@@ -99,42 +99,37 @@ def seed_data_3():
             lecturer = Lecturer(name=lecturer_name, faculty=faculty)
             db.session.add(lecturer)
 
-        # --- Credit ---
+        subject_id = item['subject']['id']
         credit_data = item['subject']['credit']
-        credit = db.session.query(Credit).filter_by(
-            numberTheory=credit_data['number_theory'],
-            numberPractice=credit_data['number_practice']
-        ).first()
-        if not credit:
-            credit = Credit(
+
+        subject = db.session.query(Subject).filter_by(id=subject_id).first()
+
+        if not subject:
+            new_credit = Credit(
                 numberTheory=credit_data['number_theory'],
                 numberPractice=credit_data['number_practice'],
                 hourSelfStudy=credit_data['hour_self_study']
             )
-            db.session.add(credit)
-
-        # --- Subject ---
-        subject_id = item['subject']['id']
-        subject = db.session.query(Subject).filter_by(id=subject_id).first()
-        if not subject:
-            subject = Subject(id=subject_id, name=item['subject']['name'], credit=credit)
+            subject = Subject(id=subject_id, name=item['subject']['name'], credit=new_credit)
             db.session.add(subject)
+        else:
+            if subject.credit:
+                subject.credit.numberTheory = credit_data['number_theory']
+                subject.credit.numberPractice = credit_data['number_practice']
+                subject.credit.hourSelfStudy = credit_data['hour_self_study']
 
         # --- RequirementSubject ---
         require_subject_data = item['subject'].get('required_subjects', [])
         for temp in require_subject_data:
             require_subject_id = temp['require_subject_id']
 
-            # SỬA LỖI 1: Dùng một biến duy nhất 'require_subject'
             require_subject = db.session.query(Subject).filter_by(id=require_subject_id).first()
             if not require_subject:
-                # Tìm credit cho môn học tiên quyết, nếu không có thì dùng credit của môn chính
-                # (Trong thực tế bạn sẽ cần logic phức tạp hơn)
-                prereq_credit = Credit.query.first()  # Lấy tạm một credit
+                default_credit = Credit(numberTheory=0, numberPractice=0, hourSelfStudy=0)
                 require_subject = Subject(
                     id=require_subject_id,
                     name=temp['require_subject_name'],
-                    credit=prereq_credit
+                    credit=default_credit
                 )
                 db.session.add(require_subject)
 

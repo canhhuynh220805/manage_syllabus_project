@@ -207,7 +207,7 @@ class TableSubSection(SubSection):
 class Subject(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), unique=True)
-    credit_id = Column(Integer, ForeignKey('credit.id'), nullable=False)
+    credit_id = Column(Integer, ForeignKey('credit.id'), nullable=False, unique=True)
     # Quan hệ
     syllabuses = relationship('Syllabus', backref='subject', lazy=True)
     course_objectives = relationship('CourseObjective', backref='subject', lazy=True, cascade="all, delete-orphan")
@@ -295,7 +295,7 @@ class Credit(db.Model):
     numberTheory = Column(Integer, nullable=False)
     numberPractice = Column(Integer, nullable=False)
     hourSelfStudy = Column(Integer, nullable=False)
-    subjects = relationship('Subject', backref='credit', lazy=True)
+    subject = relationship('Subject', backref=backref('credit', uselist=False), uselist=False)
 
     def getTotalCredit(self):
         return self.numberTheory + self.numberPractice

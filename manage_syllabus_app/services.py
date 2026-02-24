@@ -1,7 +1,7 @@
 import copy, json
 from manage_syllabus_app import app, db, dao
 from manage_syllabus_app.models import MainSection, TextSubSection, AttributeGroup, SelectionSubSection, \
-    ReferenceSubSection, Syllabus, Subject, Lecturer, SubSection, TableSubSection, AttributeValue
+    ReferenceSubSection, Syllabus, Subject, Lecturer, SubSection, TableSubSection, AttributeValue, LearningMaterial
 
 
 def init_structure_syllabus(syllabus):
@@ -151,10 +151,6 @@ def merge_syllabus_data(template, syllabus):
             sub_code = sub.get('code')
             if sub_type == "reference":
                 ref_code = sub.get('reference_code')
-                if ref_code == 'learning_material' or ref_code == 'learning_materials':
-                    print(f"DEBUG: Tìm thấy ref_code='{ref_code}'")
-                    print(f"DEBUG: Có trong store không? {ref_code in reference_store}")
-                    print(f"DEBUG: Dữ liệu là: {reference_store.get(ref_code)}")
                 if ref_code and ref_code in reference_store:
                     ref_data = reference_store[ref_code]
 
@@ -176,9 +172,11 @@ def merge_syllabus_data(template, syllabus):
                     elif sub_type == 'selection':
                         new_sub['selected_value_ids'] = item['selected_value_ids']
                     elif sub_type == 'table':
-                        if 'data' in item and 'rows' in item['data']:
-                            if 'data' not in new_sub: new_sub['data'] = {}
+                        if 'data' in item:
+                            if 'data' not in new_sub:
+                                new_sub['data'] = {}
                             new_sub['data']['rows'] = item['data']['rows']
+                            new_sub['data']['header'] = item['data']['header']
 
 
             new_subs.append(new_sub)
@@ -228,10 +226,17 @@ def build_syllabus_structure(new_syllabus, json_structure_syllabus):
                     data=sub.get('data', {})
                 )
             elif sub_type == 'reference':
+                ref_code = sub.get('reference_code')
                 new_sub = ReferenceSubSection(
                     **base_data,
-                    reference_code=sub.get('reference_code')
+                    reference_code=ref_code
                 )
+                ref_data = sub.get('ref_data')
+                if ref_code == 'learning_material':
+                    lm_ids = [item['id'] for item in ref_data if 'id' in item]
+                    if lm_ids:
+                        materials = LearningMaterial.query.filter(LearningMaterial.id.in_(lm_ids)).all()
+                        new_syllabus.learning_materials.extend(materials)
 
             if new_sub:
                 new_main.sub_sections.append(new_sub)
