@@ -1,46 +1,46 @@
-{% extends 'partials/subsections/references/base_th_header.html' %}
+{% extends 'partials/subsections/references/col_span_th_header.html' %}
 {% block content %}
-<td id="editable-container-credit-{{ sub_item.id }}">
-        <div class="card border-0 shadow-sm mb-2">
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label text-dark small fw-bold mb-1">
-                            Tổng số tín chỉ
-                        </label>
-                        <input type="number" id="total-credits-{{syllabus.subject.credit.id}}"
-                               class="form-control bg-primary bg-opacity-10 text-primary fw-bold border-primary border-opacity-25"
-                               value="{{ syllabus.subject.credit.getTotalCredit() }}" readonly>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label text-dark small fw-bold mb-1">
-                            Lý thuyết
-                        </label>
-                        <input type="number" class="form-control" min="0"
-                               value="{{ syllabus.subject.credit.numberTheory }}"
-                               id="theory-{{ syllabus.subject.credit.id }}"
-                                onblur="saveCredits('{{ syllabus.subject.credit.id }}')">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label text-dark small fw-bold mb-1">
-                            Thực hành
-                        </label>
-                        <input type="number" class="form-control" min="0"
-                               id="practice-{{ syllabus.subject.credit.id }}"
-                               value="{{ syllabus.subject.credit.numberPractice }}"
-                            onblur="saveCredits('{{ syllabus.subject.credit.id }}')">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label text-dark small fw-bold mb-1">
-                            Giờ học (phút)
-                        </label>
-                        <input type="number" class="form-control" min="0"
-                               id="self-study-{{ syllabus.subject.credit.id }}"
-                               value="{{ syllabus.subject.credit.hourSelfStudy }}"
-                               onblur="saveCredits('{{ syllabus.subject.credit.id }}')">
-                    </div>
+<div id="editable-container-credit-{{ sub_item.id }}">
+    <div class="card border-0 shadow-sm mb-2">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label text-dark small fw-bold mb-1">
+                        Tổng tín chỉ
+                    </label>
+                    <input type="number" id="total-credits-{{syllabus.subject.credit.id}}"
+                           class="form-control bg-primary bg-opacity-10 text-primary fw-bold border-primary border-opacity-25"
+                           value="{{ syllabus.subject.credit.getTotalCredit() }}" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-dark small fw-bold mb-1">
+                        Lý thuyết
+                    </label>
+                    <input type="number" class="form-control" min="0"
+                           value="{{ syllabus.subject.credit.numberTheory }}"
+                           id="theory-{{ syllabus.subject.credit.id }}"
+                           onblur="saveCredits('{{ syllabus.subject.credit.id }}')">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-dark small fw-bold mb-1">
+                        Thực hành
+                    </label>
+                    <input type="number" class="form-control" min="0"
+                           id="practice-{{ syllabus.subject.credit.id }}"
+                           value="{{ syllabus.subject.credit.numberPractice }}"
+                           onblur="saveCredits('{{ syllabus.subject.credit.id }}')">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-dark small fw-bold mb-1">
+                        Giờ học
+                    </label>
+                    <input type="number" class="form-control" min="0"
+                           id="self-study-{{ syllabus.subject.credit.id }}"
+                           value="{{ syllabus.subject.credit.hourSelfStudy }}"
+                           onblur="saveCredits('{{ syllabus.subject.credit.id }}')">
                 </div>
             </div>
         </div>
-    </td>
+    </div>
+</div>
 {% endblock %}

@@ -19,13 +19,19 @@ def admin_view():
 
     all_faculties = dao.get_all_faculties()
     total_pages = math.ceil(total / page_size)
+    lecturers = dao.get_lecturers()
+    years = dao.get_years()
+    programs = dao.get_all_training_program()
 
     return render_template(
         'admin/index.html',
         syllabuses=syllabus,
         all_faculties=all_faculties,
         pages=total_pages,
-        current_page=page
+        current_page=page,
+        lecturers=lecturers,
+        years=years,
+        programs=programs,
     )
 
 
@@ -327,3 +333,29 @@ def admin_update_training_program(program_id):
     other_programs = dao.get_all_training_program()
     return render_template('admin/training_program_form.html', program=program, majors=majors,
                            other_programs=other_programs)
+
+
+@app.route('/admin/syllabus/lecturers/<int:lecturer_id>', methods=['POST'])
+@login_required
+def admin_assign_lecturer_syllabus(lecturer_id):
+    try:
+        data = request.json
+        syllabus_id = data.get('syllabusId')
+        s = dao.get_syllabus_by_id(syllabus_id)
+        if not s:
+            return jsonify({
+                'status': 404,
+                'err_msg': 'Không tìm thấy đề cương'
+            })
+
+        s.lecturer_id = lecturer_id
+        db.session.commit()
+        return jsonify({
+            "status": 200,
+            "msg": "Thay đổi giảng viên thành công"
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 500,
+            'err_msg': str(e)
+        })

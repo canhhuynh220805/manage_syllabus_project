@@ -7,48 +7,76 @@
     <div class="container-fluid" style="max-width: 1440px;">
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body bg-white rounded">
-                <div class="row g-3 align-items-end">
+    <div class="row g-2 align-items-end">
 
-                    <div class="col-md-6 col-lg-7">
-                        <label for="search" class="form-label text-secondary small fw-bold mb-1">
-                            Tìm kiếm Đề cương
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
-                            <input
-                                    type="text"
-                                    id="search"
-                                    class="form-control border-start-0 ps-0"
-                                    placeholder="Nhập tên đề cương..."
-                                    style="box-shadow: none !important; border-color: #dee2e6;"
-                            >
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 col-lg-3">
-                        <div class="dropdown">
-                            <button class="btn btn-primary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <span>Lọc theo Khoa</span></button>
-                            <ul class="dropdown-menu w-100">
-                                {% for f in all_faculties %}
-                                <li><a class="dropdown-item" href="#">{{f.name}}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-2 col-lg-2">
-                        <label class="d-block small mb-1 opacity-0">Hành động</label>
-                        <button class="btn btn-primary w-100 fw-medium">
-                            Tìm kiếm
-                        </button>
-                    </div>
-                </div>
+        <div class="col-12 col-lg-4">
+            <label for="search" class="form-label text-secondary small fw-bold mb-1">
+                Tìm kiếm Đề cương
+            </label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input
+                        type="text"
+                        id="search"
+                        class="form-control border-start-0 ps-0"
+                        placeholder="Nhập tên đề cương..."
+                        style="box-shadow: none !important; border-color: #dee2e6;"
+                >
             </div>
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-2">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="text-truncate">Lọc Khoa</span>
+                </button>
+                <ul class="dropdown-menu">
+                    {% for f in all_faculties %}
+                    <li><a class="dropdown-item" href="#">{{f.name}}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-2">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="text-truncate">Lọc Khóa</span>
+                </button>
+                <ul class="dropdown-menu w-100">
+                    {% for y in years %}
+                    <li><a class="dropdown-item" href="#">Khóa {{y}}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-2">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="text-truncate">Lọc CTĐT</span>
+                </button>
+                <ul class="dropdown-menu w-100">
+                    {% for p in programs %}
+                    <li><a class="dropdown-item" href="#">{{p.name}}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-2">
+            <button class="btn btn-primary w-100 fw-medium">
+                Tìm kiếm
+            </button>
+        </div>
+
+    </div>
+</div>
         </div>
 
         <div class="card border-0 shadow-sm mb-4 rounded-3 overflow-hidden">
@@ -59,10 +87,18 @@
                     <tr>
                         <th scope="col" class="py-3 px-3 col-stt text-center align-middle text-secondary">STT</th>
                         <th scope="col" class="py-3 px-3 text-center align-middle text-secondary">Tên Đề cương</th>
-                        <th scope="col" class="py-3 px-3 text-center align-middle text-secondary">Giảng viên phụ trách</th>
-                        <th scope="col" class="py-3 px-3 text-center align-middle text-secondary" style="width: 15%;">Trạng thái</th>
-                        <th scope="col" class="py-3 px-3 text-center align-middle text-secondary" style="width: 20%;">Cập nhật lần cuối</th>
-                        <th scope="col" class="py-3 px-3 col-action text-center align-middle text-secondary">Thao tác</th>
+                        <th scope="col" class="py-3 px-3 text-center align-middle text-secondary">Giảng viên phụ trách
+                        </th>
+                        <th scope="col" class="py-3 px-3 text-center align-middle text-secondary">Thời gian
+                        </th>
+                        <th scope="col" class="py-3 px-3 text-center align-middle text-secondary" style="width: 15%;">
+                            Trạng thái
+                        </th>
+                        <th scope="col" class="py-3 px-3 text-center align-middle text-secondary" style="width: 20%;">
+                            Cập nhật lần cuối
+                        </th>
+                        <th scope="col" class="py-3 px-3 col-action text-center align-middle text-secondary">Thao tác
+                        </th>
                     </tr>
                     </thead>
 
@@ -76,7 +112,20 @@
                             <span class="d-block fw-medium text-dark">{{s.name}}</span>
                             <small class="text-muted">Mã: {{s.subject.id}}</small>
                         </td>
-                        <td class="px-3 text-center align-middle">{{s.lecturer.name}}</td>
+                        <td class="px-3 text-center align-middle">
+                            <div class="d-flex gap-2">
+                                <select class="form-select select2-lecturer" data-syllabus-id="{{ s.id }}"
+                                        style="width: 100%;">
+                                    {% for l in lecturers %}
+                                    <option value="{{ l.id }}" {% if s.lecturer_id== l.id %}selected{% endif %}>
+                                        {{ l.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </td>
+                        <td  class="px-3"> NAN
+                        </td>
                         <td class="px-3">
                             <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-3 py-2">
                                 {{s.status}}

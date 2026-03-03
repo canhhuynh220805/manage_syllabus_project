@@ -1,4 +1,130 @@
-{% extends 'partials/subsections/references/base_th_header.html' %}
+{% extends 'partials/subsections/references/col_span_th_header.html' %}
 {% block content %}
-<td></td>
-{% endblock%}
+<div class="assessment-wrapper mt-2">
+    {% if not type_assessments %}
+    <div class="text-center text-muted fst-italic py-3 small">
+        Chưa có nhóm đánh giá nào
+    </div>
+    {% else %}
+    {% for type_assess in type_assessments %}
+    <div class="card mb-4 shadow-sm border-light">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+            <h6 class="mb-0 fw-bold text-primary text-uppercase">{{ type_assess.name }}</h6>
+            <button class="btn btn-sm btn-primary" onclick="addAssessment('{{ type_assess.id }}', '{{syllabus.id}}')">
+                <i class="fas fa-plus"></i> Thêm bài đánh giá
+            </button>
+        </div>
+
+        <div class="card-body bg-white p-3">
+            <div class="d-flex flex-column gap-3" id="assessment-container-{{ type_assess.id }}">
+                {% if assessments %}
+                {% for assess in assessments %}
+                <div class="border rounded p-3 bg-light bg-opacity-50" id="assessment-{{ assess.id }}">
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                        <h6 class="fw-bold mb-0 text-dark">Bài đánh giá {{ loop.index }}</h6>
+                        <div class="d-flex gap-2 align-items-center">
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1">
+                                    Tổng trọng số: {{ assess.get_total_weight() }}%
+                                </span>
+                            <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteAssessment({{assess.id}})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+
+                    <table class="table table-sm table-bordered table-hover mb-2 bg-white">
+                        <thead class="table-light text-secondary">
+                        <tr>
+                            <th class="text-center align-middle">Phương pháp</th>
+                            <th style="width: 20%;" class="text-center align-middle">Thời gian</th>
+                            <th class="text-center align-middle">CĐR môn học/CLOS</th>
+                            <th style="width: 20%;" class="text-center align-middle">Trọng số (%)</th>
+                            <th class="text-center align-middle" style="width: 80px;">Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody id="method-tbody-{{ assess.id }}">
+                        {% for am in assess.assessment_methods %}
+                        <tr>
+                            <td class="align-middle"><input type="text" class="form-control form-control-sm method-name"
+                                       placeholder="VD: kiểm tra máy" value="{{ am.name }}"></td>
+                            <td class="align-middle"><input type="text" class="form-control form-control-sm method-time"
+                                       placeholder="VD: 60 phút, 2 tuần..." value="{{ am.time }}"></td>
+                            <td class="ms-auto align-middle">
+                                <div class="d-flex flex-wrap gap-2 mb-2" id="list-clo-{{ am.id }}">
+                                    {% for m_clo in am.course_learning_outcomes %}
+                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-3 py-2 d-flex align-items-center"
+                                          id="badge-{{ am.id }}-clo-{{ m_clo.clo_id }}">
+                                        CLO.{{ m_clo.clo_id }}
+                                        <a href="javascript:void(0)" class="ms-2 text-success text-decoration-none fw-bold"
+                                           onclick="deleteCLO('{{ am.id }}', '{{ m_clo.clo_id }}')">
+                                            &times;
+                                        </a>
+                                        <input type="hidden" class="method-clo-input" value="{{ m_clo.clo_id }}">
+                                    </span>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="dropdown">
+                                    <button type="button"
+                                            class="btn btn-link text-primary text-decoration-none p-0 small dropdown-toggle"
+                                            data-bs-toggle="dropdown">
+                                        <i class="fas fa-plus me-1"></i>CLO
+                                    </button>
+                                    <ul class="dropdown-menu shadow-sm">
+                                        {% for clo in clos %}
+                                        <li id="li-method-{{ am.id }}-clo-{{ clo.id }}">
+                                            <a class="dropdown-item" href="javascript:void(0)"
+                                               onclick="selectCLO('{{ am.id }}', '{{ clo.id }}', 'CLO.{{ clo.id }}')">
+                                                CLO.{{ clo.id }}
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                            <td class="align-middle"><input type="number" class="form-control method-weight" placeholder="0" min="0"
+                                       max="100" value="{{ am.weight }}"></td>
+                            <td class="text-center align-middle">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 fw-medium"
+                                            onclick="saveMethod(this, {{am.id}}, {{assess.id}}, {{type_assess.id}}, {{syllabus.id}})">
+                                        Lưu
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger py-0 px-2 fw-medium"
+                                            onclick="deleteMethodRecord(this,{{am.id}})"> Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted small py-2">Chưa có phương pháp nào</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <button class="btn btn-sm btn-outline-secondary" onclick="addMethod('{{ assess.id }}', '{{type_assess.id}}', '{{syllabus.id}}')">
+                        <i class="fas fa-plus me-1"></i> Thêm phương pháp
+                    </button>
+
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center text-muted fst-italic py-3 small" id="empty-msg-{{ type_assess.id }}">
+                    Chưa có bài đánh giá nào thuộc nhóm này.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+<script>
+    const availableCLOs = [
+        {% for clo in clos %}
+            { id: "{{ clo.id }}", name: "CLO.{{ clo.id }}" }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+</script>
+{% endblock %}

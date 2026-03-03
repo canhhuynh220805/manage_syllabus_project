@@ -1,14 +1,13 @@
 <tr class="sub-section"
-    data-id="{{ sub_item.id }}"
     data-position="{{ sub_item.position }}"
     data-name="{{ sub_item.name }}"
     data-code="{{ sub_item.code }}"
-    data-type="{{ sub_item.type }}">
-    <input id="user-info" value="{{current_user.user_role.name}}" type="hidden">
-    <th scope="row" style="width: 40%;" class="fs-6">
+    data-type="{{ sub_item.type }}"
+    data-ref-code="{{ sub_item.reference_code}}">
+    <th scope="row" style="width: 40%;" class="fs-6" colspan="2">
         {% if is_editing %}
-        <div class="input-group input-group-sm mb-2 ps-4">
-            <span class="input-group-text bg-transparent border-0 text-muted p-0 me-2 small">
+        <div class="input-group input-group-sm mb-2 ps-4"> <span
+                class="input-group-text bg-transparent border-0 text-muted p-0 me-2 small">
                 <small>Mã định danh tiểu mục:</small>
             </span>
             <input type="text"
@@ -22,11 +21,13 @@
             <label class="fw-bold text-dark me-2 mb-0 text-nowrap">
                 {{ sub_item.position }}.
             </label>
-            <input type="text"
-                   class="form-control label-input"
-                   value="{{ sub_item.name }}"
-                   id="content-{{ sub_item.id }}"
-                   placeholder="Nhập tên tiểu mục..."
+
+            <input
+                    type="text"
+                    class="form-control label-input"
+                    value="{{ sub_item.name }}"
+                    id="content-{{ sub_item.id }}"
+                    placeholder="Nhập tên tiểu mục..."
             >
         </div>
         <div class="mt-2">
@@ -73,30 +74,9 @@
             {{ sub_item.position }}. {{ sub_item.name }}
         </label>
         {% endif %}
-    </th>
-
-    <td>
-        <div class="card border-0 shadow-sm bg-light">
-            <div class="card-body p-3">
-
-                <div id="hot-container-{{ sub_item.id }}" class="border rounded bg-white"
-                     style="overflow: visible; z-index: 0; position: relative;"></div>
-
-                <input type="hidden" id="hot-data-{{ sub_item.id }}" value='{{ sub_item.data | tojson | safe }}'>
-
-                <div class="d-flex align-items-center mt-3 gap-2">
-                    <small class="text-muted me-auto">
-                        <i class="fas fa-mouse-pointer me-1"></i>
-                        <strong>Click chuột phải</strong> vào bảng để thêm/xóa hàng, cột.
-                    </small>
-                    <button type="button" class="btn btn-outline-primary btn-sm"
-                            onclick="submitTableData('{{ sub_item.id }}')">
-                        <i class="fas fa-save me-1"></i> Lưu dữ liệu bảng
-                    </button>
-                </div>
-
-            </div>
+        <div class="content-wrapper w-100">
+            {% block content %}
+            {% endblock %}
         </div>
-    </td>
-</tr>
-
+    </th>
+<tr>

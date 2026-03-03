@@ -1,7 +1,8 @@
 import copy, json
 from manage_syllabus_app import app, db, dao
 from manage_syllabus_app.models import MainSection, TextSubSection, AttributeGroup, SelectionSubSection, \
-    ReferenceSubSection, Syllabus, Subject, Lecturer, SubSection, TableSubSection, AttributeValue, LearningMaterial
+    ReferenceSubSection, Syllabus, Subject, Lecturer, SubSection, TableSubSection, AttributeValue, LearningMaterial, \
+    Credit
 
 
 def init_structure_syllabus(syllabus):
@@ -55,7 +56,7 @@ def create_fake_syllabus_from_template(template_id):
     fake_syllabus = Syllabus(
         id=template_id,
         name=template.name,
-        subject=Subject(name="(Môn học mẫu)", credit=dao.get_credit_by_id(1)),
+        subject=Subject(name="(Môn học mẫu)", credit=Credit(numberTheory=1, numberPractice=1, hourSelfStudy=1)),
         lecturer=Lecturer(name="(Tên giảng viên)"),
     )
     fake_syllabus.main_sections = []

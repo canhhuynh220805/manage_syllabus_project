@@ -5,7 +5,8 @@ from manage_syllabus_app.models import User, Syllabus, Faculty, Lecturer, Subjec
     LearningMaterial, TypeLearningMaterial, CourseObjective, CourseLearningOutcome, CloPloAssociation, \
     RequirementSubject, Credit, SubSection, ProgrammeLearningOutcome, TrainingProgram, TemplateSyllabus, TextSubSection, \
     AttributeGroup, AttributeValue, SubSectionAttributeValue, SelectionSubSection, \
-    CourseObjectiveProgrammeLearningOutcome, UserRole, Major
+    CourseObjectiveProgrammeLearningOutcome, UserRole, Major, Assessment, TypeAssessment, Method, ScheduleGroup, \
+    TeachingSession
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -136,6 +137,12 @@ def create_subject(id, name, number_theory, number_practice, hour_self_study):
 def get_credit_by_id(credit_id):
     return Credit.query.filter_by(id=credit_id).first()
 
+def get_clos_by_subject_id(subject_id):
+    query = db.session.query(CourseLearningOutcome)\
+        .join(CourseObjective)\
+        .filter(CourseObjective.subject_id == subject_id)\
+        .all()
+    return query
 
 # def get_subsection_by_id(type, id):
 #     return type.query.filter_by(id=id).first()
@@ -147,6 +154,24 @@ def get_all_type_subjects():
 def get_all_learning_material_types():
     return TypeLearningMaterial.query.all()
 
+def get_type_assessments():
+    return TypeAssessment.query.all()
+
+def get_assessments_by_syllabus(syllabus_id):
+    query = Assessment.query.filter_by(syllabus_id=syllabus_id)
+    return query.all()
+
+def get_assessment_by_id(assessment_id):
+    return Assessment.query.filter_by(id=assessment_id).first()
+
+def is_valid_assessment(assessment_id):
+    return Assessment.query.filter_by(id=assessment_id).first() is not None
+
+def is_valid_method(method_id):
+    return Method.query.filter_by(id=method_id).first() is not None
+
+def get_method_by_id(method_id):
+    return Method.query.filter_by(id=method_id).first()
 
 def get_available_require_subjects(current_subject_id):
     subquery = (
@@ -537,6 +562,12 @@ def update_rating(clo_id, plo_id, rating):
         print(e)
         return False
 
+
+def get_schedule_groups():
+    return ScheduleGroup.query.all()
+
+def get_teaching_sessions(syllabus_id):
+    return TeachingSession.query.filter_by(syllabus_id=syllabus_id).all()
 # if __name__ == '__main__':
 #     with app.app_context():
 #         u = User.query.get(2)

@@ -263,3 +263,25 @@ function createProgram(){
         showToast("Lỗi kết nối server", "danger");
     });
 }
+
+function assignLecturer(syllabusId, lecturerId){
+    fetch(`/admin/syllabus/lecturers/${lecturerId}`,{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            'syllabusId': syllabusId
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 200) {
+            showToast(data.msg, "success");
+        } else {
+            showToast(data.err_msg, "danger");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast("Lỗi kết nối server", "danger");
+    });
+}

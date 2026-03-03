@@ -1,6 +1,6 @@
-{% extends 'partials/subsections/references/base_th_header.html' %}
+{% extends 'partials/subsections/references/col_span_th_header.html' %}
 {% block content %}
-<td>
+<div>
     {% set subjects = syllabus.subject.required_by_relation %}
     <table class="table table-bordered table-hover align-middle mb-0">
         <thead class="table-light">
@@ -112,5 +112,5 @@
             </div>
         </div>
     </div>
-</td>
+</div>
 {% endblock%}

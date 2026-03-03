@@ -1,0 +1,183 @@
+{% extends 'partials/subsections/references/col_span_th_header.html' %}
+{% block content %}
+<div class="container-fluid py-4 max-w-1440px">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <p class="text-muted small mb-0">Quản lý chi tiết các buổi học</p>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs mb-4" id="scheduleTabs" role="tablist">
+        {% for group in schedule_groups %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if loop.first %}active{% endif %} fw-medium px-4 py-3"
+                    id="btn-group-{{ group.id }}"
+                    data-bs-toggle="tab"
+                    data-bs-target="#pane-group-{{ group.id }}"
+                    type="button"
+                    role="tab"
+                    aria-controls="pane-group-{{ group.id }}"
+                    aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                {{group.name}} <span class="badge bg-secondary ms-2 rounded-pill">{{group.get_total_hours()}}</span>
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content" id="scheduleTabsContent">
+        {% for group in schedule_groups %}
+        <div class="tab-pane fade {% if loop.first %}show active{% endif %}"
+             id="pane-group-{{ group.id }}"
+             role="tabpanel"
+             aria-labelledby="btn-group-{{ group.id }}">
+
+            <div id="session-container-{{ group.id }}">
+                {% for session in teaching_sessions %}
+                {% if session.schedule_group_id == group.id %}
+                <div class="card shadow-sm mb-4 session-card" id="session-card-{{ session.id }}">
+                    <div class="card-header bg-white border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold text-primary mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>Buổi học số
+                            {{ session.session_no }}</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted fw-bold small text-uppercase mb-1">Buổi số <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" value="{{session.session_no}}" min="1">
+                            </div>
+                            <div class="col-md-10">
+                                <label class="form-label text-muted fw-bold small text-uppercase mb-1">Nội dung & Chủ đề
+                                    <span class="text-danger">*</span></label>
+                                <textarea class="form-control" rows="4" placeholder="Nhập tóm tắt nội dung buổi học...">{{session.content}}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="mt-4">
+                                <div class="p-3 rounded bg-primary bg-opacity-10 border border-primary border-opacity-25 h-100">
+                                    <label class="text-primary fw-bold small text-uppercase mb-2 d-block">Trực tiếp
+                                        (Offline)</label>
+                                    <textarea class="form-control form-control-sm mb-2" rows="5"
+                                              placeholder="VD: Thuyết giảng, thảo luận...">{{session.offline_activity}}</textarea>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-white text-muted">Số giờ</span>
+                                        <input type="number" class="form-control" value="{{session.offline_hours}}"
+                                               step="0.5" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="p-3 rounded bg-success bg-opacity-10 border border-success border-opacity-25 h-100">
+                                    <label class="text-success fw-bold small text-uppercase mb-2 d-block">Trực tuyến
+                                        (Online)</label>
+                                    <textarea class="form-control form-control-sm mb-2" rows="5"
+                                              placeholder="VD: Làm quiz trên LMS...">{{session.online_activity or ''}}</textarea>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-white text-muted">Số giờ</span>
+                                        <input type="number" class="form-control" value="{{session.online_hours or 0}}"
+                                               step="0.5" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="p-3 rounded bg-warning bg-opacity-10 border border-warning border-opacity-25 h-100">
+                                    <label class="text-warning text-dark fw-bold small text-uppercase mb-2 d-block">Tự
+                                        học (Self-study)</label>
+                                    <textarea class="form-control form-control-sm mb-2" rows="5"
+                                              placeholder="VD: Đọc tài liệu tham khảo...">{{session.self_study_activity}}</textarea>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-white text-muted">Số giờ</span>
+                                        <input type="number" class="form-control"
+                                               value="{{session.self_study_hours or 0}}" step="0.5" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4 custom-tag-group" data-color="success">
+                                <label class="form-label text-muted fw-bold small text-uppercase mb-1">
+                                    <i class="fas fa-bullseye me-1"></i> Chuẩn đầu ra (CLOs)
+                                </label>
+
+                                <div class="selected-tags d-flex flex-wrap gap-2 mb-2" style="min-height: 32px;">
+                                </div>
+
+                                <div class="available-tags d-flex flex-wrap gap-2">
+                                    {% for clo in clos %}
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary px-2 py-1 fw-normal add-tag"
+                                            data-value="{{ clo.id }}" onclick="addTag(this)">
+                                        + CLO.{{ loop.index }}
+                                    </button>
+                                    {% endfor %}
+                                </div>
+
+                                <select class="hidden-select select2-clos d-none" multiple>
+                                </select>
+                            </div>
+                            <div class="col-md-4 custom-tag-group">
+                                <label class="form-label text-muted fw-bold small text-uppercase mb-2">
+                                    <i class="fas fa-clipboard-check me-1"></i> Đánh giá (Assessments)
+                                </label>
+                                <div class="selected-tags d-flex flex-wrap gap-2 mb-2" style="min-height: 32px;">
+                                </div>
+                                {% for assessment in assessments %}
+                                {% for method in assessment.assessment_methods %}
+                                <div class="available-tags d-flex flex-wrap gap-2">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary px-2 py-1 fw-normal add-tag"
+                                            data-value="{{method.id}}" onclick="addTag(this)">
+                                        + {{method.name}}
+                                    </button>
+                                </div>
+                                {% endfor %}
+                                {% endfor %}
+                                <select class="hidden-select select2-clos d-none" multiple>
+                                </select>
+                            </div>
+                            <div class="col-md-4 custom-tag-group" data-color="info">
+                                <label class="form-label text-muted fw-bold small text-uppercase mb-1"><i
+                                        class="fas fa-book me-1"></i> Học liệu (Materials)</label>
+                                <div class="selected-tags d-flex flex-wrap gap-2 mb-2" style="min-height: 32px;">
+                                </div>
+                                {% for material in syllabus.learning_materials%}
+                                <div class="available-tags d-flex flex-wrap gap-2">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary px-2 py-1 fw-normal add-tag"
+                                            data-value="{{material.id}}" onclick="addTag(this)">
+                                        + {{material.name}}
+                                    </button>
+                                </div>
+                                {% endfor %}
+                                <select class="hidden-select select2-materials d-none" multiple>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-light border-top d-flex justify-content-end gap-2 py-3">
+                        <button class="btn btn-outline-danger px-3" onclick="deleteSession(this, {{ session.id }})">
+                            <i class="fas fa-trash-alt me-1"></i> Xóa buổi học
+                        </button>
+                        <button class="btn btn-primary px-4 fw-medium" onclick="saveSession(this, {{ session.id }})">
+                            <i class="fas fa-save me-1"></i> Lưu buổi học
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-4 mb-5">
+                <button class="btn btn-outline-primary border-dashed w-100 py-3 fw-bold bg-white"
+                        onclick="addNewSessionCard({{ group.id }})">
+                    <i class="fas fa-plus-circle me-2"></i> THÊM BUỔI HỌC MỚI
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

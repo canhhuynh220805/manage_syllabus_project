@@ -1,3 +1,4 @@
+var hotInstances = {};
 function collectSyllabus(){
     mainSections = []
     document.querySelectorAll('.main-section').forEach(mainDiv =>{
@@ -11,6 +12,7 @@ function collectSyllabus(){
         }
 
         mainDiv.querySelectorAll('.sub-section').forEach(subDiv =>{
+            const subItemId = subDiv.dataset.id;
             const type = subDiv.dataset.type;
             const title = subDiv.querySelector(".label-input");
             const name = title ? title.value : subDiv.dataset.name;
@@ -35,8 +37,7 @@ function collectSyllabus(){
                 subData.reference_code = reference_code
             }
             else if (type == 'table'){
-                const tableEl = subDiv.querySelector('table');
-                const data = extractTableData(tableEl);
+                const data = saveHandsontable(subItemId);
                 subData.data = data;
             }
             mainData.sub_sections.push(subData)
@@ -57,6 +58,7 @@ function save() {
     }
     let data = collectSyllabus();
     data = (JSON.stringify(data));
+    console.log(data)
     fetch('/syllabus/template',{
         method: 'POST',
         body: JSON.stringify({
@@ -77,6 +79,9 @@ function save() {
             }).then(res => res.json()).then(data2 => {
                 if(data2.status == 200) {
                     showToast(data2.msg, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/specialist';
+                    }, 1500);
                 } else {
                     showToast('Lỗi: ' + data2.err_msg, 'danger');
                 }
@@ -132,221 +137,6 @@ function saveDraft(templateId){
         btnDraft.disabled = false;
     });
 }
-    document.addEventListener('DOMContentLoaded', () => {
-    const contextEl = document.getElementById('editor-context');
-    const rawDraft = contextEl.dataset.draft;
-    const serverDraft = (rawDraft && rawDraft !== "null") ? JSON.parse(rawDraft) : null;
-    const isAutoRestore = contextEl.dataset.autoRestore === "true";
-    if (serverDraft) {
-        if (isAutoRestore) {
-            console.log("Auto restoring draft...");
-            restoreDraftData(serverDraft);
-            showToast('Đã tải lại bản nháp cũ', 'info');
-        }
-        else {
-            if (confirm("Phát hiện bản nháp...")) {
-                restoreDraftData(serverDraft);
-            }
-        }
-    }
-});
-
-function restoreDraftData(savedData){
-    savedData.sort((a, b) => a.position - b.position);
-    data = savedData;
-    data.forEach(section =>{
-        const mainDiv = document.querySelector(`.main-section[data-position="${section.position}"]`);
-        const labelName = mainDiv.querySelector(".part-input")
-        if(labelName) labelName.value = section.name;
-        mainDiv.dataset.name = section.name
-        const tbody = mainDiv.querySelector('tbody');
-        tbody.innerHTML = '';
-        const items = section.subSections || []
-        items.forEach(sub_section =>{
-            let row = mainDiv.querySelector(`.sub-section[data-position="${sub_section.position}"]`);
-            if (!row) {
-                restoreCustomRow(tbody, sub_section.type, sub_section);
-                row = tbody.querySelector(`tr[data-position="${sub_section.position}"]`);
-                if (!row) row = tbody.lastElementChild;
-            }
-            else if (row) {
-                tbody.appendChild(row);
-                console.info(tbody)
-                if (sub_section.name) {
-                    const labelInput = row.querySelector('.label-input');
-                    if (labelInput) labelInput.value = sub_section.name;
-                    row.dataset.name = sub_section.name;
-                }
-            }
-        })
-
-        reindexRows(tbody)
-    })
-}
-function restoreCustomRow(triggerEl, type, existingData = null, display_mode = null) {
-    let targetContainer;
-    if (triggerEl.tagName === 'TBODY') {
-        targetContainer = triggerEl;
-    } else {
-        targetContainer = triggerEl.closest('tbody');
-    }
-
-    let displayMode = display_mode;
-    if (existingData && existingData.display_mode) {
-        displayMode = existingData.display_mode;
-    }
-
-    const template = document.getElementById(`tpl-${type}`);
-    if (!template) return;
-    const newRow = template.content.cloneNode(true).querySelector('tr');
-    const tempPos = (existingData && existingData.position)
-                    ? existingData.position
-                    : (targetContainer.children.length + 1);
-    newRow.dataset.position = tempPos;
-    newRow.dataset.code = existingData.code;
-    newRow.dataset.type = type;
-    newRow.dataset.display_mode = displayMode;
-
-    const codeValue = existingData && existingData.code ? existingData.code : '';
-    const codeInputId = `code-${existingData.position}`;
-
-    const codeInputHtml = `
-        <div class="input-group input-group-sm mb-2 ps-4">
-            <span class="input-group-text bg-transparent border-0 text-muted p-0 me-2 small">
-                <small>Mã định danh tiểu mục:</small>
-            </span>
-            <input type="text"
-                   class="form-control form-control-sm border-0 bg-light text-secondary font-monospace py-0 h-auto label-code"
-                   style="font-size: 0.85rem;"
-                   value="${codeValue}"
-                   id="${codeInputId}"
-                   placeholder="VD: subject_name_vi"
-            >
-        </div>
-    `;
-    if (type === 'text') {
-        const contentCell = newRow.lastElementChild;
-        const nameLabel = existingData.name ? existingData.name : 'Tiêu đề mục';
-        const actionButtonsHtml = `
-        <div class="d-flex align-items-center my-2">
-            <div class="dropdown me-1">
-                <button class="btn btn-sm btn-outline-success border-0 dropdown-toggle" type="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-plus-circle"></i> Thêm mục
-                </button>
-                <ul class="dropdown-menu shadow">
-                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="addCustomRow(this, 'text','input')"><i class="fas fa-minus me-2"></i>Text (1 dòng)</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="addCustomRow(this, 'text', 'textarea')"><i class="fas fa-align-justify text-muted me-2"></i> Văn bản (Nhiều dòng)</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="addCustomRow(this, 'selection')"><i class="far fa-check-square me-2"></i>Selection</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="addCustomRow(this, 'table')"><i class="fas fa-table me-2"></i>Table</a></li>
-                </ul>
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-danger border-0"
-                    onclick="removeRow(this)" title="Xóa mục này">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        </div>
-        `;
-        if (displayMode === 'textarea') {
-            contentCell.innerHTML = `
-                    ${codeInputHtml}
-                    <div class="d-flex align-items-center mb-2">
-                        <label class="fw-bold text-dark me-2 mb-0 text-nowrap">
-                            ${tempPos}.
-                        </label>
-                        <input
-                                type="text"
-                                class="form-control label-input"
-                                value="${nameLabel}"
-                                placeholder="Nhập tên tiểu mục"
-                        >
-                    </div>
-                    ${actionButtonsHtml}
-                    <textarea class="form-control mb-2 label-input" rows="4" placeholder="Nhập nội dung chi tiết..."></textarea>
-            `;
-        } else {
-            contentCell.innerHTML = `
-                ${codeInputHtml}
-                <div class="d-flex align-items-center mb-2">
-                    <label class="fw-bold text-dark me-2 mb-0 text-nowrap">
-                    ${tempPos}.
-                    </label>
-                    <input
-                            type="text"
-                            class="form-control label-input"
-                            value="${nameLabel}"
-                            placeholder="Nhập tên tiểu mục"
-                    >
-                </div>
-                ${actionButtonsHtml}
-                <input type="text" class="form-control label-input" placeholder="Nhập nội dung...">
-            `;
-        }
-    }else if (type === 'selection' && existingData) {
-        const rowId = existingData.position;
-
-        const selectGroup = newRow.querySelector('select');
-        const openModalBtn = newRow.querySelector('button[onclick^="openCreateGroupModal"]');
-
-        if (selectGroup) {
-            selectGroup.id = `selection-group-${existingData.attribute_group_id}`;
-            selectGroup.setAttribute('onchange', `updateAttributeGroupForSubSection(this, ${rowId})`);
-
-            if (existingData && existingData.attribute_group_id) {
-                newRow.dataset.groupId = existingData.attribute_group_id;
-                selectGroup.value = existingData.attribute_group_id;
-            }
-        }
-
-        if (openModalBtn) {
-            openModalBtn.setAttribute('onclick', `openCreateGroupModal(${rowId})`);
-        }
-
-        const displayList = newRow.querySelector('[id^="display-list"]');
-        if (displayList) {
-            displayList.id = `display-list-${rowId}`;
-            if (!existingData || !existingData.selected_values || existingData.selected_values.length === 0) {
-                displayList.innerHTML = '<span class="text-muted small fst-italic">Chưa có lựa chọn</span>';
-            }
-        }
-
-        const addTagBtn = newRow.querySelector('button[onclick^="loadOptions"]');
-
-        if (addTagBtn) {
-            const currentGroupId = (existingData && existingData.attribute_group_id) ? existingData.attribute_group_id : '';
-            addTagBtn.setAttribute('onclick', `loadOptions(this, ${rowId}, '${currentGroupId}')`);
-            const parentDiv = addTagBtn.closest('.dropdown') || addTagBtn.parentElement;
-            const dropdownMenu = parentDiv.querySelector('.dropdown-menu');
-            if (dropdownMenu) {
-                dropdownMenu.id = `dropdown-menu-${rowId}`;
-                dropdownMenu.innerHTML = '';
-                dropdownMenu.removeAttribute('data-loaded');
-            }
-        }
-
-        if (existingData && existingData.name) {
-            newRow.dataset.name = existingData.name;
-            const labelInput = newRow.querySelector('.label-input');
-            if (labelInput) labelInput.value = existingData.name;
-            const labelContainer = labelInput.closest('.d-flex');
-            if (labelContainer) {
-                labelContainer.insertAdjacentHTML('afterend', codeInputHtml);
-            }
-        }
-    }
-    else if (type=="reference"){
-        const labelInput = newRow.querySelector('.label-input');
-        if (labelInput) {
-            const labelContainer = labelInput.closest('.d-flex');
-            if (labelContainer) {
-                labelContainer.insertAdjacentHTML('afterend', codeInputHtml);
-            }
-        }
-    }
-
-    targetContainer.appendChild(newRow);
-    return newRow
-}
 
 function createTemplate(){
     showConfirmDialog(
@@ -355,6 +145,15 @@ function createTemplate(){
         const data = collectSyllabus();
     }
     )
+}
+
+function saveTable(btn) {
+    const subSection = btn.closest('.sub-section');
+    if (subSection) {
+        const subItemId = subSection.dataset.id;
+        saveHandsontable(subItemId);
+        showToast('Đã lưu dữ liệu bảng thành công!', 'success');
+    }
 }
 
 function addCustomRow(btn, type, display_mode = null){
@@ -380,7 +179,7 @@ function addCustomRow(btn, type, display_mode = null){
     newRow.dataset.position = "";
     newRow.dataset.name = "";
     newRow.dataset.displayMode = display_mode;
-
+    newRow.dataset.id = tempId;
     currentRow.insertAdjacentElement('afterend', newRow);
     reindexRows(currentRow.closest('tbody'));
     const labelInput = newRow.querySelector('.label-input');
@@ -420,6 +219,22 @@ function addCustomRow(btn, type, display_mode = null){
             }
         }
     }
+    else if (type === 'table') {
+        const container = newRow.querySelector('div[id^="hot-container"]');
+        const dataInput = newRow.querySelector('input[id^="hot-data"]');
+        const saveBtn = newRow.querySelector('button[onclick^="saveHandsontable"]');
+        if (container) container.id = `hot-container-${tempId}`;
+        if (dataInput) {
+            dataInput.id = `hot-data-${tempId}`;
+            dataInput.value = JSON.stringify({ header: ["Cột 1", "Cột 2"], rows: [["", ""]] });
+        }
+
+        if (saveBtn) saveBtn.setAttribute('onclick', `saveHandsontable('${tempId}')`);
+
+        setTimeout(() => {
+            initHandsontable(tempId, true);
+        }, 1000);
+    }
 }
 
 function removeRow(btn) {
@@ -434,6 +249,7 @@ function removeRow(btn) {
         }
     )
 }
+
 function reindexRows(tbody) {
     let index = 1;
     tbody.querySelectorAll('tr.sub-section').forEach(row => {
@@ -445,181 +261,6 @@ function reindexRows(tbody) {
         index++;
     });
 }
-
-function addTableRow(btn){
-    const table = btn.closest('.card-body').querySelector('table');
-    const tbody = table.querySelector('tbody');
-
-    const headerCols = table.querySelectorAll("thead tr th")
-    const colCount = headerCols.length - 1;
-
-    const tr = document.createElement('tr');
-    tr.className = "bg-primary bg-opacity-10";
-
-    let cellsHtml = '';
-    for (let i = 0; i < colCount; i++) {
-        cellsHtml += `
-            <td class="p-0">
-                <textarea rows="1"
-                   class="form-control border-0 bg-transparent fw-bold shadow-none hybrid-textarea"
-                   oninput="resizeHybrid(this)"></textarea>
-            </td>
-        `;
-    }
-    cellsHtml += `
-        <td class="text-center p-0 action-cell">
-            <button type="button" class="btn btn-sm btn-outline-danger border-0 ms-1" onclick="delTableRow(this)">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        </td>
-    `;
-
-    tr.innerHTML = cellsHtml;
-    tbody.appendChild(tr);
-}
-
-function addTableCol(btn){
-    const table = btn.closest('.card-body').querySelector('table');
-    const theadRow = table.querySelector('thead tr');
-    const tbodyRows = table.querySelectorAll('tbody tr');
-
-    const headerCols = table.querySelectorAll("thead tr th")
-    const colCount = headerCols.length - 1;
-
-    const newTh = document.createElement('th');
-    newTh.className = "text-center p-0";
-    newTh.style.width = "1%";
-    newTh.innerHTML = `
-        <div class="d-inline-flex justify-content-center w-100">
-            <textarea rows="1"
-               class="form-control border-0 bg-transparent fw-bold shadow-none hybrid-textarea"
-               oninput="resizeHybrid(this)">Cột ${colCount + 1}</textarea>
-            <button type="button" class="btn btn-sm btn-outline-danger border-0 ms-1"
-                    onclick="delTableCol(this)">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        </div>
-    `
-
-    const actionTh = theadRow.lastElementChild;
-    actionTh.before(newTh);
-
-    tbodyRows.forEach(row => {
-        const newTd = document.createElement('td');
-        newTd.className = "p-0";
-        newTd.innerHTML = `
-            <td class="p-0">
-                <textarea rows="1"
-                   class="form-control border-0 bg-transparent fw-bold shadow-none hybrid-textarea"
-                   oninput="resizeHybrid(this)"></textarea>
-            </td>
-        `;
-        let actionTd = row.querySelector(".action-cell")
-        if(actionTd){
-            actionTd.before(newTd);
-        }
-    });
-}
-
-function saveTable(btn){
-    const cardBody = btn.closest('.card-body');
-    const table = cardBody.querySelector('table');
-    const data = extractTableData(table);
-//    const mainDraftBtn = document.querySelector('button[onclick*="saveDraft"]');
-//    if(mainDraftBtn)
-//        mainDraftBtn.click()
-}
-
-function delTableCol(btn){
-    if (!confirm('Bạn có chắc muốn xóa cột này? Dữ liệu cột sẽ mất hết.')) return;
-
-    const th = btn.closest('th');
-    const table = th.closest('table');
-
-    const columnIndex = th.cellIndex;
-    th.remove();
-
-    const rows = table.querySelectorAll('tbody tr');
-    rows.forEach(r => {
-        if (r.cells[columnIndex]) {
-            r.cells[columnIndex].remove();
-        }
-    })
-}
-
-function delTableRow(btn){
-    if (confirm('Bạn có chắc muốn xóa hàng này?')) {
-        const row = btn.closest('tr');
-        row.remove();
-    }
-}
-
-function resizeHybrid(el) {
-    // -----------------------------------------------------------
-    // PHẦN 1: CHUẨN BỊ THƯỚC ĐO (SPAN)
-    // -----------------------------------------------------------
-    let measureSpan = document.getElementById('hybrid-measure-span');
-    if (!measureSpan) {
-        measureSpan = document.createElement('span');
-        measureSpan.id = 'hybrid-measure-span';
-        measureSpan.style.visibility = 'hidden';
-        measureSpan.style.position = 'absolute';
-        measureSpan.style.whiteSpace = 'pre'; // Đo trên 1 dòng
-        measureSpan.style.top = '-9999px';
-        document.body.appendChild(measureSpan);
-    }
-
-    // Copy font style để đo chính xác
-    const styles = window.getComputedStyle(el);
-    measureSpan.style.fontFamily = styles.fontFamily;
-    measureSpan.style.fontSize = styles.fontSize;
-    measureSpan.style.fontWeight = styles.fontWeight;
-    measureSpan.style.letterSpacing = styles.letterSpacing;
-    measureSpan.style.paddingLeft = styles.paddingLeft;
-    measureSpan.style.paddingRight = styles.paddingRight;
-
-    // Lấy nội dung hiện tại
-    measureSpan.textContent = el.value || el.placeholder || '';
-
-    // -----------------------------------------------------------
-    // PHẦN 2: XỬ LÝ CO GIÃN CHIỀU NGANG (WIDTH)
-    // -----------------------------------------------------------
-    const realWidth = measureSpan.offsetWidth;
-    const MAX_WIDTH = 300;
-    const MIN_WIDTH = 60; // Kích thước tối thiểu
-
-    // Tính toán width mới dựa trên nội dung
-    let targetWidth = realWidth + 10; // +Buffer
-    if (targetWidth > MAX_WIDTH) targetWidth = MAX_WIDTH;
-    if (targetWidth < MIN_WIDTH) targetWidth = MIN_WIDTH;
-
-    // [MẤU CHỐT CO LẠI NGANG]:
-    // Khi bạn xóa chữ -> realWidth giảm -> targetWidth giảm.
-    // Dòng này gán trực tiếp width bé hơn vào -> Textarea lập tức co lại.
-    el.style.minWidth = targetWidth + 'px';
-
-    // -----------------------------------------------------------
-    // PHẦN 3: XỬ LÝ CO GIÃN CHIỀU DỌC (HEIGHT)
-    // -----------------------------------------------------------
-
-    // [MẤU CHỐT CO LẠI DỌC - QUAN TRỌNG NHẤT]:
-    // Bước 1: Phải Reset chiều cao về 'auto' để nó "xẹp" xuống
-    el.style.height = 'auto';
-
-    // Bước 2: Đo lại chiều cao thực tế (lúc này đã xẹp)
-    let newHeight = el.scrollHeight;
-
-    // Bước 3: Gán chiều cao mới
-    el.style.height = newHeight + 'px';
-}
-
-function initHybridTextareas() {
-    document.querySelectorAll('.hybrid-textarea').forEach(el => {
-        el.removeAttribute('style');
-        resizeHybrid(el);
-    });
-}
-document.addEventListener('DOMContentLoaded', initHybridTextareas);
 
 function openCreateGroupModal(subSectionId) {
     document.getElementById('target-sub-section-id').value = subSectionId;
@@ -744,3 +385,154 @@ function extractTableData(table){
         rows: rows
     }
 }
+
+function initHandsontable(subItemId, isEditing){
+    const userInfo = document.getElementById('user-info').value;
+    const container = document.getElementById(`hot-container-${subItemId}`);
+    const dataInput = document.getElementById(`hot-data-${subItemId}`);
+    if(!container || !dataInput) return;
+
+    let rawData = { cornerHeader: "STT", header: ["Cột 1", "Cột 2"], rows: [["1", "1"]] };
+    try {
+        const parsed = JSON.parse(dataInput.value);
+        if (parsed) rawData = parsed;
+        if (!rawData.cornerHeader) rawData.cornerHeader = "STT";
+        if (!rawData.mergeCells) rawData.mergeCells = [];
+    } catch(e) { console.warn("Lỗi parse data table", e); }
+
+    let tableData = [rawData.header].concat(rawData.rows);
+    const hot = new Handsontable(container, {
+        data: tableData,
+        licenseKey: 'non-commercial-and-evaluation',
+        rowHeaders: true,
+        colHeaders: false,
+        mergeCells: rawData.mergeCells.length > 0 ? rawData.mergeCells : true,
+        width: '100%',
+        wordWrap: true,
+        autoRowSize: true,
+        stretchH: 'all',
+        autoWrapRow: true,
+        autoWrapCol: true,
+        readOnly: !isEditing,
+        rowHeights: 40,
+        colWidths: 80,
+        rowHeaderWidth: 60,
+        contextMenu: isEditing ? {
+        items: {
+                "row_above": { name: "Thêm hàng trên", disabled: function() { return this.getSelectedLast()[0] === 0; } },
+                "row_below": { name: "Thêm hàng dưới" },
+                "sp1": { name: "---------" },
+                "col_left": { name: "Thêm cột trái" },
+                "col_right": { name: "Thêm cột phải" },
+                "sp2": { name: "---------" },
+                "remove_row": { name: "Xóa hàng", disabled: function() { return this.getSelectedLast()[0] === 0 || this.countRows() <= 2; } },
+                "remove_col": { name: "Xóa cột", disabled: function() { return this.countCols() <= 1; } },
+                "mergeCells": { name: "Gộp / Bỏ gộp ô" },
+                "sp3": { name: "---------" },
+                "undo": { name: "Hoàn tác" },
+                "redo": { name: "Làm lại" },
+                "alignment": { name: "Căn lề" }
+            }
+        } : false,
+        afterGetRowHeader: function(row, TH) {
+            const cornerText = rawData.cornerHeader || "STT";
+
+            if (row === 0) {
+                if (isEditing) {
+                    TH.innerHTML = `
+                        <input type="text"
+                               id="corner-input-${subItemId}"
+                               value="${cornerText}"
+                               style="min-width: 45px; width: ${cornerText.length + 2}ch; border: none; background: transparent; text-align: center; font-weight: bold; outline: none; padding: 0;"
+                               placeholder="..."
+                               onmousedown="event.stopPropagation()">`;
+                } else {
+                    TH.innerHTML = `<div class="text-center fw-bold w-100">${cornerText}</div>`;
+                }
+            } else {
+                TH.innerHTML = `<div class="text-center w-100">${row}</div>`;
+            }
+        },
+
+        cells(row, col) {
+            const cellProperties = {};
+            if (row === 0) {
+                cellProperties.renderer = function(instance, td, row, col, prop, value, cellProperties) {
+                    Handsontable.renderers.TextRenderer.apply(this, arguments);
+                    td.style.fontWeight = 'bold';
+                    td.style.background = '#e9ecef';
+                    td.style.textAlign = 'center';
+                    td.style.verticalAlign = 'middle';
+                };
+            }
+            return cellProperties;
+        }
+    });
+
+    hotInstances[subItemId] = hot;
+    setTimeout(() => {
+        hot.render();
+    }, 100);
+}
+
+function saveHandsontable(subItemId) {
+    const hot = hotInstances[subItemId];
+    if (!hot) return;
+    const allData = hot.getData();
+    const cornerInput = document.getElementById(`corner-input-${subItemId}`);
+    const cornerHeaderValue = cornerInput ? cornerInput.value : "STT";
+    const newHeader = allData[0];
+    const newRows = allData.slice(1);
+    const mergePlugin = hot.getPlugin('mergeCells');
+    const mergedCellsArray = mergePlugin.mergedCellsCollection.mergedCells.map(item => ({
+        row: item.row,
+        col: item.col,
+        rowspan: item.rowspan,
+        colspan: item.colspan
+    }));
+
+    const formatData = {
+        cornerHeader: cornerHeaderValue,
+        header: hot.getRowHeader(),
+        rows: hot.getData(),
+        mergeCells: mergedCellsArray
+    };
+
+    const hiddenInput = document.getElementById(`hot-data-${subItemId}`);
+    if(hiddenInput) {
+        hiddenInput.value = JSON.stringify(formatData);
+    }
+    return formatData;
+}
+
+function submitTableData(subItemId){
+    const formatData = saveHandsontable(subItemId);
+    if (!formatData) return;
+    fetch(`/table-subsection/${subItemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data_table: formatData })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 200) {
+            showToast(data.msg, "success");
+        } else {
+            showToast(data.err_msg, "danger");
+        }
+    })
+    .catch(err => showToast(err, "danger"));
+}
+function initAllExistingTables() {
+    const tableSections = document.querySelectorAll('.sub-section[data-type*="table" i]');
+    tableSections.forEach(section => {
+        const subItemId = section.dataset.id;
+        if (subItemId && !hotInstances[subItemId]) {
+            initHandsontable(subItemId, true);
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    initAllExistingTables();
+});

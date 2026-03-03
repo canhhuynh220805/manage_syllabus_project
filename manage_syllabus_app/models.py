@@ -1,7 +1,8 @@
 import hashlib
 from datetime import datetime
 from flask_login import UserMixin
-from sqlalchemy import Column, String, Integer, ForeignKey, Text, JSON, Boolean, DateTime, Table, UniqueConstraint, Enum
+from sqlalchemy import Column, String, Integer, ForeignKey, Text, JSON, Boolean, DateTime, Table, UniqueConstraint, \
+    Enum, Float
 from sqlalchemy.orm import relationship, backref
 import enum
 from manage_syllabus_app import db, app
@@ -46,6 +47,23 @@ class TrainingProgramSyllabus(db.Model):
     syllabus_id = Column(Integer, ForeignKey('syllabus.id'), primary_key=True)
 
 
+class MethodCourseLearningOutcome(db.Model):
+    method_id = Column(Integer, ForeignKey('method.id', ondelete='CASCADE'), primary_key=True)
+    clo_id = Column(Integer, ForeignKey('course_learning_outcome.id', ondelete='CASCADE'), primary_key=True)
+
+
+class TeachingSessionCourseLearningOutcome(db.Model):
+    teaching_session_id = Column(Integer, ForeignKey('teaching_session.id', ondelete='CASCADE'), primary_key=True)
+    clo_id = Column(Integer, ForeignKey('course_learning_outcome.id', ondelete='CASCADE'), primary_key=True)
+
+class TeachingSessionAssessment(db.Model):
+    teaching_session_id = Column(Integer, ForeignKey('teaching_session.id', ondelete='CASCADE'), primary_key=True)
+    assessment_id = Column(Integer, ForeignKey('assessment.id', ondelete='CASCADE'), primary_key=True)
+
+class TeachingSessionLearningMaterial(db.Model):
+    teaching_session_id = Column(Integer, ForeignKey('teaching_session.id', ondelete='CASCADE'), primary_key=True)
+    learning_material_id = Column(Integer, ForeignKey('learning_material.id', ondelete='CASCADE'), primary_key=True)
+
 # =============================================================================
 # MODELS CHÍNH
 # =============================================================================
@@ -73,6 +91,11 @@ class Syllabus(BaseModel):
     # Quan hệ N-N (Learning Materials) - Dùng secondary là tên bảng (string)
     learning_materials = relationship('LearningMaterial', secondary='syllabus_learning_material',
                                       backref='syllabuses', lazy=True)
+    assessments = relationship('Assessment', backref='syllabus', lazy=True)
+    teaching_sessions = relationship('TeachingSession', backref='syllabus', lazy=True,
+                                     cascade="all, delete-orphan", order_by="TeachingSession.session_no")
+    start_date_edition = Column(DateTime, default=datetime.now)
+    end_date_edition = Column(DateTime, default=datetime.now)
 
     def to_structure_json(self):
         return {
@@ -86,6 +109,37 @@ class Syllabus(BaseModel):
             'learning_materials': [lm.to_dict() for lm in self.learning_materials]
         }
 
+# =============================================================================
+# CÁC MODEL BÀI ĐÁNH GIÁ...
+# =============================================================================
+
+class Assessment(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    syllabus_id = Column(Integer, ForeignKey(Syllabus.id), nullable=False)
+    type_assessment_id = Column(Integer, ForeignKey('type_assessment.id'), nullable=False)
+    assessment_methods = relationship('Method', backref='assessment', lazy=True, cascade="all, delete-orphan")
+    teaching_sessions = relationship('TeachingSessionAssessment', backref='assessment', lazy=True)
+    def get_total_weight(self):
+        return sum(m.weight for m in self.assessment_methods if m.weight)
+
+
+class TypeAssessment(BaseModel):
+    assessments = relationship('Assessment', backref='type_assessment', lazy=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Method(BaseModel):
+    assessment_id = Column(Integer, ForeignKey('assessment.id', ondelete='CASCADE'), nullable=False)
+    time = Column(Text, nullable=True)
+    weight = Column(Integer, nullable=True)
+    course_learning_outcomes = relationship('MethodCourseLearningOutcome', backref='method', lazy=True,
+                                            cascade="all, delete-orphan")
+
+# =============================================================================
+# CÁC MODEL TIỂU MỤC...
+# =============================================================================
 
 class MainSection(BaseModel):
     code = Column(String(50), nullable=False)
@@ -186,12 +240,14 @@ class ReferenceSubSection(SubSection):
         })
         return data
 
+
 class TableSubSection(SubSection):
     id = Column(Integer, ForeignKey('sub_section.id'), primary_key=True)
     data = Column(JSON, nullable=False)
     __mapper_args__ = {
         'polymorphic_identity': 'table'
     }
+
     def to_dict(self):
         data = super().to_dict()
         data.update({
@@ -270,7 +326,7 @@ class Lecturer(BaseModel):
 class LearningMaterial(BaseModel):
     name = Column(String(100), unique=True)
     type_material_id = Column(Integer, ForeignKey('type_learning_material.id'), nullable=False)
-
+    teaching_sessions = relationship('TeachingSessionLearningMaterial', backref='learning_material', lazy=True)
     def to_dict(self):
         return {
             "id": self.id,
@@ -375,7 +431,7 @@ class CourseObjective(db.Model):
     # Quan hệ N-N với PLO
     programme_learning_outcomes = relationship('ProgrammeLearningOutcome',
                                                secondary='course_objective_programme_learning_outcome',
-                                               backref='course_objectives', lazy=True,passive_deletes=True)
+                                               backref='course_objectives', lazy=True, passive_deletes=True)
 
     def to_dict(self):
         return {
@@ -385,13 +441,15 @@ class CourseObjective(db.Model):
             'clos': [clo.to_dict() for clo in self.course_learning_outcomes],
         }
 
+
 class CourseLearningOutcome(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(Text, nullable=False)
     course_objective_id = Column(Integer, ForeignKey('course_objective.id'))
     # Quan hệ custom association (CLO - PLO - Rating)
     plo_association = relationship('CloPloAssociation', backref='clo', lazy=True, cascade="all, delete-orphan")
-
+    methods = relationship('MethodCourseLearningOutcome', backref="course_learning_outcome")
+    teaching_sessions = relationship('TeachingSessionCourseLearningOutcome', backref='course_learning_outcome')
     def to_dict(self):
         rating = []
         for asso in self.plo_association:
@@ -417,6 +475,35 @@ class CloPloAssociation(db.Model):
     plo_id = Column(Integer, ForeignKey('programme_learning_outcome.id', ondelete='CASCADE'), primary_key=True)
     rating = Column(Integer, nullable=False)
 
+
+# =============================================================================
+# CÁC MODEL KẾ HOẠCH GIẢNG DẠY...
+# =============================================================================
+
+class ScheduleGroup(BaseModel):
+    teaching_sessions = relationship('TeachingSession', backref='schedule_group', lazy=True)
+    def get_total_hours(self):
+        return sum([s.offline_hours + s.online_hours + s.self_study_hours for s in self.teaching_sessions])
+
+class TeachingSession(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    syllabus_id = Column(Integer, ForeignKey('syllabus.id', ondelete='CASCADE'), nullable=False)
+    schedule_group_id = Column(Integer, ForeignKey('schedule_group.id', ondelete='CASCADE'), nullable=False)
+    session_no = Column(Integer, nullable=False)
+    content = Column(Text, nullable=False)
+
+    offline_activity = Column(Text, nullable=True)
+    offline_hours = Column(Float, default=0)
+
+    online_activity = Column(Text, nullable=True)
+    online_hours = Column(Float, default=0)
+
+    self_study_activity = Column(Text, nullable=True)
+    self_study_hours = Column(Float, default=0)
+
+    course_learning_outcomes = relationship('TeachingSessionCourseLearningOutcome', backref='teaching_session', lazy=True, cascade="all, delete-orphan")
+    assessments = relationship('TeachingSessionAssessment', backref='teaching_session', lazy=True, cascade="all, delete-orphan")
+    learning_materials = relationship('TeachingSessionLearningMaterial', backref='teaching_session', lazy=True, cascade="all, delete-orphan")
 
 # =============================================================================
 # USER & ROLE

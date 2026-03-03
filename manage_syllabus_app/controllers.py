@@ -1,5 +1,5 @@
 from datetime import datetime
-import math,json
+import math, json
 
 from manage_syllabus_app import app, dao, login, services
 import functools
@@ -11,7 +11,8 @@ from manage_syllabus_app import db
 from manage_syllabus_app.models import Faculty, Lecturer, Credit, Subject, Syllabus, RequirementSubject, \
     TypeRequirement, MainSection, LearningMaterial, TypeLearningMaterial, TextSubSection, \
     CourseLearningOutcome, CourseObjective, SelectionSubSection, AttributeValue, ProgrammeLearningOutcome, \
-    CloPloAssociation, User, UserRole, AttributeGroup, TemplateSyllabus
+    CloPloAssociation, User, UserRole, AttributeGroup, TemplateSyllabus, TableSubSection, Assessment, Method, \
+    MethodCourseLearningOutcome
 
 
 # CÁC ROUTE GỐC
@@ -71,13 +72,15 @@ def specialist_template_detail(template_id):
     except ValueError as e:
         flash(str(e), "danger")
         return redirect(url_for('specialist_view'))
-
+    type_assessments = dao.get_type_assessments()
+    assessments = dao.get_assessments_by_syllabus(mock_syllabus.id)
     return render_template(
         'specialist/sample_syllabus_view.html',
         syllabus=mock_syllabus,
         is_sample=True,
         all_faculties=[], all_lecturers=[], all_type_learning_materials=[],
-        all_subjects=[], all_type_subjects=[], plos=[],
+        all_subjects=[], all_type_subjects=[], plos=[], type_assessments=type_assessments,
+        assessments=assessments,
     )
 
 
@@ -92,11 +95,18 @@ def syllabus_detail(syllabus_id):
     available_subjects = dao.get_available_require_subjects(syllabus.subject.id)
     plos = dao.get_all_plos()
     sorted_plos = dao.get_sorted_plos_for_syllabus(syllabus_id)
+    type_assessments = dao.get_type_assessments()
+    assessments = dao.get_assessments_by_syllabus(syllabus_id)
+    clos = dao.get_clos_by_subject_id(syllabus.subject_id)
+    schedule_groups = dao.get_schedule_groups()
+    teaching_sessions = dao.get_teaching_sessions(syllabus_id)
     return render_template('syllabus_detail.html', syllabus=syllabus,
                            all_faculties=all_faculties, all_lecturers=all_lecturers,
                            all_type_learning_materials=learning_materials,
                            all_type_subjects=all_type_subjects, all_subjects=available_subjects, plos=plos,
-                           unique_plos=sorted_plos)
+                           unique_plos=sorted_plos, is_editing=False, type_assessments=type_assessments,
+                           assessments=assessments, clos=clos, schedule_groups=schedule_groups,
+                           teaching_sessions=teaching_sessions)
 
 
 # CÁC ROUTE XÁC THỰC
@@ -143,6 +153,7 @@ def user_register():
 def user_logout():
     logout_user()
     return redirect(url_for('user_login'))
+
 
 @app.route('/syllabus/sync-batch-upgrade', methods=['POST'])
 def syllabus_sync_batch_upgrade():
@@ -205,6 +216,7 @@ def syllabus_sync_batch_upgrade():
             'err_msg': str(e)
         })
 
+
 @app.route('/syllabus/create_from_template/<template_id>', methods=['GET'])
 def create_from_template(template_id):
     template_id = template_id
@@ -226,6 +238,7 @@ def create_from_template(template_id):
         )
     except Exception as e:
         raise e
+
 
 @app.route('/syllabus/template', methods=['POST'])
 def create_template():
@@ -256,8 +269,6 @@ def create_template():
             'status': 500,
             "err_msg": str(e)
         })
-
-
 
 
 @app.route('/syllabus/draft/save', methods=['POST'])
@@ -329,6 +340,25 @@ def update_text_subsection(section_id):
         })
 
 
+@app.route('/table-subsection/<int:section_id>', methods=['PATCH'])
+def update_table_subsection(section_id):
+    try:
+        s = TableSubSection.query.get(section_id)
+        data = request.json
+        data_table = data.get('data_table')
+        s.data = data_table
+        db.session.commit()
+        return jsonify({
+            "status": 200,
+            "msg": "Cập nhật thành công"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
 @app.route('/course-objective/<int:co_id>', methods=['PATCH'])
 def update_course_objective(co_id):
     try:
@@ -382,6 +412,7 @@ def update_course_learning_outcome(clo_id):
             "err_msg": str(e)
         })
 
+
 @app.route('/syllabus/<int:syllabus_id>/learning-material', methods=['POST'])
 def add_learning_material(syllabus_id):
     try:
@@ -411,6 +442,7 @@ def add_learning_material(syllabus_id):
             "status": 500,
             "err_msg": str(e)
         })
+
 
 @app.route('/syllabus/<int:syllabus_id>/learning-material/<int:material_id>', methods=['DELETE'])
 def del_learning_material(syllabus_id, material_id):
@@ -494,6 +526,7 @@ def get_attribute_group(group_id):
             "err_msg": str(e)
         })
 
+
 @app.route('/attribute-group', methods=['POST'])
 def add_attribute_group():
     try:
@@ -515,7 +548,7 @@ def add_attribute_group():
 
         ag = AttributeGroup(
             name=name,
-            attribute_values = av
+            attribute_values=av
         )
         db.session.add(ag)
         db.session.commit()
@@ -532,6 +565,7 @@ def add_attribute_group():
             "status": 500,
             "err_msg": str(e)
         })
+
 
 @app.route('/subsection/attribute', methods=['POST'])
 def add_subsection_attribute():
@@ -693,6 +727,7 @@ def delete_requirement_subject(syllabus_id, req_subject_id):
             "err_msg": str(e)
         })
 
+
 @app.route('/course-objective/<int:co_id>/plo', methods=['POST'])
 def add_plo_objective(co_id):
     try:
@@ -712,7 +747,7 @@ def add_plo_objective(co_id):
         else:
             return jsonify({
                 "status": 400,
-                "err_msg":"Thêm thất bại"
+                "err_msg": "Thêm thất bại"
             })
     except Exception as e:
         return jsonify({
@@ -739,13 +774,14 @@ def del_plo_objective(co_id, plo_id):
         else:
             return jsonify({
                 "status": 400,
-                "err_msg":"Xóa thất bại"
+                "err_msg": "Xóa thất bại"
             })
     except Exception as e:
         return jsonify({
             "status": 500,
             "err_msg": str(e)
         })
+
 
 @app.route('/subject/<subject_id>/course-objective', methods=['POST'])
 def add_course_objective(subject_id):
@@ -803,6 +839,7 @@ def del_course_objective(subject_id, co_id):
             "err_msg": str(e)
         })
 
+
 @app.route('/course-objective/<int:co_id>/clo', methods=['POST'])
 def add_course_clo(co_id):
     try:
@@ -831,6 +868,7 @@ def add_course_clo(co_id):
             "err_msg": str(e)
         })
 
+
 @app.route('/course-objective/<int:co_id>/clo/<int:clo_id>', methods=['DELETE'])
 def del_course_clo(co_id, clo_id):
     try:
@@ -858,6 +896,7 @@ def del_course_clo(co_id, clo_id):
             "err_msg": str(e)
         })
 
+
 @app.route('/clo/<int:clo_id>/plo/<int:plo_id>', methods=['PUT'])
 def update_rating(clo_id, plo_id):
     try:
@@ -883,3 +922,106 @@ def update_rating(clo_id, plo_id):
             "status": 500,
             "err_msg": str(e)
         })
+
+
+@app.route('/syllabus/<int:syllabus_id>/assessment/', methods=['POST'])
+def add_syllabus_assessment(syllabus_id):
+    try:
+        s = dao.get_syllabus_by_id(syllabus_id)
+        data = request.json
+        assessment_id = data.get('assessmentId')
+        method_id = data.get('methodId')
+        type_assess_id = data.get('typeAssessId')
+        clo_ids = [int(c) for c in data.get('cloIds', [])]
+
+        is_valid_assessment = dao.is_valid_assessment(
+            assessment_id=assessment_id)  # true nếu có tồn tại false ngược lại
+        is_valid_method = dao.is_valid_method(method_id=method_id)  # true nếu có tồn tại false ngược lại
+
+        if not is_valid_assessment:
+            assessment = Assessment(syllabus_id=s.id, type_assessment_id=type_assess_id)
+            db.session.add(assessment)
+            s.assessments.append(assessment)
+        else:
+            assessment = dao.get_assessment_by_id(assessment_id=assessment_id)
+
+        if not is_valid_method:
+            method = Method(
+                name=data.get('methodName'),
+                time=data.get('methodTime'),
+                weight=data.get('weight')
+            )
+            assessment.assessment_methods.append(method)
+            db.session.add(method)
+        else:
+            method = dao.get_method_by_id(method_id=method_id)
+            method.name = data.get('methodName')
+            method.time = data.get('methodTime')
+            method.weight = data.get('weight')
+
+        for existing_clo in method.course_learning_outcomes:
+            if existing_clo.clo_id not in clo_ids:
+                db.session.delete(existing_clo)
+
+        existing_clo_ids = [c.clo_id for c in method.course_learning_outcomes]
+        for clo_id in clo_ids:
+            if clo_id not in existing_clo_ids:
+                method.course_learning_outcomes.append(MethodCourseLearningOutcome(clo_id=int(clo_id)))
+
+        db.session.commit()
+
+        return jsonify({
+            "status": 200,
+            "msg": "Lưu thành công"
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route("/assessment/<int:assessment_id>/", methods=['DELETE'])
+def delete_assessment(assessment_id):
+    try:
+        assessment = dao.get_assessment_by_id(assessment_id)
+        if not assessment:
+            return jsonify({
+                "status": 400,
+                "err_msg": "Không tìm thấy bài đánh giá cần xóa"
+            })
+
+        db.session.delete(assessment)
+        db.session.commit()
+        return jsonify({
+            "status": 200,
+            "msg": "Xóa thành công"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+
+
+@app.route("/methods/<int:method_id>", methods=['DELETE'])
+def delete_method(method_id):
+    try:
+        method = dao.get_method_by_id(method_id)
+        if not method:
+            return jsonify({"status": 404, "err_msg": "Không tìm thấy phương pháp"})
+
+        db.session.delete(method)
+        db.session.commit()
+        return jsonify({
+            "status": 200,
+            "msg": "Xóa thành công"
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": 500,
+            "err_msg": str(e)
+        })
+

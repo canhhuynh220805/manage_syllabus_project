@@ -589,10 +589,311 @@ function updateRating(clo_id, plo_id){
     });
 }
 
+function addAssessment(typeAssessId, syllabusId){
+    const container = document.getElementById(`assessment-container-${typeAssessId}`);
+    const emptyMsg = document.getElementById(`empty-msg-${typeAssessId}`);
+    const tempId = Date.now();
+    const newAssessmentHTML = `
+        <div class="border rounded p-3 bg-light bg-opacity-50 assessment-item mt-3" id="assessment-${tempId}" data-type-id="${typeAssessId}">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                <h6 class="fw-bold mb-0 text-dark">Bài đánh giá</h6>
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1">
+                            Tổng trọng số: 0%
+                        </span>
+                        <button class="btn btn-sm btn-outline-danger border-0" onclick="this.closest('.assessment-item').remove()">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-sm table-bordered table-hover mb-2 bg-white">
+                <thead class="table-light text-secondary">
+                    <tr>
+                        <th class="text-center align-middle">Phương pháp</th>
+                        <th style="width: 20%;" class="text-center align-middle">Thời gian</th>
+                        <th class="text-center align-middle">CĐR  môn học/CLOS</th>
+                        <th style="width: 20%;" class="text-center align-middle">Trọng số (%)</th>
+                        <th class="text-center align-middle" style="width: 80px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="method-tbody-${tempId}">
+                    <tr>
+                        <td colspan="5" class="text-center text-muted small py-2">Vui lòng thêm phương pháp</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button class="btn btn-sm btn-outline-secondary" onclick="addMethod('${tempId}', '${typeAssessId}', '${syllabusId}')">
+                <i class="fas fa-plus me-1"></i> Thêm phương pháp
+            </button>
+        </div>
+    `;
+
+    if (emptyMsg) emptyMsg.classList.add('d-none');
+    container.insertAdjacentHTML('beforeend', newAssessmentHTML);
+}
+
+function deleteAssessment(assessmentId){
+    showConfirmDialog(
+    "Xác nhận xóa",
+    "Bạn có chắc muốn xóa bài đánh giá này, các phương pháp sẽ bị xóa theo?",
+    function(){
+        fetch(`/assessment/${assessmentId}/`,{
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        }).then(res =>res.json()).then(data =>{
+            if (data.status === 200) {
+                showToast(data.msg, "success");
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showToast(data.err_msg, "danger");
+            }
+        }).catch(err => {
+            console.error(err);
+            showToast("Lỗi kết nối server", "danger");
+        });
+    }
+    )
+}
+
+function addMethod(assessmentId, typeAssessId, syllabusId) {
+    const tbody = document.getElementById(`method-tbody-${assessmentId}`);
+    const tempMethodId = 'method_' + Date.now();
+
+    const emptyRow = tbody.querySelector('td[colspan="5"]');
+    if (emptyRow) {
+        emptyRow.closest('tr').remove();
+    }
+
+    const cloDropdownItems = availableCLOs.map(clo => `
+        <li id="li-method-${tempMethodId}-clo-${clo.id}">
+            <a class="dropdown-item" href="javascript:void(0)"
+               onclick="selectCLO('${tempMethodId}', '${clo.id}', '${clo.name}')">
+               ${clo.name}
+            </a>
+        </li>
+    `).join('');
+
+    const newRowHTML = `
+        <tr class="method-item" id="method-row-${tempMethodId}">
+            <td>
+                <input type="text" class="form-control form-control-sm method-name" placeholder="VD: kiểm tra máy">
+            </td>
+            <td>
+                <input type="text" class="form-control form-control-sm method-time" placeholder="VD: 60 phút, 2 tuần...">
+            </td>
+            <td class="ms-auto align-middle">
+                <div class="d-flex flex-wrap gap-2 mb-2" id="list-clo-${tempMethodId}"></div>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-link text-primary text-decoration-none p-0 small dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-plus me-1"></i>CLO
+                    </button>
+                    <ul class="dropdown-menu shadow-sm">
+                        ${cloDropdownItems}
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <input type="number" class="form-control method-weight" placeholder="0" min="0" max="100">
+                    <span class="input-group-text">%</span>
+                </div>
+            </td>
+            <td class="text-center align-middle" style="width: 100px;">
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 fw-medium" onclick="saveMethod(this, 'null','${assessmentId}', '${typeAssessId}', '${syllabusId}')">
+                        Lưu
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 fw-medium" onclick="deleteMethodRecord(this, 'null')">
+                        Xóa
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+
+    tbody.insertAdjacentHTML('beforeend', newRowHTML);
+}
+
+function saveMethod(btnElement, methodId, assessmentId, typeAssessId, syllabusId) {
+    const tr = btnElement.closest('tr');
+
+    const methodName = tr.querySelector('.method-name').value.trim();
+    const methodTime = tr.querySelector('.method-time').value.trim();
+    const methodWeight = tr.querySelector('.method-weight').value;
+
+    const cloInputs = tr.querySelectorAll('.method-clo-input');
+    const cloIds = Array.from(cloInputs).map(input => input.value);
+
+    if (!methodName || !methodWeight || !methodTime || cloIds.length == 0) {
+        showToast('Vui lòng nhập đầy đủ thông tin', "danger");
+        return;
+    }
+
+    const payload = {
+        syllabusId: syllabusId,
+        assessmentId: assessmentId,
+        typeAssessId: typeAssessId,
+        methodId: methodId,
+        methodName: methodName,
+        methodTime: methodTime,
+        weight: parseInt(methodWeight),
+        cloIds: cloIds
+    };
+
+    fetch(`/syllabus/${syllabusId}/assessment/`,{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).then(res =>res.json()).then(data =>{
+        if (data.status === 200) {
+            showToast(data.msg, "success");
+            setTimeout(() => {
+                location.reload();
+            }, 300);
+        } else {
+            showToast(data.err_msg, "danger");
+        }
+    }).catch(err => {
+        console.error(err);
+        showToast("Lỗi kết nối server", "danger");
+    });
+
+}
+
+function deleteMethodRecord(btnElement, methodId) {
+    const tr = btnElement.closest('tr');
+    if (!methodId || methodId === 'null') {
+        tr.remove();
+        return;
+    }
+
+    fetch(`/methods/${methodId}`,{
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+    }).then(res =>res.json()).then(data =>{
+        if (data.status === 200) {
+            showToast(data.msg, "success");
+            location.reload()
+        } else {
+            showToast(data.err_msg, "danger");
+        }
+    }).catch(err => {
+        console.error(err);
+        showToast("Lỗi kết nối server", "danger");
+    });
+}
+
+function selectCLO(methodId, cloId, cloName) {
+    const listContainer = document.getElementById(`list-clo-${methodId}`);
+
+    if (listContainer.querySelector(`#badge-${methodId}-clo-${cloId}`)) {
+        return;
+    }
+
+    const badgeHTML = `
+        <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success px-3 py-2 d-flex align-items-center"
+              id="badge-${methodId}-clo-${cloId}">
+            ${cloName}
+            <a href="javascript:void(0)" class="ms-2 text-success text-decoration-none fw-bold"
+               onclick="deleteCLO('${methodId}', '${cloId}')">
+                &times;
+            </a>
+
+            <input type="hidden" class="method-clo-input" value="${cloId}">
+        </span>
+    `;
+
+    listContainer.insertAdjacentHTML('beforeend', badgeHTML);
+}
+
+function deleteCLO(methodId, cloId) {
+    const badge = document.getElementById(`badge-${methodId}-clo-${cloId}`);
+    if (badge) {
+        badge.remove();
+    }
+}
+
 
 $(document).ready(function () {
     $('#new-type-learning-material').select2({
         theme: 'bootstrap-5',
         width: '100%'
     });
+    $('.select2-lecturer').select2({
+        theme: 'bootstrap-5',
+        width: '100%'
+    });
+    $('.select2-lecturer').on('change', function() {
+        const syllabusId = $(this).data('syllabus-id');
+        const lecturerId = $(this).val();
+        assignLecturer(syllabusId, lecturerId);
+    });
 });
+
+
+function deleteSession(btn, sessionId){
+
+}
+
+function saveSession(btn, sessionId){
+
+}
+
+function addNewSessionCard(groupId){
+
+}
+
+
+function addTag(btnElement) {
+    const container = btnElement.closest('.custom-tag-group');
+    const selectedArea = container.querySelector('.selected-tags');
+    const hiddenSelect = container.querySelector('.hidden-select');
+
+    const value = btnElement.getAttribute('data-value');
+    const text = btnElement.innerText.replace(/^\+?\s*/, '').trim();
+    const color = container.getAttribute('data-color') || 'primary';
+    const badge = document.createElement('span');
+    badge.className = `badge bg-${color} bg-opacity-10 text-${color} border border-${color} d-inline-flex align-items-center px-2 py-1 fw-normal tag-item text-wrap text-start lh-base`;        badge.setAttribute('data-value', value);
+    badge.innerHTML = `${text} <i class="fas fa-times ms-2 cursor-pointer remove-tag" onclick="removeTag(this)"></i>`;
+    selectedArea.appendChild(badge);
+
+    const option = document.createElement('option');
+    option.value = value;
+    option.text = text;
+    option.selected = true;
+    hiddenSelect.appendChild(option);
+
+    btnElement.remove();
+}
+
+
+function removeTag(iconElement) {
+    const badge = iconElement.closest('.tag-item');
+    const container = badge.closest('.custom-tag-group');
+    const availableArea = container.querySelector('.available-tags');
+    const hiddenSelect = container.querySelector('.hidden-select');
+
+    const value = badge.getAttribute('data-value');
+    const text = badge.childNodes[0].nodeValue.trim();
+
+    const btn = document.createElement('button');
+    btn.type = "button";
+    btn.className = "btn btn-sm btn-outline-secondary px-2 py-1 fw-normal add-tag";
+    btn.setAttribute('data-value', value);
+    btn.setAttribute('onclick', 'addTag(this)');
+    btn.innerText = `+ ${text}`;
+    availableArea.appendChild(btn);
+
+    const option = hiddenSelect.querySelector(`option[value="${value}"]`);
+    if (option) {
+        option.remove();
+    }
+
+    badge.remove();
+}

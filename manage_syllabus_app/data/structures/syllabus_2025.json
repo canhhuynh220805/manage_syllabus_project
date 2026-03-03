@@ -112,6 +112,13 @@
         "position": 6,
         "reference_code": "subject_assessment",
         "code": "subject_assessment"
+      },
+      {
+        "name": "Kế hoạch giảng dạy/Teaching schedule",
+        "type": "reference",
+        "position": 7,
+        "reference_code": "teaching_schedule",
+        "code": "teaching_schedule"
       }
     ]
   }
